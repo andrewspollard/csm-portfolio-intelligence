@@ -14,9 +14,9 @@
   --bg: #f8f9fc; --surface: #ffffff; --surface-alt: #f1f3f8; --border: #e2e6ef;
   --text-primary: #1a1f36; --text-secondary: #5a6178; --text-muted: #8890a6;
   --accent: #4f46e5; --accent-light: #eef2ff;
-  --green: #059669; --green-light: #ecfdf5; --green-bg: #d1fae5;
+  --green: #059669; --green-light: #ecfdf5;
   --yellow: #d97706; --yellow-light: #fffbeb; --yellow-bg: #fef3c7;
-  --red: #dc2626; --red-light: #fef2f2; --red-bg: #fecaca;
+  --red: #dc2626; --red-light: #fef2f2;
   --blue: #2563eb; --blue-light: #eff6ff;
   --purple: #7c3aed; --purple-light: #f5f3ff;
   --radius: 12px; --radius-sm: 8px;
@@ -59,16 +59,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-s
 .engagement-stat { text-align:center; padding:16px; background:var(--surface-alt); border-radius:var(--radius-sm); }
 .engagement-stat .value { font-size:28px; font-weight:700; }
 .engagement-stat .label { font-size:11px; color:var(--text-muted); text-transform:uppercase; margin-top:4px; }
-.signal-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-.signal-card { padding:16px; border-radius:var(--radius-sm); }
-.signal-card h4 { font-size:13px; font-weight:600; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
-.signal-card ul { list-style:none; padding:0; }
-.signal-card li { font-size:13px; color:var(--text-secondary); padding:4px 0 4px 16px; position:relative; }
-.signal-card li:before { content:""; position:absolute; left:0; top:10px; width:6px; height:6px; border-radius:50%; }
-.churn-signals { background:var(--red-light); }
-.churn-signals li:before { background:var(--red); }
-.expansion-signals { background:var(--green-light); }
-.expansion-signals li:before { background:var(--green); }
 .team-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:12px; }
 .team-card { padding:14px 16px; background:var(--surface-alt); border-radius:var(--radius-sm); }
 .team-card .role { font-size:10px; color:var(--accent); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
@@ -91,7 +81,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-s
 @media (max-width:768px) {
   .container { padding:12px; }
   .engagement-grid { grid-template-columns:1fr; }
-  .signal-grid { grid-template-columns:1fr; }
   .header-kpis { grid-template-columns:repeat(2, 1fr); }
   .contract-details { grid-template-columns:1fr; }
 }
@@ -106,7 +95,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-s
   <div class="header-top">
     <div>
       <div class="header-title">Precise Systems, Inc.</div>
-      <div style="margin-top:6px; display:flex; gap:8px; align-items:center;">
+      <div style="margin-top:6px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
         <span class="badge badge-tier">Tier 2</span>
         <span class="badge badge-tier">Enterprise</span>
         <span class="badge" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd;"><i class="fas fa-drafting-compass"></i> Architecture, Engineering & Design</span>
@@ -127,16 +116,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-s
   </div>
 </div>
 
-<!-- EXECUTIVE SYNTHESIS -->
 <div class="section">
   <div class="section-header">
     <div class="section-title"><i class="fas fa-brain"></i> Executive Synthesis</div>
     <span class="source-badge source-composite">Composite</span>
   </div>
-  <div class="synthesis">Precise Systems, Inc. is a 13.6 yr customer generating $155,000 ARR across 1 product in the Architecture, Engineering & Design vertical with 800 employees. Engagement health is moderate at 60%, signaling room for deeper adoption. Account has 1.0 active at-risk alert(s). Next renewal: Feb 2028 (Automatic Renewal). Framed against Greg's priorities: retention of this ARR requires active engagement ownership (#1), expansion signals should be qualified for pipeline (#2), and cross-functional coordination must be lean and accountable (#3).</div>
+  <div class="synthesis">Precise Systems, Inc. is a 13.6 yr customer generating $155,000 ARR across 1 product in the Architecture, Engineering & Design vertical with 800 employees. No Chorus activity detected in the last 30 days, which may indicate communication silence. SFDC engagement is moderate at 60%, signaling room for deeper adoption. Framed against Greg's priorities: retention requires active engagement ownership (#1), expansion signals should be qualified for pipeline (#2), and cross-functional coordination must be lean and accountable (#3).</div>
 </div>
 
-<!-- PRIORITY ACTIONS -->
 <div class="section">
   <div class="section-header">
     <div class="section-title"><i class="fas fa-bolt"></i> Priority Actions</div>
@@ -146,15 +133,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-s
     <div class="priority-item">
       <div class="priority-num">1</div>
       <div class="priority-content">
-        <h4>Active at-risk alert</h4>
-        <p>Address identified risk signal. Monitor engagement and schedule touchpoint.</p>
-        <span class="priority-tag tag-retention">Retention</span>
+        <h4>Re-establish Communication Cadence</h4>
+        <p>No Chorus activity detected in 30 days. Confirm engagement is happening outside tracked channels or schedule touchpoint.</p>
+        <span class="priority-tag tag-retention">Engagement</span>
       </div>
     </div>
     <div class="priority-item">
       <div class="priority-num">2</div>
       <div class="priority-content">
-        <h4>Detractor NPS (6.0)</h4>
+        <h4>Active at-risk alert</h4>
         <p>Address identified risk signal. Monitor engagement and schedule touchpoint.</p>
         <span class="priority-tag tag-retention">Retention</span>
       </div>
@@ -162,42 +149,54 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-s
     <div class="priority-item">
       <div class="priority-num">3</div>
       <div class="priority-content">
+        <h4>Detractor NPS (6.0)</h4>
+        <p>Address identified risk signal. Monitor engagement and schedule touchpoint.</p>
+        <span class="priority-tag tag-retention">Retention</span>
+      </div>
+    </div>
+    <div class="priority-item">
+      <div class="priority-num">4</div>
+      <div class="priority-content">
         <h4>Qualify Expansion Opportunity</h4>
         <p>•Offer Letter in Onboarding. Just went live</p>
         <span class="priority-tag tag-expansion">Expansion</span>
       </div>
     </div>
     <div class="priority-item">
-      <div class="priority-num">4</div>
+      <div class="priority-num">5</div>
       <div class="priority-content">
         <h4>Renewal Preparation</h4>
-        <p>Renewal scheduled for Feb 2028 (Automatic Renewal). Begin prep 90 days prior. Confirm stakeholder alignment and value narrative.</p>
+        <p>Renewal: Feb 2028 (Automatic Renewal). Begin prep 90 days prior. Confirm stakeholder alignment and value narrative.</p>
         <span class="priority-tag tag-retention">Renewal</span>
       </div>
     </div></div>
 </div>
 
-<!-- ENGAGEMENT METRICS -->
 <div class="section">
   <div class="section-header">
     <div class="section-title"><i class="fas fa-chart-line"></i> Engagement Metrics</div>
-    <span class="source-badge source-sfdc">SFDC</span>
+    <span class="source-badge source-chorus">Chorus + SFDC</span>
   </div>
-  <div class="engagement-grid">
-    <div class="engagement-stat">
-      <div class="value" style="color:var(--yellow);">60%</div>
-      <div class="label">SFDC Engagement</div>
+  
+    <div class="engagement-grid">
+      <div class="engagement-stat">
+        <div class="value" style="color:var(--text-muted);">0</div>
+        <div class="label">Emails (30d)</div>
+      </div>
+      <div class="engagement-stat">
+        <div class="value" style="color:var(--text-muted);">0</div>
+        <div class="label">Calls (30d)</div>
+      </div>
+      <div class="engagement-stat">
+        <div class="value" style="color:var(--yellow);">60%</div>
+        <div class="label">SFDC Engagement</div>
+      </div>
     </div>
-    <div class="engagement-stat">
-      <div class="value" style="color:var(--purple);">25%</div>
-      <div class="label">Services Engagement</div>
+    <div style="margin-top:12px; padding:10px 14px; background:var(--yellow-light); border-radius:var(--radius-sm); font-size:12px; color:var(--yellow); display:flex; align-items:center; gap:8px;">
+      <i class="fas fa-exclamation-triangle"></i>
+      <span><strong>No Chorus activity detected in last 30 days.</strong> This may indicate communication silence or activity happening outside tracked channels.</span>
     </div>
-    <div class="engagement-stat">
-      <div class="value" style="color:var(--accent);">312.0</div>
-      <div class="label">Days Since Site Review</div>
-    </div>
-  </div>
-  <div style="margin-top:16px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+  <div style="margin-top:12px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
     <div style="padding:10px 14px; background:var(--surface-alt); border-radius:var(--radius-sm); font-size:12px;">
       <span style="color:var(--text-muted);">Last Site Review:</span> <strong>2025-07-24</strong>
     </div>
@@ -205,14 +204,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-s
       <span style="color:var(--text-muted);">Last Training:</span> <strong>2026-03-19</strong>
     </div>
   </div>
-  <div class="scaffold-notice" style="margin-top:16px; border:1px dashed var(--border);">
-    <i class="fas fa-microphone"></i>
-    <div><strong>Chorus Call/Email Breakdown: Pending</strong></div>
-    <div style="margin-top:4px;">Monthly email + call cadence data will populate once Chorus intelligence is pulled for this account.</div>
-  </div>
 </div>
 
-<!-- PREDICTIVE SIGNALS -->
 <div class="section">
   <div class="section-header">
     <div class="section-title"><i class="fas fa-signal"></i> Predictive Signals</div>
@@ -228,45 +221,23 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-s
     </div>
     <div style="padding:16px; background:var(--surface-alt); border-radius:var(--radius-sm); text-align:center;">
       <div style="font-size:12px; color:var(--text-muted); font-weight:600; text-transform:uppercase;">NPS</div>
-      <div style="font-size:24px; font-weight:700; color:var(--text-primary); margin-top:4px;">6.0</div>
-      <div style="font-size:11px; color:var(--text-muted); margin-top:8px;"></div>
+      <div style="font-size:24px; font-weight:700; margin-top:4px;">6.0</div>
     </div>
   </div>
   <div style="padding:6px 10px; background:var(--red-light); border-radius:var(--radius-sm); font-size:12px; color:var(--red); margin-bottom:4px;"><i class="fas fa-exclamation-triangle"></i> Active at-risk alert</div><div style="padding:6px 10px; background:var(--red-light); border-radius:var(--radius-sm); font-size:12px; color:var(--red); margin-bottom:4px;"><i class="fas fa-exclamation-triangle"></i> Detractor NPS (6.0)</div>
-  <div class="scaffold-notice" style="margin-top:12px;">
-    <i class="fas fa-satellite-dish"></i>
-    <div><strong>Full Signal Analysis: Pending</strong></div>
-    <div style="margin-top:4px;">Churn/expansion signal taxonomy will populate with Chorus + ZoomInfo intelligence pull.</div>
-  </div>
 </div>
 
-<!-- SUPPORT TICKETS -->
-<div class="section">
-  <div class="section-header">
-    <div class="section-title"><i class="fas fa-ticket-alt"></i> Support Tickets</div>
-    <span class="source-badge source-sfdc">SFDC Cases</span>
-  </div>
-  <div class="scaffold-notice">
-    <i class="fas fa-headset"></i>
-    <div><strong>Pending: Support Ticket Pull</strong></div>
-    <div style="margin-top:4px;">Open/closed ticket data, resolution times, and health indicators will populate once SFDC Cases are queried for this account.</div>
-  </div>
-</div>
-
-<!-- MARKET INTELLIGENCE -->
 <div class="section">
   <div class="section-header">
     <div class="section-title"><i class="fas fa-satellite-dish"></i> Market Intelligence</div>
     <span class="source-badge source-zoominfo">ZoomInfo</span>
   </div>
-  <div class="scaffold-notice">
-    <i class="fas fa-binoculars"></i>
-    <div><strong>Pending: ZoomInfo Scoops Pull</strong></div>
-    <div style="margin-top:4px;">Company news, hiring signals, technology adoption, and market movements will populate once ZoomInfo enrichment is run for this account.</div>
-  </div>
+  <div style="padding:16px 20px; background:var(--surface-alt); border-radius:var(--radius-sm); display:flex; align-items:center; gap:12px; color:var(--text-muted); font-size:13px;">
+      <i class="fas fa-info-circle"></i>
+      <div>No ZoomInfo scoops available for this account in the enrichment period.</div>
+    </div>
 </div>
 
-<!-- CONTRACT & COMMERCIAL -->
 <div class="section">
   <div class="section-header">
     <div class="section-title"><i class="fas fa-file-contract"></i> Contract & Commercial</div>
@@ -294,7 +265,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-s
   </div>
 </div>
 
-<!-- COMPETITIVE LANDSCAPE -->
 <div class="section">
   <div class="section-header">
     <div class="section-title"><i class="fas fa-chess"></i> Competitive Landscape</div>
@@ -304,7 +274,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-s
     <div style="margin-top:8px; font-size:11px; color:var(--text-muted);">Source: SFDC competitive fields. No active displacement signals detected.</div>
 </div>
 
-<!-- STRATEGY (from SFDC) -->
 <div class="section">
   <div class="section-header">
     <div class="section-title"><i class="fas fa-chess-king"></i> Account Strategy</div>
@@ -316,44 +285,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-s
   
 </div>
 
-<!-- CS ALIGNMENT -->
-<div class="section">
-  <div class="section-header">
-    <div class="section-title"><i class="fas fa-compass"></i> CS Alignment (Signal Taxonomy)</div>
-    <span class="source-badge source-composite">Blair Framework</span>
-  </div>
-  <div class="scaffold-notice">
-    <i class="fas fa-project-diagram"></i>
-    <div><strong>Pending: Full Signal Mapping</strong></div>
-    <div style="margin-top:4px;">Blair's churn/expansion signal taxonomy will be mapped once Chorus + ZoomInfo intelligence is pulled for this account.</div>
-  </div>
-</div>
-
-<!-- PRODUCT ROADMAP -->
-<div class="section">
-  <div class="section-header">
-    <div class="section-title"><i class="fas fa-road"></i> Product Roadmap</div>
-  </div>
-  <div class="scaffold-notice">
-    <i class="fas fa-plug"></i>
-    <div><strong>Pending: SharePoint Integration</strong></div>
-    <div style="margin-top:4px;">Product roadmap data will populate once the SharePoint connector is configured.</div>
-  </div>
-</div>
-
-<!-- USAGE & ADOPTION -->
-<div class="section">
-  <div class="section-header">
-    <div class="section-title"><i class="fas fa-chart-bar"></i> Usage & Adoption Telemetry</div>
-  </div>
-  <div class="scaffold-notice">
-    <i class="fas fa-database"></i>
-    <div><strong>Pending: Telemetry Data Feed</strong></div>
-    <div style="margin-top:4px;">Usage metrics will populate once the product analytics connector is established. Current proxy: SFDC Engagement = 60%, Services = 25%.</div>
-  </div>
-</div>
-
-<!-- TEAM COVERAGE -->
 <div class="section">
   <div class="section-header">
     <div class="section-title"><i class="fas fa-people-arrows"></i> Rival Team Coverage</div>
@@ -377,9 +308,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-s
     </div></div>
 </div>
 
-<!-- FOOTER -->
 <div class="footer">
-  <div style="margin-bottom:8px;"><i class="fas fa-sync-alt"></i> Last Refresh: June 1, 2026 | Sources: SFDC (base), Chorus/ZoomInfo (pending)</div>
+  <div style="margin-bottom:8px;"><i class="fas fa-sync-alt"></i> Last Refresh: June 1, 2026 | Sources: SFDC, Chorus, ZoomInfo</div>
   <div><a href="../" style="color:var(--accent); text-decoration:none; font-size:12px;"><i class="fas fa-arrow-left"></i> Back to Portfolio Dashboard</a></div>
 </div>
 
@@ -391,13 +321,7 @@ Highcharts.chart('arr-donut', {
   title: { text: 'ARR by Product', style: { fontSize: '13px', fontWeight: '600' } },
   tooltip: { pointFormat: '<b>${point.y:,.0f}</b> ({point.percentage:.1f}%)' },
   accessibility: { enabled: true },
-  plotOptions: {
-    pie: {
-      innerSize: '60%',
-      dataLabels: { enabled: true, format: '{point.name}', style: { fontSize: '11px' } },
-      colors: ['#6b7280']
-    }
-  },
+  plotOptions: { pie: { innerSize: '60%', dataLabels: { enabled: true, format: '{point.name}', style: { fontSize: '11px' } }, colors: ['#6b7280'] } },
   series: [{ name: 'ARR', data: [{ name: 'Other', y: 155000.0 }] }],
   credits: { enabled: false }
 });
