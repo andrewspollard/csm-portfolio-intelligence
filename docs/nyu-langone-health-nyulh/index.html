@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NYU Langone Health (NYULH) | CSM Intelligence Cockpit</title>
+<title>NYU Langone Health (NYULH) | CSM Account Intelligence</title>
 <script src="https://cdn.jsdelivr.net/npm/highcharts@12.1.2/highcharts.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/highcharts@12.1.2/highcharts-more.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/highcharts@12.1.2/modules/solid-gauge.js"></script>
@@ -11,226 +11,710 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 :root {
-  --color-bg: #f8f9fb; --color-bg-secondary: #ffffff; --color-text: #1a1a2e;
-  --color-text-secondary: #44546f; --color-text-muted: #8993a4;
-  --color-border-light: #e8eaed; --color-border: #dfe1e6;
-  --color-primary: #2563eb; --color-primary-light: #eff6ff;
-  --color-success: #16a34a; --color-success-light: #f0fdf4;
-  --color-error: #dc2626; --color-error-light: #fef2f2;
-  --color-warning: #d97706; --color-warning-light: #fffbeb;
+  --color-bg: #f8f9fb;
+  --color-bg-secondary: #ffffff;
+  --color-text: #1a1a2e;
+  --color-text-secondary: #44546f;
+  --color-text-muted: #8993a4;
+  --color-border-light: #e8eaed;
+  --color-border: #dfe1e6;
+  --color-primary: #2563eb;
+  --color-primary-light: #eff6ff;
+  --color-success: #16a34a;
+  --color-success-light: #f0fdf4;
+  --color-error: #dc2626;
+  --color-error-light: #fef2f2;
+  --color-warning: #d97706;
+  --color-warning-light: #fffbeb;
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif;
   --font-mono: 'SF Mono', 'JetBrains Mono', Consolas, monospace;
-  --radius-sm: 6px; --radius-md: 10px;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06); --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.1);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--color-bg); font-family: var(--font-sans); color: var(--color-text); padding: 24px 32px; line-height: 1.5; }
-a { color: var(--color-primary); text-decoration: none; }
-a:hover { text-decoration: underline; }
-.back-link { font-size: 13px; margin-bottom: 20px; display: inline-flex; align-items: center; gap: 6px; }
-.back-link i { font-size: 11px; }
-.header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--color-border-light); }
-.header h1 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
-.header-meta { display: flex; gap: 16px; font-size: 13px; color: var(--color-text-secondary); flex-wrap: wrap; }
-.header-meta span { display: flex; align-items: center; gap: 5px; }
-.tier-badge { display: inline-block; padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; }
-.tier-badge.t1 { background: #dbeafe; color: #1d4ed8; }
-.tier-badge.t2 { background: #e0e7ff; color: #4338ca; }
-.tier-badge.t3 { background: #f1f5f9; color: #475569; }
-.arr-header { font-family: var(--font-mono); font-size: 28px; font-weight: 700; color: var(--color-text); }
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
-.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+body { background: var(--color-bg); font-family: var(--font-sans); color: var(--color-text); line-height: 1.6; padding: 32px; max-width: 1400px; margin: 0 auto; }
+
+/* Navigation */
+.nav-back { display: inline-flex; align-items: center; gap: 6px; color: var(--color-primary); font-size: 13px; font-weight: 500; text-decoration: none; margin-bottom: 24px; padding: 6px 12px; border-radius: var(--radius-sm); transition: background 0.15s; }
+.nav-back:hover { background: var(--color-primary-light); }
+
+/* Header */
+.account-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--color-border-light); }
+.account-header h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+.account-meta { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
+.meta-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--color-text-secondary); background: var(--color-bg); padding: 4px 10px; border-radius: 100px; border: 1px solid var(--color-border-light); }
+.meta-tag i { font-size: 11px; color: var(--color-text-muted); }
+.tier-badge-lg { display: inline-block; padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 700; background: #dbeafe; color: #1d4ed8; }
+.arr-badge { font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--color-text); }
+
+/* Sections */
+.section { margin-bottom: 36px; }
+.section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.section-header h2 { font-size: 16px; font-weight: 700; }
+.section-header .source-badge { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 8px; border-radius: 4px; }
+.source-sfdc { background: #e0f2fe; color: #0369a1; }
+.source-chorus { background: #fae8ff; color: #a21caf; }
+.source-composite { background: #f0fdf4; color: #166534; }
+.source-zi { background: #fef3c7; color: #92400e; }
+
+/* Synthesis */
+.synthesis-card { background: var(--color-bg-secondary); border: 1px solid var(--color-border-light); border-radius: var(--radius-lg); padding: 28px 32px; box-shadow: var(--shadow-md); border-left: 4px solid var(--color-primary); margin-bottom: 32px; }
+.synthesis-card p { font-size: 15px; line-height: 1.8; color: var(--color-text); }
+.synthesis-card .risk-highlight { background: var(--color-error-light); color: var(--color-error); padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 13px; }
+.synthesis-card .positive-highlight { background: var(--color-success-light); color: var(--color-success); padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 13px; }
+
+/* Cards */
 .card { background: var(--color-bg-secondary); border: 1px solid var(--color-border-light); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm); }
-.card h3 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
-.card h3 i { font-size: 12px; color: var(--color-primary); }
-.metric { margin-bottom: 12px; }
-.metric .m-label { font-size: 11px; color: var(--color-text-muted); font-weight: 500; margin-bottom: 2px; }
-.metric .m-value { font-size: 15px; font-weight: 600; color: var(--color-text); }
-.metric .m-value.mono { font-family: var(--font-mono); }
-.team-member { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--color-border-light); }
-.team-member:last-child { border-bottom: none; }
-.tm-role { font-size: 11px; color: var(--color-text-muted); font-weight: 500; }
-.tm-name { font-size: 13px; font-weight: 600; color: var(--color-text); }
-.gauge-row { display: flex; gap: 20px; align-items: center; margin-bottom: 16px; }
-.gauge-container { width: 140px; height: 120px; }
-.gauge-label { font-size: 11px; color: var(--color-text-muted); text-align: center; margin-top: 4px; }
-.disagreement-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; background: var(--color-warning-light); color: var(--color-warning); }
-.risk-section.has-risks .risk-item { background: var(--color-error-light); color: var(--color-error); padding: 10px 14px; border-radius: var(--radius-sm); margin-bottom: 8px; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
-.risk-section.no-risks .risk-item { background: var(--color-success-light); color: var(--color-success); padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
-.strategy-text { font-size: 13px; line-height: 1.7; color: var(--color-text-secondary); white-space: pre-line; }
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.card-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+/* KPI Metrics */
+.metric-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+.metric-item { flex: 1; min-width: 140px; background: var(--color-bg-secondary); border: 1px solid var(--color-border-light); border-radius: var(--radius-sm); padding: 14px; position: relative; }
+.metric-item .label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin-bottom: 6px; }
+.metric-item .value { font-size: 22px; font-weight: 700; font-family: var(--font-mono); }
+.metric-item .sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 4px; }
+
+/* Stakeholder Map */
+.stakeholder-group { margin-bottom: 20px; }
+.stakeholder-group-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-muted); margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--color-border-light); }
+.stakeholder-card { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--color-bg-secondary); border: 1px solid var(--color-border-light); border-radius: var(--radius-sm); margin-bottom: 8px; border-left: 4px solid #e2e8f0; transition: box-shadow 0.15s; }
+.stakeholder-card:hover { box-shadow: var(--shadow-md); }
+.stakeholder-card.active { border-left-color: var(--color-success); }
+.stakeholder-card.warm { border-left-color: var(--color-warning); }
+.stakeholder-card.departing { border-left-color: var(--color-error); }
+.stakeholder-card.cold { border-left-color: #94a3b8; }
+.stakeholder-info { flex: 1; }
+.stakeholder-name { font-weight: 600; font-size: 14px; color: var(--color-text); }
+.stakeholder-title { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
+.stakeholder-badge { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 100px; }
+.badge-active { background: var(--color-success-light); color: var(--color-success); }
+.badge-warm { background: var(--color-warning-light); color: var(--color-warning); }
+.badge-departing { background: var(--color-error-light); color: var(--color-error); }
+.badge-successor { background: #dbeafe; color: #1d4ed8; }
+.stakeholder-last { font-size: 11px; color: var(--color-text-muted); font-family: var(--font-mono); }
+
+/* Risk section */
+.risk-card { border-left-color: var(--color-error); }
+.risk-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--color-border-light); }
+.risk-item:last-child { border-bottom: none; }
+.risk-icon { color: var(--color-error); margin-top: 2px; }
+.risk-text { font-size: 13px; color: var(--color-text); }
+.risk-text .risk-label { font-weight: 600; }
+
+/* Call intelligence */
+.call-card { border-left: 4px solid #a855f7; }
+.call-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.call-date { font-family: var(--font-mono); font-size: 13px; color: var(--color-text-secondary); }
+.call-duration { font-size: 12px; color: var(--color-text-muted); }
+.call-participants { display: flex; gap: 20px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--color-border-light); }
+.call-participants .group { font-size: 12px; }
+.call-participants .group-label { font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; font-size: 10px; letter-spacing: 0.05em; margin-bottom: 4px; }
+.theme-tag { display: inline-block; padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 500; background: #f1f5f9; color: #475569; margin: 3px 4px 3px 0; }
+.action-item { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; font-size: 12px; color: var(--color-text-secondary); }
+.action-item i { color: var(--color-text-muted); margin-top: 2px; font-size: 10px; }
+
+/* Expansion */
+.expansion-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--color-border-light); }
+.expansion-item:last-child { border-bottom: none; }
+.expansion-status { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px; white-space: nowrap; }
+.status-confirmed { background: var(--color-success-light); color: var(--color-success); }
+.status-discussed { background: var(--color-warning-light); color: var(--color-warning); }
+.status-future { background: #f1f5f9; color: #475569; }
+.status-declined { background: var(--color-error-light); color: var(--color-error); }
+
+/* Competitive landscape */
 .comp-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--color-border-light); }
 .comp-row:last-child { border-bottom: none; }
-.comp-label { font-size: 12px; color: var(--color-text-muted); font-weight: 500; }
-.comp-value { font-size: 13px; font-weight: 600; color: var(--color-text); }
-.comp-stale { font-size: 10px; color: var(--color-text-muted); margin-left: 8px; opacity: 0.5; font-style: italic; }
-.comp-row.stale .comp-value { opacity: 0.5; }
+.comp-label { font-size: 12px; font-weight: 600; color: var(--color-text); }
+.comp-value { font-size: 13px; color: var(--color-text-secondary); }
+.comp-stale { font-size: 10px; color: var(--color-text-muted); opacity: 0.6; font-style: italic; }
+.stale-data { opacity: 0.5; }
+
+/* Team coverage */
+.team-member { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--color-border-light); }
+.team-member:last-child { border-bottom: none; }
+.team-role { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); min-width: 80px; }
+.team-name { font-weight: 600; font-size: 14px; color: var(--color-text); }
+.team-note { font-size: 11px; color: var(--color-text-muted); background: #fef3c7; padding: 8px 12px; border-radius: var(--radius-sm); margin-top: 12px; }
+
+/* Tooltips */
+[data-tooltip] { position: relative; cursor: help; }
+[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e293b;
+  color: white;
+  font-size: 11px;
+  line-height: 1.5;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  white-space: pre-wrap;
+  max-width: 320px;
+  min-width: 200px;
+  z-index: 1000;
+  box-shadow: var(--shadow-lg);
+  pointer-events: none;
+  font-weight: 400;
+}
+[data-tooltip]:hover::before {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #1e293b;
+  z-index: 1001;
+}
+
+/* Engagement cadence */
 .cadence-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--color-border-light); }
 .cadence-item:last-child { border-bottom: none; }
-.cadence-label { font-size: 12px; color: var(--color-text-muted); }
-.cadence-value { font-size: 13px; font-weight: 600; font-family: var(--font-mono); }
-.cadence-days { font-size: 11px; color: var(--color-text-muted); margin-left: 8px; }
-.cadence-days.overdue { color: var(--color-error); font-weight: 600; }
-.health-metrics { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 14px; margin-top: 16px; }
-.hm-card { text-align: center; padding: 12px; background: var(--color-bg); border-radius: var(--radius-sm); }
-.hm-card .hm-val { font-size: 18px; font-weight: 700; font-family: var(--font-mono); }
-.hm-card .hm-label { font-size: 10px; color: var(--color-text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
-.products-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.product-tag { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: var(--color-primary-light); color: var(--color-primary); }
-.product-tag.expired { background: #fef2f2; color: #dc2626; opacity: 0.7; }
-.footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--color-border-light); font-size: 11px; color: var(--color-text-muted); text-align: center; }
-[data-tooltip] { position: relative; cursor: help; border-bottom: 1px dotted var(--color-text-muted); }
-[data-tooltip]:hover::after { content: attr(data-tooltip); position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: var(--color-text); color: white; padding: 8px 12px; border-radius: var(--radius-sm); font-size: 11px; font-weight: 400; line-height: 1.5; width: max-content; max-width: 300px; white-space: normal; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-[data-tooltip]:hover::before { content: ''; position: absolute; bottom: calc(100% + 2px); left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: var(--color-text); z-index: 100; }
+.cadence-label { font-size: 13px; color: var(--color-text); }
+.cadence-value { font-family: var(--font-mono); font-size: 13px; }
+.cadence-flag { font-size: 11px; color: var(--color-warning); background: var(--color-warning-light); padding: 3px 8px; border-radius: 4px; margin-top: 8px; }
+
+/* Footer */
+.footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--color-border-light); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--color-text-muted); }
 </style>
 </head>
 <body>
-<a href="../index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to Portfolio</a>
-<div class="header">
+
+<!-- Navigation -->
+<a href="../index.html" class="nav-back"><i class="fa-solid fa-arrow-left"></i> Back to Portfolio</a>
+
+<!-- Header -->
+<div class="account-header">
   <div>
     <h1>NYU Langone Health (NYULH)</h1>
-    <div class="header-meta">
-      <span><i class="fa-solid fa-industry"></i> Colleges & Universities</span>
-      <span><i class="fa-solid fa-users"></i> 19,000 employees</span>
-      <span><i class="fa-solid fa-layer-group"></i> Enterprise</span>
-      <span><i class="fa-solid fa-globe"></i> <a href="https://www.nyumc.org" target="_blank">www.nyumc.org</a></span>
+    <div class="account-meta">
+      <span class="meta-tag"><i class="fa-solid fa-hospital"></i> Colleges & Universities / Healthcare</span>
+      <span class="meta-tag"><i class="fa-solid fa-users"></i> 19,000 employees</span>
+      <span class="meta-tag"><i class="fa-solid fa-globe"></i> <a href="https://www.nyumc.org" target="_blank" style="color:inherit;text-decoration:none;">nyumc.org</a></span>
+      <span class="tier-badge-lg">Tier 1</span>
     </div>
   </div>
   <div style="text-align:right;">
-    <span class="tier-badge t1">Tier 1</span>
-    <div class="arr-header" style="margin-top:8px;">$332,905</div>
-    <div style="font-size:11px;color:var(--color-text-muted);">Annual Recurring Revenue</div>
+    <div class="arr-badge" data-tooltip="Total ARR across all active products.\nSource: SFDC Subscription_ARR_ALL_PRODUCTS__c">$332,905</div>
+    <div style="font-size:12px;color:var(--color-text-muted);margin-top:4px;">Annual Recurring Revenue</div>
   </div>
 </div>
 
-<div class="grid-2">
-  <div class="card">
-    <h3><i class="fa-solid fa-chart-pie"></i> ARR Breakdown</h3>
-    <div id="arr-chart" style="height:220px;"></div>
-    <div style="margin-top:10px;">
-      <div class="metric"><span class="m-label">Active Products</span>
-        <div class="products-row"><span class="product-tag">Recruiting</span><span class="product-tag">Onboarding</span><span class="product-tag">Other</span></div>
+<!-- Executive Synthesis -->
+<div class="synthesis-card">
+  <div class="section-header" style="margin-bottom:12px;">
+    <h2><i class="fa-solid fa-brain" style="color:var(--color-primary);"></i> Executive Synthesis</h2>
+    <span class="source-badge source-composite">Multi-Source</span>
+  </div>
+  <p>
+    NYU Langone Health is a <strong>15.5-year customer</strong> ($333K ARR) running Rival Recruit and Onboarding across their 19,000-employee academic medical center. Engagement is <span class="positive-highlight">healthy</span> (80% SFDC score, monthly call cadence, 99 email touchpoints in last 30 days). 
+    <span class="risk-highlight">PRIMARY RISK</span>: Key contact Camilla Odelius departing mid-June; George Bruno stepping up as successor. Technical debt accumulating (duplicate jobs, name search issues, data purge pending). ROSI AI underutilized, represents expansion/stickiness opportunity. Renewal: March 2027, auto-renewal, 3-year extension.
+  </p>
+</div>
+
+<!-- Section 2: Risk & Renewal Posture -->
+<div class="section">
+  <div class="section-header">
+    <h2><i class="fa-solid fa-shield-halved" style="color:var(--color-error);"></i> Risk & Renewal Posture</h2>
+    <span class="source-badge source-sfdc">SFDC</span>
+  </div>
+  <div class="card-grid-2">
+    <div class="card">
+      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:12px;">Renewal Details</div>
+      <div style="display:grid;gap:10px;">
+        <div class="cadence-item" style="border:none;padding:4px 0;" data-tooltip="Source: SFDC Next_Renewal_Date__c\nAuto-renewal clause in contract">
+          <span class="cadence-label"><i class="fa-solid fa-calendar" style="color:var(--color-primary);margin-right:6px;"></i> Renewal Date</span>
+          <span class="cadence-value" style="color:var(--color-success);font-weight:700;">March 1, 2027</span>
+        </div>
+        <div class="cadence-item" style="border:none;padding:4px 0;">
+          <span class="cadence-label"><i class="fa-solid fa-file-contract" style="color:var(--color-primary);margin-right:6px;"></i> Contract Type</span>
+          <span class="cadence-value">3-Year Extension</span>
+        </div>
+        <div class="cadence-item" style="border:none;padding:4px 0;">
+          <span class="cadence-label"><i class="fa-solid fa-rotate" style="color:var(--color-primary);margin-right:6px;"></i> Renewal Process</span>
+          <span class="cadence-value">Automatic</span>
+        </div>
+        <div class="cadence-item" style="border:none;padding:4px 0;">
+          <span class="cadence-label"><i class="fa-solid fa-clock" style="color:var(--color-primary);margin-right:6px;"></i> Tenure</span>
+          <span class="cadence-value">15.5 years (since Dec 2010)</span>
+        </div>
       </div>
-      <div class="metric"><span class="m-label">Previously Licensed (Expired/Lost)</span>
-        <div class="products-row"><span class="product-tag expired">Onboarding</span><span class="product-tag expired">Talent Center</span><span class="product-tag expired">Recruiting</span><span class="product-tag expired">Integrations</span><span class="product-tag expired">Additional Offerings</span></div>
+    </div>
+    <div class="card risk-card" style="border-left:4px solid var(--color-error);">
+      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-error);margin-bottom:12px;">Active Risks</div>
+      <div class="risk-item">
+        <i class="fa-solid fa-user-minus risk-icon"></i>
+        <div class="risk-text"><span class="risk-label">Contact Departure:</span> Camilla Odelius (primary day-to-day) departing mid-June 2026. George Bruno identified as successor.</div>
+      </div>
+      <div class="risk-item">
+        <i class="fa-solid fa-bug risk-icon"></i>
+        <div class="risk-text"><span class="risk-label">Technical Debt:</span> Duplicate job postings, applicant name search discrepancies, form validation issues requiring escalation.</div>
+      </div>
+      <div class="risk-item">
+        <i class="fa-solid fa-database risk-icon"></i>
+        <div class="risk-text"><span class="risk-label">Pending Project:</span> Data purge project stalled. Needs SOW review + litigation hold exception parameters from NYU.</div>
       </div>
     </div>
   </div>
-  <div class="card">
-    <h3><i class="fa-solid fa-file-contract"></i> Contract Details</h3>
-    <div class="metric"><span class="m-label">Next Renewal</span><div class="m-value mono" data-tooltip="Source: SFDC Next_Renewal_Date__c. Auto-calculated from active subscription contracts.">2027-03-01</div></div>
-    <div class="metric"><span class="m-label">Renewal Process</span><div class="m-value" data-tooltip="Source: SFDC Contract_Renewal_Process__c. Indicates whether contract auto-renews or requires manual negotiation.">Automatic Renewal</div></div>
-    <div class="metric"><span class="m-label">Customer Tenure</span><div class="m-value" data-tooltip="Source: SFDC CSM_Earliest_Contract_Date__c. Calculated as years since first contract start.">15.4 years (since 2010-12-29)</div></div>
-    <div class="metric"><span class="m-label">Active Contracts</span><div class="m-value mono" data-tooltip="Source: SFDC Number_of_Active_Contracts__c. Count of non-expired subscription agreements.">2</div></div>
+  <div class="card" style="margin-top:12px;" data-tooltip="Source: SFDC CSM_Renewal_Strategy__c field">
+    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:8px;">Renewal Strategy (from SFDC)</div>
+    <p style="font-size:13px;color:var(--color-text-secondary);">Working on finalizing the 2024 Renewal, which is a 3-Year extension for ONB and REC. Contract pending signatures. Early Feb 2024. Next Renewal Contract to be discussed at later time. When?</p>
   </div>
 </div>
 
-<div class="grid-3">
-  <div class="card">
-    <h3><i class="fa-solid fa-user-group"></i> Team Coverage</h3>
-    <div class="team-member"><span class="tm-role">Customer Success Manager</span><span class="tm-name">Andrew Pollard</span></div>
-          <div class="team-member"><span class="tm-role">Account Manager</span><span class="tm-name">Kara Sheridan</span></div>
-          <div class="team-member"><span class="tm-role">Enterprise Program Manager</span><span class="tm-name">Elizabeth Affholder</span></div>
-          <div class="team-member"><span class="tm-role">Client Support Specialist</span><span class="tm-name">Kristian Monge</span></div>
+<!-- Section 3: Engagement Health -->
+<div class="section">
+  <div class="section-header">
+    <h2><i class="fa-solid fa-heartbeat" style="color:var(--color-success);"></i> Engagement Health</h2>
+    <span class="source-badge source-sfdc">SFDC</span>
+    <span class="source-badge source-chorus">Chorus</span>
   </div>
-  <div class="card" style="grid-column: span 2;">
-    <h3><i class="fa-solid fa-heart-pulse"></i> Health & Engagement</h3>
-    <div class="gauge-row">
+  <div class="card-grid-2">
+    <div class="card" style="text-align:center;">
+      <div id="gauge-sfdc" style="height:180px;"></div>
+      <div style="font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-top:-10px;" data-tooltip="Source: SFDC Customer_Engagement_Score__c\nCalculated by Salesforce based on product usage and activity metrics.\nRefresh: Weekly recalculation">SFDC Engagement Score</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div id="gauge-composite" style="height:180px;"></div>
+      <div style="font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-top:-10px;" data-tooltip="Composite of Chorus recorded calls, email cadence, support tickets, and login activity.\nWeighted toward recency: last 30 days = 50%, 31-60 = 30%, 61-90 = 20%.\nEstimate based on 99 emails + 1 call in 30 days.\nStatus: Pending full Chorus backfill for precision">Composite Score (Est.)</div>
+    </div>
+  </div>
+  <div class="metric-row" style="margin-top:16px;">
+    <div class="metric-item" data-tooltip="Source: Chorus engagement data\nLast recorded video call: June 1, 2026\nCadence: Monthly meetings established">
+      <div class="label">Call Gap</div>
+      <div class="value" style="color:var(--color-success);">0 days</div>
+      <div class="sub">Last call: Jun 1, 2026 (Monthly cadence)</div>
+    </div>
+    <div class="metric-item" data-tooltip="Source: Chorus email capture\n99 email touchpoints captured in May 2026\nIndicates high operational engagement">
+      <div class="label">Email Cadence (30d)</div>
+      <div class="value" style="color:var(--color-success);">99</div>
+      <div class="sub">Touchpoints in May 2026</div>
+    </div>
+    <div class="metric-item" data-tooltip="Source: SFDC Last_NPS_Sent__c\nSent May 16, 2026. Score: 0 (no response received yet)\nNext NPS scheduled: Oct 15, 2026">
+      <div class="label">NPS</div>
+      <div class="value" style="color:var(--color-text-muted);">--</div>
+      <div class="sub">Sent May 16 (no response yet)</div>
+    </div>
+    <div class="metric-item" data-tooltip="Source: SFDC Services_Engagement_Score_Percent__c\nMeasures utilization of professional services offerings">
+      <div class="label">Services Engagement</div>
+      <div class="value" style="color:var(--color-warning);">50%</div>
+      <div class="sub">Room for services growth</div>
+    </div>
+    <div class="metric-item" data-tooltip="Source: SFDC Account_Sentiments__c\nValues: OPEN, AT RISK, CHAMPION\nOPEN = neutral / no explicit designation">
+      <div class="label">Sentiment</div>
+      <div class="value">OPEN</div>
+      <div class="sub">No explicit risk or champion flag</div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 4: Stakeholder Power Map -->
+<div class="section">
+  <div class="section-header">
+    <h2><i class="fa-solid fa-sitemap" style="color:var(--color-primary);"></i> Stakeholder Power Map</h2>
+    <span class="source-badge source-sfdc">SFDC</span>
+    <span class="source-badge source-chorus">Chorus</span>
+  </div>
+  <div class="card" style="padding:24px;">
+    <!-- Champions -->
+    <div class="stakeholder-group">
+      <div class="stakeholder-group-title"><i class="fa-solid fa-star" style="color:var(--color-warning);margin-right:6px;"></i> Champions (Day-to-Day)</div>
+      <div class="stakeholder-card departing">
+        <div class="stakeholder-info">
+          <div class="stakeholder-name">Camilla Odelius</div>
+          <div class="stakeholder-title">Asst. Director, HR Systems Strategy & HR Onboarding</div>
+        </div>
+        <span class="stakeholder-badge badge-departing">DEPARTING MID-JUNE</span>
+        <span class="stakeholder-last">Jun 1</span>
+      </div>
+      <div class="stakeholder-card active">
+        <div class="stakeholder-info">
+          <div class="stakeholder-name">George Bruno</div>
+          <div class="stakeholder-title">Director, Talent Acquisition - Nursing & MCIT</div>
+        </div>
+        <span class="stakeholder-badge badge-successor">SUCCESSOR</span>
+        <span class="stakeholder-last">Jun 1</span>
+      </div>
+    </div>
+
+    <!-- Executive Sponsors -->
+    <div class="stakeholder-group">
+      <div class="stakeholder-group-title"><i class="fa-solid fa-crown" style="color:var(--color-primary);margin-right:6px;"></i> Executive Sponsors</div>
+      <div class="stakeholder-card active">
+        <div class="stakeholder-info">
+          <div class="stakeholder-name">Venkatesh Ravula</div>
+          <div class="stakeholder-title">Senior Director, Corporate Applications (IT Sponsor)</div>
+        </div>
+        <span class="stakeholder-badge badge-active">ACTIVE</span>
+        <span class="stakeholder-last">May 19</span>
+      </div>
+      <div class="stakeholder-card warm">
+        <div class="stakeholder-info">
+          <div class="stakeholder-name">Carol Musto</div>
+          <div class="stakeholder-title">AVP, Talent Management</div>
+        </div>
+        <span class="stakeholder-badge badge-warm">WARM</span>
+        <span class="stakeholder-last">Feb 11</span>
+      </div>
+      <div class="stakeholder-card warm">
+        <div class="stakeholder-info">
+          <div class="stakeholder-name">Amy James</div>
+          <div class="stakeholder-title">Sr. Director HR Solutions Center & HR Transformation</div>
+        </div>
+        <span class="stakeholder-badge badge-warm">WARM</span>
+        <span class="stakeholder-last">Jan 12</span>
+      </div>
+    </div>
+
+    <!-- Operational Users -->
+    <div class="stakeholder-group">
+      <div class="stakeholder-group-title"><i class="fa-solid fa-user-gear" style="color:var(--color-text-muted);margin-right:6px;"></i> Operational Users</div>
+      <div class="stakeholder-card active">
+        <div class="stakeholder-info">
+          <div class="stakeholder-name">Sandra Santiago</div>
+          <div class="stakeholder-title">Title unknown</div>
+        </div>
+        <span class="stakeholder-badge badge-active">ACTIVE</span>
+        <span class="stakeholder-last">Jun 1</span>
+      </div>
+      <div class="stakeholder-card active">
+        <div class="stakeholder-info">
+          <div class="stakeholder-name">Fabiola Plantin</div>
+          <div class="stakeholder-title">Admin Coordinator</div>
+        </div>
+        <span class="stakeholder-badge badge-active">ACTIVE</span>
+        <span class="stakeholder-last">May 30</span>
+      </div>
+      <div class="stakeholder-card active">
+        <div class="stakeholder-info">
+          <div class="stakeholder-name">Kali Buehner</div>
+          <div class="stakeholder-title">Asst. Director, Ambulatory & Internal Talent Acquisition</div>
+        </div>
+        <span class="stakeholder-badge badge-active">ACTIVE</span>
+        <span class="stakeholder-last">May 28</span>
+      </div>
+      <div class="stakeholder-card active">
+        <div class="stakeholder-info">
+          <div class="stakeholder-name">Jennifer Fierro</div>
+          <div class="stakeholder-title">HRSC Team Leader</div>
+        </div>
+        <span class="stakeholder-badge badge-active">ACTIVE</span>
+        <span class="stakeholder-last">May 23</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 5: Use Case / Pain / Solve / Outcomes -->
+<div class="section">
+  <div class="section-header">
+    <h2><i class="fa-solid fa-bullseye" style="color:var(--color-primary);"></i> Use Case / Pain / Solve / Outcomes</h2>
+    <span class="source-badge source-sfdc">SFDC</span>
+    <span class="source-badge source-chorus">Chorus</span>
+  </div>
+  <div class="card" style="padding:24px;" data-tooltip="Source: SFDC expansion_opportunities + Chorus call context (June 1, 2026 monthly meeting)">
+    <div style="display:grid;gap:20px;">
       <div>
-        <div class="gauge-container" id="sfdc-gauge"></div>
-        <div class="gauge-label" data-tooltip="Source: Salesforce Customer_Engagement_Score__c. Calculated by SFDC based on product usage and activity metrics.">SFDC Score</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-error);margin-bottom:6px;">Pain</div>
+        <p style="font-size:13px;color:var(--color-text-secondary);">19,000-employee academic medical center with massive nursing/clinical hiring volume. Manual recruiting workflows, fragmented onboarding across dozens of departments, compliance complexity in healthcare hiring (I-9, credentialing, background checks at scale).</p>
       </div>
       <div>
-        <div class="gauge-container" id="composite-gauge"></div>
-        <div class="gauge-label" data-tooltip="Composite of Chorus recorded calls, email cadence, support tickets, and login activity. Weighted toward recency (last 30 days = 50%, 31-60 = 30%, 61-90 = 20%).">Composite Score</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-primary);margin-bottom:6px;">Solve</div>
+        <p style="font-size:13px;color:var(--color-text-secondary);">Rival Recruit handles high-volume nursing/clinical TA workflows including job posting, applicant tracking, and candidate communication. Rival Onboarding manages day-one compliance and credentialing paperwork at scale across multiple NYU entities and geographies.</p>
       </div>
-      <div style="padding-left:12px;" id="disagreement-badge"></div>
-    </div>
-    <div class="health-metrics">
-      <div class="hm-card"><div class="hm-val" data-tooltip="Source: SFDC Average_NPS_Score_SFDC__c. Net Promoter Score from most recent NPS survey cycle.">0</div><div class="hm-label">NPS</div></div>
-      <div class="hm-card"><div class="hm-val" data-tooltip="Source: SFDC Services_Engagement_Score_Percent__c. Measures utilization of professional services (site reviews, training, enablement).">50%</div><div class="hm-label">Services Eng.</div></div>
-      <div class="hm-card"><div class="hm-val" data-tooltip="Source: SFDC Account_Sentiments__c. CSM-set qualitative assessment of account relationship health.">OPEN</div><div class="hm-label">Sentiment</div></div>
-      <div class="hm-card"><div class="hm-val" style="color:var(--color-success)" data-tooltip="Source: SFDC Count_of_Active_At_Risk_Alerts__c. Active risk cases flagged in Salesforce.">0</div><div class="hm-label">At-Risk Alerts</div></div>
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-success);margin-bottom:6px;">Outcomes Delivered</div>
+        <p style="font-size:13px;color:var(--color-text-secondary);">Centralized TA workflow for nursing pipeline. Streamlined onboarding compliance across all departments. Self-service candidate experience (help center, localization, automated notifications). Active expansion: 20 additional R/RM licenses added on latest renewal cycle.</p>
+      </div>
     </div>
   </div>
 </div>
 
-<div class="card" style="margin-bottom:24px;">
-  <h3><i class="fa-solid fa-shield-halved"></i> Risk Signals</h3>
-  <div class="risk-section no-risks"><div class="risk-item no-risk"><i class="fa-solid fa-shield-check"></i> No active risk signals</div></div>
+<!-- Section 6: Call Intelligence -->
+<div class="section">
+  <div class="section-header">
+    <h2><i class="fa-solid fa-phone-volume" style="color:#a855f7;"></i> Call Intelligence</h2>
+    <span class="source-badge source-chorus">Chorus</span>
+  </div>
+  <div class="card call-card" style="padding:24px;">
+    <div class="call-header">
+      <div>
+        <div style="font-weight:700;font-size:15px;">NYU Langone / Rival Monthly Meeting</div>
+        <div class="call-date">June 1, 2026</div>
+      </div>
+      <div class="call-duration"><i class="fa-solid fa-clock"></i> 42 min | Video</div>
+    </div>
+    <div class="call-participants">
+      <div class="group">
+        <div class="group-label">Rival</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);">Sean Hoye, Kara Sheridan, Shelly Price, Blair Brandow, Elizabeth Affholder, Kelly Brennan, Michael de los Reyes, Bernard Jackson, Jennifer Madrigal</div>
+      </div>
+      <div class="group">
+        <div class="group-label">NYU</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);">Camilla Odelius, George Bruno</div>
+      </div>
+    </div>
+    <div style="margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:8px;">Key Themes</div>
+      <span class="theme-tag">CSM Transition</span>
+      <span class="theme-tag">Contact Departure</span>
+      <span class="theme-tag">Technical Issues</span>
+      <span class="theme-tag">Data Purge Project</span>
+      <span class="theme-tag">ROSI AI Adoption</span>
+      <span class="theme-tag">Candidate Experience</span>
+      <span class="theme-tag">Roadmap Updates</span>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:8px;">Open Action Items (12)</div>
+      <div class="action-item"><i class="fa-solid fa-circle"></i> Sean Hoye to investigate assessments vendor issues</div>
+      <div class="action-item"><i class="fa-solid fa-circle"></i> Blair Brandow to connect with Sean on assessments resolution</div>
+      <div class="action-item"><i class="fa-solid fa-circle"></i> Sean Hoye to obtain data purge exception details from George Bruno</div>
+      <div class="action-item"><i class="fa-solid fa-circle"></i> Sean Hoye to follow up with Pornema on roadmap timeline</div>
+      <div class="action-item"><i class="fa-solid fa-circle"></i> Blair Brandow to coordinate roadmap follow-up conversation</div>
+      <div class="action-item"><i class="fa-solid fa-circle"></i> Sean Hoye to send updated help center links + product deck</div>
+      <div class="action-item"><i class="fa-solid fa-circle"></i> Michael de los Reyes to confirm 100-application limit with product</div>
+      <div class="action-item"><i class="fa-solid fa-circle"></i> Michael de los Reyes to explore name search delineation solutions</div>
+      <div class="action-item"><i class="fa-solid fa-circle"></i> Michael de los Reyes to discuss auto-purge flagging with product</div>
+      <div class="action-item"><i class="fa-solid fa-circle"></i> Sean + Kelly to schedule ROSI deep dive with recruiter feedback group</div>
+      <div class="action-item"><i class="fa-solid fa-circle"></i> Sean + Kelly to demo new candidate experience matching functionality</div>
+      <div class="action-item"><i class="fa-solid fa-circle"></i> Michael de los Reyes to review Symphony Talent mapping email</div>
+    </div>
+  </div>
 </div>
 
-<div class="grid-2">
-  <div class="card">
-    <h3><i class="fa-solid fa-chess"></i> Renewal Strategy</h3>
-    <div class="strategy-text">Working on finalizing the 2024 Renewal, which is a 3-Year extension for ONB and REC. Contract pending signatures. Early Feb 2024Next Renewal Contract to be discussed at later time. When?</div>
+<!-- Section 7: Expansion Opportunities -->
+<div class="section">
+  <div class="section-header">
+    <h2><i class="fa-solid fa-arrow-up-right-dots" style="color:var(--color-success);"></i> Expansion Opportunities</h2>
+    <span class="source-badge source-sfdc">SFDC</span>
   </div>
-  <div class="card">
-    <h3><i class="fa-solid fa-arrow-up-right-dots"></i> Expansion Opportunities</h3>
-    <div class="strategy-text">Adding 10 (NOW 20) additional R/RM Licenses on this Renewal for the LIC Expansion. Opp: Yes, part of RenewalPotential for ONB/REC Licenses as they continue to grow further in 2024. Opp: Not at this timeManaged Services potential (KellyB new SC) - intro Feb. Opp: Has been discussed !!!Search and OTC - discussed in 2023 but they declined, potential for further discussions later in 2024. Opp:License Overages - will monitor as contract cycle ends</div>
+  <div class="card" data-tooltip="Source: SFDC Expansion_Opportunities__c field\nLast updated by CSM during renewal planning">
+    <div class="expansion-item">
+      <span class="expansion-status status-confirmed">CONFIRMED</span>
+      <div style="font-size:13px;color:var(--color-text);">20 additional R/RM Licenses on current renewal (license expansion)</div>
+    </div>
+    <div class="expansion-item">
+      <span class="expansion-status status-future">FUTURE</span>
+      <div style="font-size:13px;color:var(--color-text);">ONB/REC license growth as NYU continues scaling (monitor headcount)</div>
+    </div>
+    <div class="expansion-item">
+      <span class="expansion-status status-discussed">DISCUSSED</span>
+      <div style="font-size:13px;color:var(--color-text);">Managed Services potential (Kelly Brennan as SC, intro Feb). Has been actively discussed.</div>
+    </div>
+    <div class="expansion-item">
+      <span class="expansion-status status-declined">DECLINED 2023</span>
+      <div style="font-size:13px;color:var(--color-text);">Search and OTC. Declined in 2023, potential for later discussions in 2024+.</div>
+    </div>
+    <div class="expansion-item">
+      <span class="expansion-status status-future">MONITOR</span>
+      <div style="font-size:13px;color:var(--color-text);">License overages. Monitor as contract cycle ends.</div>
+    </div>
   </div>
 </div>
 
-<div class="grid-2" style="margin-top:24px;">
-  <div class="card">
-    <h3><i class="fa-solid fa-triangle-exclamation"></i> Renewal Risks & Competitive Threats</h3>
-    <div class="strategy-text">Known or Suspected? Product Related. Enhancement requests, some issues / tickets for ONB and REC. File "NYU Top 20" - that Sean has maintainedKnown or Suspected? REC SMS. Appears to be canceling REC SMS - meeting with NYU 1/31/24. Issues since started and not using. REC Product AwareKnown or Suspected?  Support Cases. High number. 221 in 2023. So far 15 in 2024 (MS Needed)</div>
+<!-- Section 8: ARR Breakdown -->
+<div class="section">
+  <div class="section-header">
+    <h2><i class="fa-solid fa-chart-pie" style="color:var(--color-primary);"></i> ARR Breakdown</h2>
+    <span class="source-badge source-sfdc">SFDC</span>
+  </div>
+  <div class="card-grid-2">
+    <div class="card">
+      <div id="chart-arr" style="height:250px;" data-tooltip="Source: SFDC Subscription_ARR_* fields\nBreakdown by product line"></div>
+    </div>
+    <div class="card">
+      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:16px;">Product Detail</div>
+      <div class="cadence-item" style="padding:8px 0;">
+        <span class="cadence-label" style="font-weight:600;">Onboarding</span>
+        <span class="cadence-value" style="color:var(--color-text);">$166,049</span>
+      </div>
+      <div class="cadence-item" style="padding:8px 0;">
+        <span class="cadence-label" style="font-weight:600;">Recruiting</span>
+        <span class="cadence-value" style="color:var(--color-text);">$159,506</span>
+      </div>
+      <div class="cadence-item" style="padding:8px 0;">
+        <span class="cadence-label" style="font-weight:600;">Other (Integrations)</span>
+        <span class="cadence-value" style="color:var(--color-text);">$7,350</span>
+      </div>
+      <div style="margin-top:16px;padding-top:12px;border-top:2px solid var(--color-border);">
+        <div class="cadence-item" style="padding:4px 0;border:none;">
+          <span class="cadence-label" style="font-weight:700;font-size:14px;">Total ARR</span>
+          <span class="cadence-value" style="font-size:18px;font-weight:700;color:var(--color-primary);">$332,905</span>
+        </div>
+      </div>
+      <div style="margin-top:16px;">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:8px;">Active Products</div>
+        <span class="theme-tag">Recruiting</span> <span class="theme-tag">Onboarding</span> <span class="theme-tag">Other</span>
+      </div>
+      <div style="margin-top:12px;">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:8px;">Expired / Lost Products</div>
+        <span class="theme-tag" style="opacity:0.5;">Onboarding (prev)</span> <span class="theme-tag" style="opacity:0.5;">Talent Center</span> <span class="theme-tag" style="opacity:0.5;">Recruiting (prev)</span> <span class="theme-tag" style="opacity:0.5;">Integrations</span> <span class="theme-tag" style="opacity:0.5;">Additional Offerings</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 9: Contract & Commercial -->
+<div class="section">
+  <div class="section-header">
+    <h2><i class="fa-solid fa-file-signature" style="color:var(--color-text-secondary);"></i> Contract & Commercial</h2>
+    <span class="source-badge source-sfdc">SFDC</span>
+  </div>
+  <div class="card" data-tooltip="Source: SFDC contract fields\nCSM_Earliest_Contract_Date__c, LastContractStartDate__c, Next_Renewal_Date__c">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
+      <div>
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;color:var(--color-text-muted);margin-bottom:6px;">Customer Since</div>
+        <div style="font-size:14px;font-weight:600;">December 29, 2010</div>
+        <div style="font-size:12px;color:var(--color-text-muted);">15.5 years</div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;color:var(--color-text-muted);margin-bottom:6px;">Last Contract Start</div>
+        <div style="font-size:14px;font-weight:600;">March 1, 2024</div>
+        <div style="font-size:12px;color:var(--color-text-muted);">3-year extension</div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;color:var(--color-text-muted);margin-bottom:6px;">Active Contracts</div>
+        <div style="font-size:14px;font-weight:600;">2</div>
+        <div style="font-size:12px;color:var(--color-text-muted);">Auto-renewal</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 10: Competitive Landscape -->
+<div class="section">
+  <div class="section-header">
+    <h2><i class="fa-solid fa-chess" style="color:var(--color-text-secondary);"></i> Competitive Landscape</h2>
+    <span class="source-badge source-sfdc">SFDC</span>
+  </div>
+  <div class="card stale-data" data-tooltip="Source: SFDC Competitor_* fields\nMost data is ancient or missing.\nRecommend refreshing during next QBR.">
+    <div class="comp-row">
+      <span class="comp-label">ATS Competitor</span>
+      <span class="comp-value">No data</span>
+      <span class="comp-stale">Last updated: Unknown</span>
+    </div>
+    <div class="comp-row">
+      <span class="comp-label">Onboarding Competitor</span>
+      <span class="comp-value">No data</span>
+      <span class="comp-stale">Last updated: Unknown</span>
+    </div>
+    <div class="comp-row">
+      <span class="comp-label">EPM Competitor</span>
+      <span class="comp-value">Other Vendor</span>
+      <span class="comp-stale">Last updated: Jun 2018 (8 years stale)</span>
+    </div>
+    <div class="comp-row">
+      <span class="comp-label">HRIS Vendor</span>
+      <span class="comp-value">No data</span>
+      <span class="comp-stale">Last updated: Unknown</span>
+    </div>
+  </div>
+</div>
+
+<!-- Section 11: Team Coverage -->
+<div class="section">
+  <div class="section-header">
+    <h2><i class="fa-solid fa-people-group" style="color:var(--color-primary);"></i> Rival Coverage Team</h2>
+    <span class="source-badge source-sfdc">SFDC</span>
   </div>
   <div class="card">
-    <h3><i class="fa-solid fa-calendar-check"></i> Engagement Cadence</h3>
+    <div class="team-member">
+      <span class="team-role">CSM</span>
+      <span class="team-name">Andrew Pollard</span>
+    </div>
+    <div class="team-member">
+      <span class="team-role">AM</span>
+      <span class="team-name">Kara Sheridan</span>
+    </div>
+    <div class="team-member">
+      <span class="team-role">EPM</span>
+      <span class="team-name">Elizabeth Affholder</span>
+    </div>
+    <div class="team-member">
+      <span class="team-role">Support</span>
+      <span class="team-name">Kristian Monge</span>
+    </div>
+    <div class="team-note">
+      <i class="fa-solid fa-triangle-exclamation" style="color:var(--color-warning);margin-right:6px;"></i>
+      <strong>Note:</strong> Previous CSM: Bernard Jackson (transitioned off). Chorus (June 1) shows Sean Hoye introduced as new CSM. Verify alignment with Andrew Pollard assignment.
+    </div>
+  </div>
+</div>
+
+<!-- Section 12: Engagement Cadence -->
+<div class="section">
+  <div class="section-header">
+    <h2><i class="fa-solid fa-clock-rotate-left" style="color:var(--color-text-secondary);"></i> Engagement Cadence</h2>
+    <span class="source-badge source-sfdc">SFDC</span>
+    <span class="source-badge source-chorus">Chorus</span>
+  </div>
+  <div class="card">
     <div class="cadence-item">
-      <span class="cadence-label" data-tooltip="Source: SFDC Last_Engagement_Date__c. Date of last meaningful customer interaction logged.">Last Engagement</span>
-      <span><span class="cadence-value">2023-11-13</span></span>
+      <span class="cadence-label">Last Site Review</span>
+      <span class="cadence-value" style="color:var(--color-text-muted);">Not recorded</span>
     </div>
     <div class="cadence-item">
-      <span class="cadence-label" data-tooltip="Source: SFDC Last_Site_Review_Date__c. Date of last formal site review / health check meeting.">Last Site Review</span>
-      <span><span class="cadence-value">2025-10-03</span><span class="cadence-days overdue">241d ago</span></span>
+      <span class="cadence-label">Last Training / Enablement</span>
+      <span class="cadence-value" style="color:var(--color-text-muted);">Not recorded</span>
     </div>
     <div class="cadence-item">
-      <span class="cadence-label" data-tooltip="Source: SFDC Last_Training_Enablement_Date__c. Date of last training or enablement session delivered.">Last Training/Enablement</span>
-      <span><span class="cadence-value">2026-04-16</span><span class="cadence-days">46d ago</span></span>
+      <span class="cadence-label">Last Engagement Date (SFDC)</span>
+      <span class="cadence-value" style="color:var(--color-warning);">Nov 13, 2023</span>
+    </div>
+    <div class="cadence-flag">
+      <i class="fa-solid fa-triangle-exclamation" style="margin-right:4px;"></i>
+      SFDC Last_Engagement_Date is stale. Chorus confirms active monthly cadence through June 2026. Field needs manual update.
     </div>
   </div>
 </div>
 
-<div class="card" style="margin-top:24px;">
-  <h3><i class="fa-solid fa-crosshairs"></i> Competitive Landscape</h3>
-  <div class="comp-row stale"><span class="comp-label">ATS / Recruiting</span><span class="comp-value">SilkRoad Recruiting<span class="comp-stale">Last updated: Unknown</span></span></div>
-  <div class="comp-row stale"><span class="comp-label">Onboarding</span><span class="comp-value">SilkRoad Onboarding<span class="comp-stale">Last updated: Unknown</span></span></div>
-  <div class="comp-row stale"><span class="comp-label">Performance Mgmt</span><span class="comp-value">Other Vendor<span class="comp-stale">Last updated: Unknown</span></span></div>
-  <div class="comp-row stale"><span class="comp-label">HRIS</span><span class="comp-value">PeopleSoft<span class="comp-stale">Last updated: Unknown</span></span></div>
+<!-- Footer -->
+<div class="footer">
+  <div>Last refreshed: June 1, 2026 | Refresh: Weekly (Mon) + event-driven</div>
+  <a href="../index.html" style="color:var(--color-primary);text-decoration:none;font-weight:500;"><i class="fa-solid fa-arrow-left" style="margin-right:4px;"></i> Back to Portfolio</a>
 </div>
 
-<div class="footer">Last refreshed: June 1, 2026 | Refresh: Weekly (Mon) + event-driven | Data sources: Salesforce, Chorus (pending), ZoomInfo (pending)</div>
-
+<!-- Scripts -->
 <script>
-Highcharts.chart('sfdc-gauge', {
-  chart: { type: 'solidgauge', backgroundColor: 'transparent', margin: [0,0,0,0] },
+// Engagement Gauges
+Highcharts.chart('gauge-sfdc', {
+  chart: { type: 'solidgauge', backgroundColor: 'transparent', height: 180 },
   title: null,
-  pane: { startAngle: -130, endAngle: 130, size: '100%', background: { backgroundColor: '#e8eaed', innerRadius: '75%', outerRadius: '100%', shape: 'arc', borderWidth: 0 } },
-  yAxis: { min: 0, max: 100, lineWidth: 0, tickWidth: 0, minorTickLength: 0, labels: { enabled: false }, stops: [[0.3, '#dc2626'], [0.5, '#d97706'], [0.7, '#16a34a']] },
-  plotOptions: { solidgauge: { dataLabels: { y: -20, borderWidth: 0, style: { fontSize: '16px', fontFamily: 'SF Mono, Consolas, monospace', fontWeight: '700' }, format: '{y}%' }, rounded: true } },
-  series: [{ name: 'SFDC', data: [80], innerRadius: '75%' }],
+  pane: { center: ['50%', '70%'], size: '120%', startAngle: -90, endAngle: 90, background: { backgroundColor: '#f1f5f9', innerRadius: '60%', outerRadius: '100%', shape: 'arc', borderWidth: 0 } },
+  yAxis: { min: 0, max: 100, stops: [[0.3, '#dc2626'], [0.6, '#d97706'], [0.8, '#16a34a']], lineWidth: 0, tickWidth: 0, minorTickInterval: null, labels: { enabled: false } },
+  series: [{ name: 'SFDC Score', data: [80], dataLabels: { format: '<div style="text-align:center"><span style="font-size:28px;font-weight:700;color:#1a1a2e">{y}%</span></div>', borderWidth: 0, y: -20 }, innerRadius: '60%', radius: '100%' }],
   tooltip: { enabled: false },
-  credits: { enabled: false }
+  credits: { enabled: false },
 });
-Highcharts.chart('composite-gauge', {
-  chart: { type: 'solidgauge', backgroundColor: 'transparent', margin: [0,0,0,0] },
+
+Highcharts.chart('gauge-composite', {
+  chart: { type: 'solidgauge', backgroundColor: 'transparent', height: 180 },
   title: null,
-  pane: { startAngle: -130, endAngle: 130, size: '100%', background: { backgroundColor: '#e8eaed', innerRadius: '75%', outerRadius: '100%', shape: 'arc', borderWidth: 0 } },
-  yAxis: { min: 0, max: 100, lineWidth: 0, tickWidth: 0, minorTickLength: 0, labels: { enabled: false } },
-  plotOptions: { solidgauge: { dataLabels: { y: -20, borderWidth: 0, style: { fontSize: '12px', color: '#8993a4' }, format: 'Pending' }, rounded: true } },
-  series: [{ name: 'Composite', data: [0], color: '#dfe1e6', innerRadius: '75%' }],
+  pane: { center: ['50%', '70%'], size: '120%', startAngle: -90, endAngle: 90, background: { backgroundColor: '#f1f5f9', innerRadius: '60%', outerRadius: '100%', shape: 'arc', borderWidth: 0 } },
+  yAxis: { min: 0, max: 100, stops: [[0.3, '#dc2626'], [0.6, '#d97706'], [0.8, '#16a34a']], lineWidth: 0, tickWidth: 0, minorTickInterval: null, labels: { enabled: false } },
+  series: [{ name: 'Composite', data: [85], dataLabels: { format: '<div style="text-align:center"><span style="font-size:28px;font-weight:700;color:#1a1a2e">~85%</span><br><span style="font-size:10px;color:#8993a4">Est. pending backfill</span></div>', borderWidth: 0, y: -20 }, innerRadius: '60%', radius: '100%' }],
   tooltip: { enabled: false },
-  credits: { enabled: false }
+  credits: { enabled: false },
 });
-Highcharts.chart('arr-chart', {
+
+// ARR Donut
+Highcharts.chart('chart-arr', {
   chart: { type: 'pie', backgroundColor: 'transparent' },
   title: { text: null },
   tooltip: { pointFormat: '<b>${point.y:,.0f}</b> ({point.percentage:.1f}%)' },
   plotOptions: { pie: { innerSize: '55%', dataLabels: { enabled: true, format: '{point.name}<br>${point.y:,.0f}', style: { fontSize: '11px', color: '#44546f' } } } },
   colors: ['#2563eb', '#16a34a', '#64748b'],
-  series: [{ name: 'ARR', data: [{ name: 'Onboarding', y: 166049.1 }, { name: 'Recruiting', y: 159505.5 }, { name: 'Other', y: 7350.0 }] }],
-  credits: { enabled: false }
+  series: [{ name: 'ARR', data: [{ name: 'Onboarding', y: 166049 }, { name: 'Recruiting', y: 159506 }, { name: 'Other', y: 7350 }] }],
+  credits: { enabled: false },
 });
 </script>
 </body>
