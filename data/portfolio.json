@@ -1,0 +1,1110 @@
+{
+  "portfolio_owner": {
+    "name": "Andrew Pollard",
+    "role": "Customer Success Manager",
+    "email": "Andrew.Pollard@rival-hr.com"
+  },
+  "team": {
+    "am": {
+      "name": "Kara Sheridan",
+      "role": "Enterprise Account Manager",
+      "email": "kara.sheridan@rival-hr.com"
+    },
+    "epm": {
+      "name": "Elizabeth Affholder",
+      "role": "Enterprise Program Manager",
+      "email": "elizabeth.affholder@rival-hr.com"
+    },
+    "support_primary": {
+      "name": "Kristian Monge",
+      "role": "Client Support Specialist",
+      "email": "kristian.monge@rival-hr.com"
+    },
+    "support_secondary": {
+      "name": "Hazel Laude",
+      "role": "Sr Technical Support Specialist",
+      "email": "hazel.laude@rival-hr.com"
+    },
+    "sc": {
+      "name": "Bill McGuire",
+      "role": "Sr Solution Engineer",
+      "email": "bill.mcguire@rival-hr.com"
+    },
+    "services": {
+      "name": "Randy Havel",
+      "role": "Senior Services Consultant",
+      "email": "randy.havel@rival-hr.com"
+    }
+  },
+  "summary": {
+    "total_accounts": 16,
+    "total_arr": 2091688.87,
+    "arr_by_product": {
+      "onboarding": 856017.12,
+      "recruiting": 315368.83,
+      "performance": 308584.01,
+      "learning": 281874.01,
+      "managed_services": 126076.95,
+      "other": 203767.95
+    },
+    "renewals_2026": [
+      {
+        "account": "GroupM",
+        "date": "2026-08-04",
+        "arr": 314000.0
+      },
+      {
+        "account": "Public Health Management Corporation",
+        "date": "2026-10-30",
+        "arr": 111328.98
+      },
+      {
+        "account": "Tri Pointe Homes",
+        "date": "2026-12-01",
+        "arr": 89245.92
+      },
+      {
+        "account": "Viejas Casino & Resort",
+        "date": "2026-09-01",
+        "arr": 77334.85
+      }
+    ],
+    "at_risk_count": 4
+  },
+  "accounts": [
+    {
+      "id": "0016000000ItrYZAAZ",
+      "name": "NYU Langone Health (NYULH)",
+      "slug": "nyu-langone-health-nyulh",
+      "type": "Customer",
+      "industry": "Colleges & Universities",
+      "employees": 19000,
+      "tier": "Tier 1",
+      "segment": "Enterprise",
+      "website": "www.nyumc.org",
+      "arr": {
+        "total": 332904.6,
+        "performance": 0,
+        "recruiting": 159505.5,
+        "onboarding": 166049.1,
+        "learning": 0,
+        "managed_services": 0,
+        "other": 7350.0
+      },
+      "products": {
+        "active": "Recruiting, Onboarding, Other",
+        "expired": "Onboarding, Talent Center, Recruiting, Integrations, Additional Offerings"
+      },
+      "contract": {
+        "next_renewal": "2027-03-01",
+        "renewal_process": "Automatic Renewal",
+        "last_start": "2024-03-01",
+        "earliest": "2010-12-29",
+        "active_count": 2.0
+      },
+      "health": {
+        "sentiment": "OPEN",
+        "engagement_score": 80.0,
+        "services_engagement": 50.0,
+        "nps": 0,
+        "last_nps_sent": "2026-05-16",
+        "at_risk_alerts": 0,
+        "risk_signals": []
+      },
+      "strategy": {
+        "renewal_strategy": "<p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Working on finalizing the 2024 Renewal, which is a 3-Year extension for ONB and REC.\u00a0Contract pending signatures. Early Feb 2024</span></p><p><br></p><p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Next Renewal Contract to be discussed at later time. When?</span></p>",
+        "expansion_opportunities": "<p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Adding 10 </span><strong style=\"color: black; font-family: Inter; font-size: 10pt;\">(</strong><strong style=\"color: red; font-family: Inter; font-size: 10pt;\">NOW 20</strong><strong style=\"color: black; font-family: Inter; font-size: 10pt;\">) </strong><span style=\"color: black; font-family: Inter; font-size: 10pt;\">additional R/RM Licenses on </span><strong style=\"color: black; font-family: Inter; font-size: 10pt;\">this</strong><span style=\"color: black; font-family: Inter; font-size: 10pt;\"> Renewal for the LIC Expansion. Opp: Yes, part of Renewal</span></p><p><br></p><p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Potential for ONB/REC Licenses as they continue to grow further in 2024. Opp: Not at this time</span></p><p><br></p><p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Managed Services potential (KellyB new SC) \u2013 intro Feb. Opp: Has been discussed !!!</span></p><p><br></p><p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Search and OTC \u2013 discussed in 2023 but they declined, potential for further discussions later in 2024. Opp:</span></p><p><br></p><p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">License Overages - will monitor as contract cycle ends</span></p>",
+        "renewal_risks": "<p>Known or Suspected? <span style=\"color: black; font-family: Inter; font-size: 10pt;\">Product Related. Enhancement requests, some issues / tickets for ONB and REC. File \u201cNYU Top 20\u201d \u2013 that Sean has maintained</span></p><p><br></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgb(68, 68, 68);\">Known or Suspected? </span><span style=\"color: black; font-family: Inter; font-size: 10pt;\">REC SMS. Appears to be canceling REC SMS \u2013 meeting with NYU 1/31/24.\u00a0Issues since started and not using.\u00a0REC Product Aware</span></p><p><br></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgb(68, 68, 68);\">Known or Suspected?  </span><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Support Cases. High number.\u00a0</span><strong style=\"color: black; font-family: Inter; font-size: 10pt;\">221</strong><span style=\"color: black; font-family: Inter; font-size: 10pt;\"> in 2023.\u00a0So far 15 in 2024\u00a0</span><strong style=\"color: black; font-family: Inter; font-size: 10pt;\">(MS Needed)</strong></p>"
+      },
+      "team": {
+        "csm": "Andrew Pollard",
+        "am": "Kara Sheridan",
+        "epm": "Elizabeth Affholder",
+        "support": "Kristian Monge"
+      },
+      "engagement": {
+        "last_engagement_date": "2023-11-13",
+        "last_site_review": "2025-10-03",
+        "days_since_site_review": 241.0,
+        "last_training": "2026-04-16",
+        "days_since_training": 46.0
+      },
+      "competitors": {
+        "ats": "SilkRoad Recruiting",
+        "onboarding": "SilkRoad Onboarding",
+        "epm": "Other Vendor",
+        "hris": "PeopleSoft"
+      }
+    },
+    {
+      "id": "0016000000Iu3CrAAJ",
+      "name": "GroupM",
+      "slug": "groupm",
+      "type": "Customer",
+      "industry": "Advertising & Marketing",
+      "employees": 42000,
+      "tier": "Tier 1",
+      "segment": "Enterprise",
+      "website": "www.groupm.com",
+      "arr": {
+        "total": 314000.0,
+        "performance": 0,
+        "recruiting": 0,
+        "onboarding": 314000.0,
+        "learning": 0,
+        "managed_services": 0,
+        "other": 0
+      },
+      "products": {
+        "active": "Onboarding, Other",
+        "expired": "Integrations, Onboarding"
+      },
+      "contract": {
+        "next_renewal": "2026-08-04",
+        "renewal_process": "Automatic Renewal",
+        "last_start": "2024-08-04",
+        "earliest": "2010-06-17",
+        "active_count": 2.0
+      },
+      "health": {
+        "sentiment": "OPEN",
+        "engagement_score": 100.0,
+        "services_engagement": 100.0,
+        "nps": 0,
+        "last_nps_sent": "2026-04-17",
+        "at_risk_alerts": 0,
+        "risk_signals": []
+      },
+      "strategy": {
+        "renewal_strategy": "<p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Current Renewal Date of 8/4.\u00a0Will begin discussions in Q2 while also monitoring License Compliance. Close by end of Q2 with License Monitoring</span></p><p><br></p><p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Will also make hard sell for Managed Services as part of next Renewal while mentioning this during year. 2024 Renewal (8/4)</span></p>",
+        "expansion_opportunities": "<p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Onboarding Portal and License Expansion. Opp: Yes</span></p><p><br></p><p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Managed Services Hours (based on Support Cases) Adam and John will PUSH hard for MS Hours !!! Opp: No, but WILL be 2024 !</span></p><p><br></p><p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Global Opportunities \u2013 Figure a way to be involved. Determine in 2024</span></p>",
+        "renewal_risks": "<p>Known: <span style=\"color: black; font-family: Inter; font-size: 10pt;\">Many, Many Support Cases in 2023/2024. Support Case Amounts:\u00a02023) 82\u00a0\u00a02024) 9</span></p>"
+      },
+      "team": {
+        "csm": "Andrew Pollard",
+        "am": "Kara Sheridan",
+        "epm": "Elizabeth Affholder",
+        "support": "Kristian Monge",
+        "services": "Randy Havel"
+      },
+      "engagement": {
+        "last_engagement_date": "2023-11-08",
+        "last_site_review": "2026-05-12",
+        "days_since_site_review": 20.0,
+        "last_training": "2026-05-05",
+        "days_since_training": 27.0
+      },
+      "competitors": {
+        "ats": "Jobvite",
+        "onboarding": "SilkRoad Onboarding",
+        "epm": "Cornerstone",
+        "hris": "ADP"
+      }
+    },
+    {
+      "id": "0016000000ItthZAAR",
+      "name": "The Cleveland Clinic Foundation",
+      "slug": "the-cleveland-clinic-foundation",
+      "type": "Customer",
+      "industry": "Medical & Surgical Hospitals",
+      "employees": 48000,
+      "tier": "Tier 1",
+      "segment": "Enterprise",
+      "website": "https://my.clevelandclinic.org/",
+      "arr": {
+        "total": 282575.65,
+        "performance": 0,
+        "recruiting": 0,
+        "onboarding": 198031.68,
+        "learning": 0,
+        "managed_services": 56754.07,
+        "other": 27789.9
+      },
+      "products": {
+        "active": "Managed Services, Onboarding, Other",
+        "expired": "SDA"
+      },
+      "contract": {
+        "next_renewal": "2027-01-01",
+        "renewal_process": null,
+        "last_start": "2023-09-26",
+        "earliest": "2012-12-28",
+        "active_count": 3.0
+      },
+      "health": {
+        "sentiment": "OPEN",
+        "engagement_score": 80.0,
+        "services_engagement": 100.0,
+        "nps": 0,
+        "last_nps_sent": "2026-04-17",
+        "at_risk_alerts": 0,
+        "risk_signals": []
+      },
+      "strategy": {
+        "renewal_strategy": "<p><span style=\"font-size: 10pt; font-family: Arial;\">\u2022</span><span style=\"font-size: 10pt; font-family: Inter; color: black;\">Set up regular monthly calls w/ Melissa. Ongoing</span></p><p><br></p><p><span style=\"font-size: 10pt; font-family: Arial;\">\u2022</span><span style=\"font-size: 10pt; font-family: Inter; color: black;\">Understand business goals and plan ahead.</span><span style=\"font-size: 13.3333px; font-family: Inter; color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);\"> Ongoing</span></p><p><br></p><p><span style=\"font-size: 10pt; font-family: Arial;\">\u2022</span><span style=\"font-size: 10pt; font-family: Inter; color: black;\"> Set up next touch point (BR) call and include Zaid.</span><span style=\"font-size: 13.3333px; font-family: Inter; color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);\"> Ongoing</span></p>",
+        "expansion_opportunities": "<p><span style=\"font-size: 10pt; font-family: Arial;\">\u2022</span><span style=\"font-size: 10pt; font-family: Inter; color: black;\">Texting? Portal work (services)</span></p>",
+        "renewal_risks": "<p>Known or suspected? <span style=\"color: black; font-family: Inter; font-size: 10pt;\">Need to make end user experience easier per Zaid\u00a0</span></p>"
+      },
+      "team": {
+        "csm": "Andrew Pollard",
+        "am": "Kara Sheridan",
+        "epm": "Elizabeth Affholder",
+        "support": "Kristian Monge",
+        "sc": "Bill McGuire"
+      },
+      "engagement": {
+        "last_engagement_date": "2023-11-09",
+        "last_site_review": "2026-01-07",
+        "days_since_site_review": 145.0,
+        "last_training": "2026-05-13",
+        "days_since_training": 19.0
+      },
+      "competitors": {
+        "ats": "Workday",
+        "onboarding": "SilkRoad Onboarding",
+        "epm": "Workday",
+        "hris": "Workday"
+      }
+    },
+    {
+      "id": "0016000000ocSW4AAM",
+      "name": "Partnership HealthPlan of California",
+      "slug": "partnership-healthplan-of-california",
+      "type": "Customer",
+      "industry": "Non-Profit & Charitable Organizations",
+      "employees": 982,
+      "tier": "Tier 1",
+      "segment": "Enterprise",
+      "website": "www.partnershiphp.org",
+      "arr": {
+        "total": 228198.12,
+        "performance": 57653.09,
+        "recruiting": 0,
+        "onboarding": 0,
+        "learning": 170545.03,
+        "managed_services": 0,
+        "other": 0
+      },
+      "products": {
+        "active": "Performance, Learning",
+        "expired": "Performance_WingSpan, Learning"
+      },
+      "contract": {
+        "next_renewal": "2029-07-01",
+        "renewal_process": "Automatic Renewal",
+        "last_start": "2026-03-31",
+        "earliest": "2014-02-14",
+        "active_count": 6.0
+      },
+      "health": {
+        "sentiment": "OPEN",
+        "engagement_score": 60.0,
+        "services_engagement": 75.0,
+        "nps": 0,
+        "last_nps_sent": "2026-04-18",
+        "at_risk_alerts": 0,
+        "risk_signals": []
+      },
+      "strategy": {
+        "renewal_strategy": null,
+        "expansion_opportunities": "<p>Increase in licenses (learning &amp; WS) for renewal - client is growing </p>",
+        "renewal_risks": null
+      },
+      "team": {
+        "csm": "Andrew Pollard",
+        "am": "Kara Sheridan",
+        "support": "Kristian Monge"
+      },
+      "engagement": {
+        "last_engagement_date": "2023-11-11",
+        "last_site_review": "2026-04-23",
+        "days_since_site_review": 39.0,
+        "last_training": "2026-04-23",
+        "days_since_training": 39.0
+      },
+      "competitors": {
+        "ats": "iCims",
+        "onboarding": "?",
+        "epm": "SilkRoad Performance",
+        "hris": "ADP - Workforce Now"
+      }
+    },
+    {
+      "id": "0016000000jpP6HAAU",
+      "name": "Precise Systems, Inc.",
+      "slug": "precise-systems-inc",
+      "type": "Customer",
+      "industry": "Architecture, Engineering & Design",
+      "employees": 800,
+      "tier": "Tier 2",
+      "segment": "Enterprise",
+      "website": "www.goprecise.com",
+      "arr": {
+        "total": 155000.0,
+        "performance": 0,
+        "recruiting": 0,
+        "onboarding": 0,
+        "learning": 0,
+        "managed_services": 0,
+        "other": 155000.0
+      },
+      "products": {
+        "active": "Recruiting, Onboarding, Other, Managed Services",
+        "expired": "Recruiting, Onboarding"
+      },
+      "contract": {
+        "next_renewal": "2028-02-29",
+        "renewal_process": "Automatic Renewal",
+        "last_start": "2026-03-01",
+        "earliest": "2012-11-09",
+        "active_count": 2.0
+      },
+      "health": {
+        "sentiment": "OPEN",
+        "engagement_score": 60.0,
+        "services_engagement": 25.0,
+        "nps": 6.0,
+        "last_nps_sent": "2026-04-29",
+        "at_risk_alerts": 1.0,
+        "risk_signals": [
+          "Active at-risk alert",
+          "Detractor NPS (6.0)"
+        ]
+      },
+      "strategy": {
+        "renewal_strategy": "<p><span style=\"font-size: 10pt; font-family: Arial;\">\u2022</span><span style=\"font-size: 10pt; font-family: Inter; color: black;\">Verbal Commitment to 3-year renewal. By When?</span></p>",
+        "expansion_opportunities": "<p><span style=\"font-size: 10pt; font-family: Arial;\">\u2022</span><span style=\"font-size: 10pt; font-family: Inter; color: black;\">Offer Letter in Onboarding. Just went live</span></p>",
+        "renewal_risks": null
+      },
+      "team": {
+        "csm": "Andrew Pollard",
+        "am": "Kara Sheridan",
+        "support": "Kristian Monge"
+      },
+      "engagement": {
+        "last_engagement_date": "2023-11-13",
+        "last_site_review": "2025-07-24",
+        "days_since_site_review": 312.0,
+        "last_training": "2026-03-19",
+        "days_since_training": 74.0
+      },
+      "competitors": {
+        "ats": "SilkRoad Recruiting",
+        "onboarding": "SilkRoad Onboarding",
+        "epm": "SilkRoad Performance",
+        "hris": "HeartBeat"
+      }
+    },
+    {
+      "id": "0016000000jrhz1AAA",
+      "name": "Public Health Management Corporation",
+      "slug": "public-health-management-corporation",
+      "type": "Customer",
+      "industry": "Non-Profit & Charitable Organizations",
+      "employees": 2500,
+      "tier": "Tier 2",
+      "segment": "Enterprise",
+      "website": "www.phmc.org",
+      "arr": {
+        "total": 111328.98,
+        "performance": 0,
+        "recruiting": 0,
+        "onboarding": 0,
+        "learning": 111328.98,
+        "managed_services": 0,
+        "other": 0
+      },
+      "products": {
+        "active": "Learning",
+        "expired": "Learning"
+      },
+      "contract": {
+        "next_renewal": "2026-10-30",
+        "renewal_process": "Automatic Renewal",
+        "last_start": "2025-10-06",
+        "earliest": "2013-09-30",
+        "active_count": 1.0
+      },
+      "health": {
+        "sentiment": "OPEN",
+        "engagement_score": 20.0,
+        "services_engagement": 0.0,
+        "nps": 0,
+        "last_nps_sent": null,
+        "at_risk_alerts": 0,
+        "risk_signals": [
+          "Critical engagement (20.0%)"
+        ]
+      },
+      "strategy": {
+        "renewal_strategy": null,
+        "expansion_opportunities": null,
+        "renewal_risks": null
+      },
+      "team": {
+        "csm": "Andrew Pollard",
+        "am": "Kara Sheridan",
+        "epm": "Elizabeth Affholder",
+        "support": "Kristian Monge"
+      },
+      "engagement": {
+        "last_engagement_date": "2023-11-12",
+        "last_site_review": null,
+        "days_since_site_review": null,
+        "last_training": null,
+        "days_since_training": null
+      },
+      "competitors": {
+        "ats": "Ultirecruit",
+        "onboarding": "?",
+        "epm": "?",
+        "hris": "UltiPro"
+      }
+    },
+    {
+      "id": "0016000000Iu34aAAB",
+      "name": "UnityPoint Health-Meriter",
+      "slug": "unitypoint-health-meriter",
+      "type": "Customer",
+      "industry": "Hospitals & Physicians Clinics",
+      "employees": 975,
+      "tier": "Tier 2",
+      "segment": "Enterprise",
+      "website": "https://www.unitypoint.org/madison/default.aspx",
+      "arr": {
+        "total": 108605.0,
+        "performance": 108605.0,
+        "recruiting": 0,
+        "onboarding": 0,
+        "learning": 0,
+        "managed_services": 0,
+        "other": 0
+      },
+      "products": {
+        "active": "Performance",
+        "expired": "Learning, Performance_WingSpan"
+      },
+      "contract": {
+        "next_renewal": "2028-01-01",
+        "renewal_process": "Automatic Renewal",
+        "last_start": "2025-12-12",
+        "earliest": "2013-04-22",
+        "active_count": 1.0
+      },
+      "health": {
+        "sentiment": "OPEN",
+        "engagement_score": 40.0,
+        "services_engagement": 25.0,
+        "nps": 3.0,
+        "last_nps_sent": "2026-04-17",
+        "at_risk_alerts": 0,
+        "risk_signals": [
+          "Low engagement (40.0%)",
+          "Detractor NPS (3.0)"
+        ]
+      },
+      "strategy": {
+        "renewal_strategy": "<ul><li>They are contracted w Performance through end of 2025. Will make sure I get on Kiah&#39;s calendar and have already expressed the importance of having her attend our regular cadence calls. She has expressed her desire to meet so will hold her to that. Create consistent relationship and show value by providing support and communication regularly.</li></ul>",
+        "expansion_opportunities": "<ul><li>With Kiah&#39;s help, will get Brian introduced into Unity Point group to see if opportunity to have this part of the org use us for performance management as well.</li></ul>",
+        "renewal_risks": "<ul><li>Only risk is if the organization as a whole decides to move everything over to Lawson which is their current HRIS.</li></ul>"
+      },
+      "team": {
+        "csm": "Andrew Pollard",
+        "am": "Kara Sheridan",
+        "epm": "Elizabeth Affholder",
+        "support": "Kristian Monge",
+        "services": "Randy Havel"
+      },
+      "engagement": {
+        "last_engagement_date": "2023-11-03",
+        "last_site_review": "2026-03-18",
+        "days_since_site_review": 75.0,
+        "last_training": "2026-03-11",
+        "days_since_training": 82.0
+      },
+      "competitors": {
+        "ats": "BrassRing",
+        "onboarding": "Workday",
+        "epm": "SilkRoad Performance",
+        "hris": "Lawson"
+      }
+    },
+    {
+      "id": "0016000000ItvaFAAR",
+      "name": "Sheppard, Mullin, Richter & Hampton LLP",
+      "slug": "sheppard-mullin-richter-and-hampton-llp",
+      "type": "Customer",
+      "industry": "Law Firms & Legal Services",
+      "employees": 1000,
+      "tier": "Tier 3",
+      "segment": "Enterprise",
+      "website": "https://www.sheppard.com/",
+      "arr": {
+        "total": 97000.0,
+        "performance": 0,
+        "recruiting": 0,
+        "onboarding": 77000.0,
+        "learning": 0,
+        "managed_services": 20000.0,
+        "other": 0
+      },
+      "products": {
+        "active": "Onboarding, Managed Services",
+        "expired": null
+      },
+      "contract": {
+        "next_renewal": "2027-10-01",
+        "renewal_process": null,
+        "last_start": "2024-08-23",
+        "earliest": "2024-08-21",
+        "active_count": 1.0
+      },
+      "health": {
+        "sentiment": "OPEN",
+        "engagement_score": 50.0,
+        "services_engagement": 100.0,
+        "nps": 0,
+        "last_nps_sent": "2026-04-23",
+        "at_risk_alerts": 0,
+        "risk_signals": []
+      },
+      "strategy": {
+        "renewal_strategy": null,
+        "expansion_opportunities": null,
+        "renewal_risks": null
+      },
+      "team": {
+        "csm": "Andrew Pollard",
+        "am": "Kara Sheridan",
+        "support": "Kristian Monge"
+      },
+      "engagement": {
+        "last_engagement_date": "2023-11-11",
+        "last_site_review": "2025-12-05",
+        "days_since_site_review": 178.0,
+        "last_training": "2026-04-28",
+        "days_since_training": 34.0
+      },
+      "competitors": {
+        "ats": "VI Desktop",
+        "onboarding": "SilkRoad Onboarding",
+        "epm": "?",
+        "hris": "UltiPro"
+      }
+    },
+    {
+      "id": "0013200001Aj2FdAAJ",
+      "name": "Tri Pointe Homes",
+      "slug": "tri-pointe-homes",
+      "type": "Customer",
+      "industry": "Commercial & Residential Construction",
+      "employees": 1579,
+      "tier": "Tier 3",
+      "segment": "Enterprise",
+      "website": "www.tripointegroup.com",
+      "arr": {
+        "total": 89245.92,
+        "performance": 65485.92,
+        "recruiting": 0,
+        "onboarding": 0,
+        "learning": 0,
+        "managed_services": 23760.0,
+        "other": 0
+      },
+      "products": {
+        "active": "Managed Services, Performance",
+        "expired": "Performance, Performance_WingSpan, Onboarding"
+      },
+      "contract": {
+        "next_renewal": "2026-12-01",
+        "renewal_process": "Automatic Renewal",
+        "last_start": "2024-12-01",
+        "earliest": "2015-09-18",
+        "active_count": 2.0
+      },
+      "health": {
+        "sentiment": "OPEN",
+        "engagement_score": 75.0,
+        "services_engagement": 100.0,
+        "nps": 0,
+        "last_nps_sent": "2026-04-18",
+        "at_risk_alerts": 0,
+        "risk_signals": []
+      },
+      "strategy": {
+        "renewal_strategy": "<p><span style=\"font-size: 10pt; font-family: Arial;\">\u2022</span><span style=\"font-size: 10pt; font-family: Inter; color: black;\">Establish Monthly meetings. February</span></p><p><span style=\"font-size: 10pt; font-family: Arial;\">\u2022</span><span style=\"font-size: 10pt; font-family: Inter; color: black;\">Ask for it. March</span></p>",
+        "expansion_opportunities": "<p>OTC. Opp: no. Not interested</p>",
+        "renewal_risks": "<p>Known or suspected? <span style=\"color: black; font-family: Inter; font-size: 10pt;\">Lost recruiting to iCIMS</span></p><p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Known or suspected? </span><span style=\"font-family: Arial; font-size: 10pt;\">\u2022</span><span style=\"font-family: Inter; font-size: 10pt; color: black;\">All new Leadership Team</span></p>"
+      },
+      "team": {
+        "csm": "Andrew Pollard",
+        "am": "Kara Sheridan",
+        "epm": "Elizabeth Affholder",
+        "support": "Kristian Monge",
+        "sc": "Bill McGuire",
+        "services": "Randy Havel"
+      },
+      "engagement": {
+        "last_engagement_date": "2023-11-11",
+        "last_site_review": "2025-07-30",
+        "days_since_site_review": 306.0,
+        "last_training": "2026-03-10",
+        "days_since_training": 83.0
+      },
+      "competitors": {
+        "ats": "iCims",
+        "onboarding": "SilkRoad Onboarding",
+        "epm": "SilkRoad Agile Performance",
+        "hris": "Kronos"
+      }
+    },
+    {
+      "id": "0016000000ItvbzAAB",
+      "name": "Wilmer Cutler Pickering Hale and Dorr LLP",
+      "slug": "wilmer-cutler-pickering-hale-and-dorr-llp",
+      "type": "Customer",
+      "industry": "Law Firms & Legal Services",
+      "employees": 2350,
+      "tier": "Tier 3",
+      "segment": "Enterprise",
+      "website": "www.wilmerhale.com",
+      "arr": {
+        "total": 84925.41,
+        "performance": 0,
+        "recruiting": 42372.74,
+        "onboarding": 33328.84,
+        "learning": 0,
+        "managed_services": 0,
+        "other": 9223.83
+      },
+      "products": {
+        "active": "Other, Onboarding, Recruiting",
+        "expired": "Onboarding, Recruiting"
+      },
+      "contract": {
+        "next_renewal": "2028-04-01",
+        "renewal_process": "Automatic Renewal",
+        "last_start": "2026-02-20",
+        "earliest": "2011-06-30",
+        "active_count": 2.0
+      },
+      "health": {
+        "sentiment": "OPEN",
+        "engagement_score": 75.0,
+        "services_engagement": 75.0,
+        "nps": 0,
+        "last_nps_sent": "2026-04-21",
+        "at_risk_alerts": 0,
+        "risk_signals": []
+      },
+      "strategy": {
+        "renewal_strategy": null,
+        "expansion_opportunities": null,
+        "renewal_risks": null
+      },
+      "team": {
+        "csm": "Andrew Pollard",
+        "am": "Kara Sheridan",
+        "epm": "Elizabeth Affholder",
+        "support": "Kristian Monge"
+      },
+      "engagement": {
+        "last_engagement_date": "2023-11-11",
+        "last_site_review": null,
+        "days_since_site_review": null,
+        "last_training": "2026-05-08",
+        "days_since_training": 24.0
+      },
+      "competitors": {
+        "ats": "SilkRoad Recruiting",
+        "onboarding": "SilkRoad Onboarding",
+        "epm": "?",
+        "hris": "Oracle"
+      }
+    },
+    {
+      "id": "0016000000Iu2jxAAB",
+      "name": "Johnson, Mirmiran & Thompson, Inc.",
+      "slug": "johnson-mirmiran-and-thompson-inc",
+      "type": "Customer",
+      "industry": "Architecture, Engineering & Design",
+      "employees": 2700,
+      "tier": "Tier 3",
+      "segment": "Enterprise",
+      "website": "http://www.jmt.com/",
+      "arr": {
+        "total": 84545.46,
+        "performance": 0,
+        "recruiting": 40560.63,
+        "onboarding": 43984.83,
+        "learning": 0,
+        "managed_services": 0,
+        "other": 0
+      },
+      "products": {
+        "active": "Recruiting, Onboarding",
+        "expired": "Talent Center, Onboarding, Recruiting"
+      },
+      "contract": {
+        "next_renewal": "2027-11-05",
+        "renewal_process": "Automatic Renewal",
+        "last_start": "2025-11-05",
+        "earliest": "2010-11-05",
+        "active_count": 2.0
+      },
+      "health": {
+        "sentiment": "OPEN",
+        "engagement_score": 100.0,
+        "services_engagement": 100.0,
+        "nps": 0,
+        "last_nps_sent": "2026-04-17",
+        "at_risk_alerts": 0,
+        "risk_signals": []
+      },
+      "strategy": {
+        "renewal_strategy": null,
+        "expansion_opportunities": null,
+        "renewal_risks": null
+      },
+      "team": {
+        "csm": "Andrew Pollard",
+        "am": "Kara Sheridan",
+        "epm": "Elizabeth Affholder",
+        "support": "Kristian Monge"
+      },
+      "engagement": {
+        "last_engagement_date": "2023-11-11",
+        "last_site_review": "2026-03-02",
+        "days_since_site_review": 91.0,
+        "last_training": "2026-04-06",
+        "days_since_training": 56.0
+      },
+      "competitors": {
+        "ats": "SilkRoad Recruiting",
+        "onboarding": "SilkRoad Onboarding",
+        "epm": "?",
+        "hris": "Other Vendor"
+      }
+    },
+    {
+      "id": "0016000000N4dFpAAJ",
+      "name": "MarketAxess Corporation",
+      "slug": "marketaxess-corporation",
+      "type": "Customer",
+      "industry": "Lending & Brokerage",
+      "employees": 859,
+      "tier": "Tier 3",
+      "segment": "Enterprise",
+      "website": "www.marketaxess.com",
+      "arr": {
+        "total": 78462.0,
+        "performance": 76840.0,
+        "recruiting": 0,
+        "onboarding": 0,
+        "learning": 0,
+        "managed_services": 0,
+        "other": 1622.0
+      },
+      "products": {
+        "active": "Performance, Other",
+        "expired": "Performance_WingSpan"
+      },
+      "contract": {
+        "next_renewal": "2027-05-24",
+        "renewal_process": "Automatic Renewal",
+        "last_start": "2026-05-21",
+        "earliest": "2012-05-24",
+        "active_count": 1.0
+      },
+      "health": {
+        "sentiment": "OPEN",
+        "engagement_score": 100.0,
+        "services_engagement": 50.0,
+        "nps": 0,
+        "last_nps_sent": "2026-05-28",
+        "at_risk_alerts": 0,
+        "risk_signals": []
+      },
+      "strategy": {
+        "renewal_strategy": null,
+        "expansion_opportunities": null,
+        "renewal_risks": null
+      },
+      "team": {
+        "csm": "Andrew Pollard",
+        "am": "Kara Sheridan",
+        "epm": "Elizabeth Affholder",
+        "support": "Kristian Monge",
+        "services": "Randy Havel"
+      },
+      "engagement": {
+        "last_engagement_date": "2023-11-11",
+        "last_site_review": "2025-12-05",
+        "days_since_site_review": 178.0,
+        "last_training": "2025-11-14",
+        "days_since_training": 199.0
+      },
+      "competitors": {
+        "ats": "Greenhouse",
+        "onboarding": "Ultipro",
+        "epm": "SilkRoad Performance",
+        "hris": "UltiPro"
+      }
+    },
+    {
+      "id": "0016000000Iu2YSAAZ",
+      "name": "Viejas Casino & Resort",
+      "slug": "viejas-casino-and-resort",
+      "type": "Customer",
+      "industry": "Gambling & Gaming",
+      "employees": 1962,
+      "tier": "Tier 3",
+      "segment": "Enterprise",
+      "website": "https://viejas.com/",
+      "arr": {
+        "total": 77334.85,
+        "performance": 0,
+        "recruiting": 50929.96,
+        "onboarding": 23622.67,
+        "learning": 0,
+        "managed_services": 0,
+        "other": 2782.22
+      },
+      "products": {
+        "active": "Onboarding, Recruiting, Other",
+        "expired": "Recruiting, Onboarding, Integrations"
+      },
+      "contract": {
+        "next_renewal": "2026-09-01",
+        "renewal_process": "Automatic Renewal",
+        "last_start": "2024-06-03",
+        "earliest": "2013-06-18",
+        "active_count": 2.0
+      },
+      "health": {
+        "sentiment": "OPEN",
+        "engagement_score": 75.0,
+        "services_engagement": 50.0,
+        "nps": 0,
+        "last_nps_sent": "2026-04-21",
+        "at_risk_alerts": 0,
+        "risk_signals": []
+      },
+      "strategy": {
+        "renewal_strategy": null,
+        "expansion_opportunities": null,
+        "renewal_risks": null
+      },
+      "team": {
+        "csm": "Andrew Pollard",
+        "am": "Kara Sheridan",
+        "support": "Hazel Laude"
+      },
+      "engagement": {
+        "last_engagement_date": "2023-11-13",
+        "last_site_review": "2026-01-08",
+        "days_since_site_review": 144.0,
+        "last_training": null,
+        "days_since_training": null
+      },
+      "competitors": {
+        "ats": "SilkRoad Recruiting",
+        "onboarding": "SilkRoad Onboarding",
+        "epm": "Halogen",
+        "hris": "Lawson"
+      }
+    },
+    {
+      "id": "001Vs00000pI2ArIAK",
+      "name": "Cleveland Clinic London, Ltd",
+      "slug": "cleveland-clinic-london-ltd",
+      "type": "Customer",
+      "industry": "Medical & Surgical Hospitals",
+      "employees": 24,
+      "tier": "Tier 1",
+      "segment": "Enterprise",
+      "website": "https://clevelandcliniclondon.uk/",
+      "arr": {
+        "total": 25562.88,
+        "performance": 0,
+        "recruiting": 0,
+        "onboarding": 0,
+        "learning": 0,
+        "managed_services": 25562.88,
+        "other": 0
+      },
+      "products": {
+        "active": "Managed Services",
+        "expired": null
+      },
+      "contract": {
+        "next_renewal": "2027-04-23",
+        "renewal_process": null,
+        "last_start": "2026-03-25",
+        "earliest": "2025-08-06",
+        "active_count": 1.0
+      },
+      "health": {
+        "sentiment": "OPEN",
+        "engagement_score": 80.0,
+        "services_engagement": 25.0,
+        "nps": 0,
+        "last_nps_sent": null,
+        "at_risk_alerts": 0,
+        "risk_signals": []
+      },
+      "strategy": {
+        "renewal_strategy": null,
+        "expansion_opportunities": null,
+        "renewal_risks": null
+      },
+      "team": {
+        "csm": "Andrew Pollard",
+        "epm": "Elizabeth Affholder",
+        "support": "Kristian Monge"
+      },
+      "engagement": {
+        "last_engagement_date": null,
+        "last_site_review": null,
+        "days_since_site_review": null,
+        "last_training": null,
+        "days_since_training": null
+      },
+      "competitors": {
+        "ats": "?",
+        "onboarding": "?",
+        "epm": "?",
+        "hris": "?"
+      }
+    },
+    {
+      "id": "0016000000ItyfJAAR",
+      "name": "Framatome Inc.",
+      "slug": "framatome-inc",
+      "type": "Customer",
+      "industry": "Industrial Machinery & Equipment",
+      "employees": 18000,
+      "tier": "Tier 3",
+      "segment": "Enterprise",
+      "website": "framatome.com",
+      "arr": {
+        "total": 17500.0,
+        "performance": 0,
+        "recruiting": 17500.0,
+        "onboarding": 0,
+        "learning": 0,
+        "managed_services": 0,
+        "other": 0
+      },
+      "products": {
+        "active": "Recruiting",
+        "expired": "Onboarding, Recruiting"
+      },
+      "contract": {
+        "next_renewal": "2028-01-01",
+        "renewal_process": "Automatic Renewal",
+        "last_start": "2026-03-20",
+        "earliest": "2016-12-07",
+        "active_count": 1.0
+      },
+      "health": {
+        "sentiment": "OPEN",
+        "engagement_score": 0,
+        "services_engagement": 0.0,
+        "nps": 0,
+        "last_nps_sent": "2025-12-19",
+        "at_risk_alerts": 0,
+        "risk_signals": [
+          "Critical engagement (0%)"
+        ]
+      },
+      "strategy": {
+        "renewal_strategy": "<p>1) Framatome is signed through 3/31/2025 for both ONB and REC. Will begin Renewal </p><p>2) Discussions in early Q4-2024. Continue to monitor License Compliance for ONB Events.  Heather Ramsey is the Decision Maker and Signee from Framatome.</p>",
+        "expansion_opportunities": "<p>1) Q1-2024 Monitoring ONB Event Overages. Have meeting scheduled with Heather Ramsey on 2/26 to discuss overages and potential to add a new amount for mid-contract adjustment.</p><p>2) Have been discussing with Framatome since late 2022 and throughout 2023 a new Onboarding Portal and Event for their FoxGuard Division. Opportunity has been created and will continue to update and discuss further.</p><p>3) Continue conversations for ONB Portals and Employee experience enhancements.</p><p>4) Potential for REC License increase as they continue to grow.</p><p>5) Onboarding expansion with their US and Global Locations in France, Germany and China</p><p>6) Managed Services has been reviewed and discussed on multiple occasions but budget constraints limit this.  We believe there is still value to pursue a small MS Hours package which would enable for an overhaul and upgrade of their ONB and REC Portals and Environment.</p>",
+        "renewal_risks": "<p>1) For their Europe Locations, they use a separate ATS - Talentsoft</p><p>2) Framatome has always been VERY reluctant to spend $&#39;s on mid-large scale projects - budget restrictions.</p><p>3) For their Other Vendors listed in SF, Framatome uses the following:</p><p>LMS:  Percipio</p><p>ERP:  Portfolio</p><p>Background Checks:  Accurate</p>"
+      },
+      "team": {
+        "csm": "Andrew Pollard",
+        "am": "Kara Sheridan",
+        "epm": "Elizabeth Affholder",
+        "support": "Kristian Monge"
+      },
+      "engagement": {
+        "last_engagement_date": "2023-11-14",
+        "last_site_review": null,
+        "days_since_site_review": null,
+        "last_training": null,
+        "days_since_training": null
+      },
+      "competitors": {
+        "ats": "SilkRoad Recruiting",
+        "onboarding": "SilkRoad Onboarding",
+        "epm": "Other Vendor",
+        "hris": "UltiPro"
+      }
+    },
+    {
+      "id": "0016000000Iu3biAAB",
+      "name": "Bud Antle, Inc.",
+      "slug": "bud-antle-inc",
+      "type": "Customer",
+      "industry": "Grocery Retail",
+      "employees": 36581,
+      "tier": "Data Repository/Limited License",
+      "segment": "Corporate",
+      "website": "www.dole.com",
+      "arr": {
+        "total": 4500.0,
+        "performance": 0,
+        "recruiting": 4500.0,
+        "onboarding": 0,
+        "learning": 0,
+        "managed_services": 0,
+        "other": 0
+      },
+      "products": {
+        "active": "Recruiting",
+        "expired": "Performance, Onboarding, Recruiting"
+      },
+      "contract": {
+        "next_renewal": null,
+        "renewal_process": "Automatic Renewal",
+        "last_start": "2026-02-27",
+        "earliest": "2012-12-07",
+        "active_count": 1.0
+      },
+      "health": {
+        "sentiment": "OPEN",
+        "engagement_score": 100.0,
+        "services_engagement": 100.0,
+        "nps": 0,
+        "last_nps_sent": "2026-04-23",
+        "at_risk_alerts": 0,
+        "risk_signals": []
+      },
+      "strategy": {
+        "renewal_strategy": null,
+        "expansion_opportunities": null,
+        "renewal_risks": null
+      },
+      "team": {
+        "csm": "Andrew Pollard",
+        "am": "Kara Sheridan",
+        "support": "Hazel Laude"
+      },
+      "engagement": {
+        "last_engagement_date": "2023-11-13",
+        "last_site_review": "2025-10-31",
+        "days_since_site_review": 213.0,
+        "last_training": "2025-10-31",
+        "days_since_training": 213.0
+      },
+      "competitors": {
+        "ats": "SilkRoad Recruiting",
+        "onboarding": "SilkRoad Onboarding",
+        "epm": "SilkRoad Performance",
+        "hris": "?"
+      }
+    }
+  ]
+}

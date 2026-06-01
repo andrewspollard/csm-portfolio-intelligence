@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSM Portfolio Intelligence | Andrew Pollard</title>
+<script src="https://cdn.jsdelivr.net/npm/highcharts@12.1.2/highcharts.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/highcharts@12.1.2/modules/accessibility.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root {
+  --color-bg: #f8f9fb;
+  --color-bg-secondary: #ffffff;
+  --color-text: #1a1a2e;
+  --color-text-secondary: #44546f;
+  --color-text-muted: #8993a4;
+  --color-border-light: #e8eaed;
+  --color-border: #dfe1e6;
+  --color-surface: #ffffff;
+  --color-primary: #2563eb;
+  --color-primary-light: #eff6ff;
+  --color-success: #16a34a;
+  --color-success-light: #f0fdf4;
+  --color-error: #dc2626;
+  --color-error-light: #fef2f2;
+  --color-warning: #d97706;
+  --color-warning-light: #fffbeb;
+  --color-info: #0284c7;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif;
+  --font-mono: 'SF Mono', 'JetBrains Mono', Consolas, monospace;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--color-bg);
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  padding: 32px;
+  line-height: 1.5;
+}
+.header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--color-border-light); }
+.header h1 { font-size: 28px; font-weight: 700; color: var(--color-text); margin-bottom: 4px; }
+.header .subtitle { color: var(--color-text-muted); font-size: 14px; }
+.header .owner-badge { display: flex; align-items: center; gap: 8px; background: var(--color-primary-light); border: 1px solid #bfdbfe; border-radius: var(--radius-sm); padding: 8px 14px; font-size: 13px; color: var(--color-primary); font-weight: 500; }
+.kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 32px; }
+.kpi-card { background: var(--color-bg-secondary); border: 1px solid var(--color-border-light); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm); }
+.kpi-card .label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-muted); margin-bottom: 8px; }
+.kpi-card .value { font-size: 26px; font-weight: 700; font-family: var(--font-mono); color: var(--color-text); }
+.kpi-card .sub { font-size: 12px; color: var(--color-text-secondary); margin-top: 4px; }
+.kpi-card.risk .value { color: var(--color-error); }
+.kpi-card.warn .value { color: var(--color-warning); }
+.kpi-card.ok .value { color: var(--color-success); }
+.charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 32px; }
+.chart-card { background: var(--color-bg-secondary); border: 1px solid var(--color-border-light); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm); }
+.chart-card h3 { font-size: 14px; font-weight: 600; color: var(--color-text); margin-bottom: 16px; }
+.section-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; margin-top: 32px; display: flex; align-items: center; gap: 8px; }
+.section-title i { color: var(--color-primary); font-size: 16px; }
+.account-table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--color-bg-secondary); border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm); border: 1px solid var(--color-border-light); }
+.account-table th { text-align: left; padding: 12px 14px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); background: var(--color-bg); border-bottom: 1px solid var(--color-border); cursor: pointer; }
+.account-table th:hover { color: var(--color-primary); }
+.account-table td { padding: 12px 14px; border-bottom: 1px solid var(--color-border-light); color: var(--color-text); vertical-align: middle; }
+.account-table tr:hover td { background: #f1f5f9; }
+.account-table tr:last-child td { border-bottom: none; }
+.account-name { font-weight: 600; color: var(--color-primary); cursor: pointer; text-decoration: none; }
+.account-name:hover { text-decoration: underline; }
+.tier-badge { display: inline-block; padding: 2px 8px; border-radius: 100px; font-size: 11px; font-weight: 600; }
+.tier-badge.t1 { background: #dbeafe; color: #1d4ed8; }
+.tier-badge.t2 { background: #e0e7ff; color: #4338ca; }
+.tier-badge.t3 { background: #f1f5f9; color: #475569; }
+.tier-badge.dr { background: #fef3c7; color: #92400e; }
+.engagement-bar { width: 60px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; display: inline-block; vertical-align: middle; margin-right: 6px; }
+.engagement-bar .fill { height: 100%; border-radius: 3px; }
+.engagement-bar .fill.high { background: var(--color-success); }
+.engagement-bar .fill.mid { background: var(--color-warning); }
+.engagement-bar .fill.low { background: var(--color-error); }
+.risk-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 100px; font-size: 11px; font-weight: 500; }
+.risk-badge.at-risk { background: var(--color-error-light); color: var(--color-error); }
+.risk-badge.warning { background: var(--color-warning-light); color: var(--color-warning); }
+.risk-badge.healthy { background: var(--color-success-light); color: var(--color-success); }
+.arr-cell { font-family: var(--font-mono); font-weight: 600; font-size: 13px; }
+.renewal-card { display: flex; align-items: center; background: var(--color-bg-secondary); border: 1px solid var(--color-border-light); border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 10px; gap: 20px; box-shadow: var(--shadow-sm); }
+.renewal-card .date { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--color-warning); min-width: 100px; }
+.renewal-card .r-name { font-weight: 600; color: var(--color-text); flex: 1; }
+.renewal-card .arr { font-family: var(--font-mono); font-weight: 600; color: var(--color-text); }
+.team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 32px; }
+.team-card { background: var(--color-bg-secondary); border: 1px solid var(--color-border-light); border-radius: var(--radius-sm); padding: 14px; box-shadow: var(--shadow-sm); }
+.team-card .role { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin-bottom: 4px; }
+.team-card .t-name { font-weight: 600; color: var(--color-text); font-size: 14px; }
+.team-card .coverage { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
+.filter-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+.filter-btn { padding: 6px 14px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); font-size: 12px; font-weight: 500; cursor: pointer; background: var(--color-bg-secondary); color: var(--color-text-secondary); transition: all 0.15s; }
+.filter-btn:hover { background: #f1f5f9; }
+.filter-btn.active { background: var(--color-primary); color: white; border-color: var(--color-primary); }
+.products-cell { display: flex; flex-wrap: wrap; gap: 3px; }
+.product-tag { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 500; background: #f1f5f9; color: #475569; }
+
+.team-card { position: relative; }
+.team-card:hover .tooltip { display: block; }
+.tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-text);
+  color: white;
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  font-size: 12px;
+  line-height: 1.6;
+  width: 280px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  z-index: 1000;
+  pointer-events: none;
+}
+.tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--color-text);
+}
+.tooltip .tt-title {
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+.tooltip .tt-role {
+  color: #93c5fd;
+  font-size: 11px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.tooltip .tt-accounts {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.tooltip .tt-accounts li {
+  padding: 2px 0;
+  font-size: 11px;
+  color: #e2e8f0;
+}
+.tooltip .tt-accounts li::before {
+  content: '\2022';
+  color: #93c5fd;
+  margin-right: 6px;
+}
+.tooltip .tt-count {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255,255,255,0.2);
+  font-weight: 600;
+  color: #93c5fd;
+  font-size: 11px;
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <h1>CSM Portfolio Intelligence</h1>
+    <div class="subtitle">Customer Success Book of Business | Last refreshed: June 1, 2026</div>
+  </div>
+  <div class="owner-badge"><i class="fa-solid fa-user-shield"></i> Andrew Pollard, CSM</div>
+</div>
+<div class="kpi-grid" id="kpi-grid"></div>
+<div class="charts-row">
+  <div class="chart-card"><h3>ARR by Product Line</h3><div id="chart-arr-product" style="height:260px;"></div></div>
+  <div class="chart-card"><h3>Renewal Timeline</h3><div id="chart-renewals" style="height:260px;"></div></div>
+</div>
+<div class="section-title"><i class="fa-solid fa-clock"></i> 2026 Renewals ($592K ARR at stake)</div>
+<div id="renewal-cards"></div>
+<div class="section-title"><i class="fa-solid fa-users"></i> Rival Coverage Team</div>
+<div class="team-grid" id="team-grid"></div>
+<div class="section-title"><i class="fa-solid fa-building"></i> Account Portfolio</div>
+<div class="filter-bar" id="filter-bar"></div>
+<table class="account-table"><thead><tr>
+  <th data-sort="name">Account</th>
+  <th data-sort="tier">Tier</th>
+  <th data-sort="arr">ARR</th>
+  <th>Products</th>
+  <th data-sort="renewal">Renewal</th>
+  <th data-sort="engagement">Engagement</th>
+  <th>Status</th>
+</tr></thead><tbody id="account-tbody"></tbody></table>
+<script>
+const accounts = [{"id": "0016000000ItrYZAAZ", "name": "NYU Langone Health (NYULH)", "slug": "nyu-langone-health-nyulh", "type": "Customer", "industry": "Colleges & Universities", "employees": 19000, "tier": "Tier 1", "segment": "Enterprise", "website": "www.nyumc.org", "arr": {"total": 332904.6, "performance": 0, "recruiting": 159505.5, "onboarding": 166049.1, "learning": 0, "managed_services": 0, "other": 7350.0}, "products": {"active": "Recruiting, Onboarding, Other", "expired": "Onboarding, Talent Center, Recruiting, Integrations, Additional Offerings"}, "contract": {"next_renewal": "2027-03-01", "renewal_process": "Automatic Renewal", "last_start": "2024-03-01", "earliest": "2010-12-29", "active_count": 2.0}, "health": {"sentiment": "OPEN", "engagement_score": 80.0, "services_engagement": 50.0, "nps": 0, "last_nps_sent": "2026-05-16", "at_risk_alerts": 0, "risk_signals": []}, "strategy": {"renewal_strategy": "<p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Working on finalizing the 2024 Renewal, which is a 3-Year extension for ONB and REC.\u00a0Contract pending signatures. Early Feb 2024</span></p><p><br></p><p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Next Renewal Contract to be discussed at later time. When?</span></p>", "expansion_opportunities": "<p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Adding 10 </span><strong style=\"color: black; font-family: Inter; font-size: 10pt;\">(</strong><strong style=\"color: red; font-family: Inter; font-size: 10pt;\">NOW 20</strong><strong style=\"color: black; font-family: Inter; font-size: 10pt;\">) </strong><span style=\"color: black; font-family: Inter; font-size: 10pt;\">additional R/RM Licenses on </span><strong style=\"color: black; font-family: Inter; font-size: 10pt;\">this</strong><span style=\"color: black; font-family: Inter; font-size: 10pt;\"> Renewal for the LIC Expansion. Opp: Yes, part of Renewal</span></p><p><br></p><p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Potential for ONB/REC Licenses as they continue to grow further in 2024. Opp: Not at this time</span></p><p><br></p><p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Managed Services potential (KellyB new SC) \u2013 intro Feb. Opp: Has been discussed !!!</span></p><p><br></p><p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Search and OTC \u2013 discussed in 2023 but they declined, potential for further discussions later in 2024. Opp:</span></p><p><br></p><p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">License Overages - will monitor as contract cycle ends</span></p>", "renewal_risks": "<p>Known or Suspected? <span style=\"color: black; font-family: Inter; font-size: 10pt;\">Product Related. Enhancement requests, some issues / tickets for ONB and REC. File \u201cNYU Top 20\u201d \u2013 that Sean has maintained</span></p><p><br></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgb(68, 68, 68);\">Known or Suspected? </span><span style=\"color: black; font-family: Inter; font-size: 10pt;\">REC SMS. Appears to be canceling REC SMS \u2013 meeting with NYU 1/31/24.\u00a0Issues since started and not using.\u00a0REC Product Aware</span></p><p><br></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgb(68, 68, 68);\">Known or Suspected?  </span><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Support Cases. High number.\u00a0</span><strong style=\"color: black; font-family: Inter; font-size: 10pt;\">221</strong><span style=\"color: black; font-family: Inter; font-size: 10pt;\"> in 2023.\u00a0So far 15 in 2024\u00a0</span><strong style=\"color: black; font-family: Inter; font-size: 10pt;\">(MS Needed)</strong></p>"}, "team": {"csm": "Andrew Pollard", "am": "Kara Sheridan", "epm": "Elizabeth Affholder", "support": "Kristian Monge"}, "engagement": {"last_engagement_date": "2023-11-13", "last_site_review": "2025-10-03", "days_since_site_review": 241.0, "last_training": "2026-04-16", "days_since_training": 46.0}, "competitors": {"ats": "SilkRoad Recruiting", "onboarding": "SilkRoad Onboarding", "epm": "Other Vendor", "hris": "PeopleSoft"}}, {"id": "0016000000Iu3CrAAJ", "name": "GroupM", "slug": "groupm", "type": "Customer", "industry": "Advertising & Marketing", "employees": 42000, "tier": "Tier 1", "segment": "Enterprise", "website": "www.groupm.com", "arr": {"total": 314000.0, "performance": 0, "recruiting": 0, "onboarding": 314000.0, "learning": 0, "managed_services": 0, "other": 0}, "products": {"active": "Onboarding, Other", "expired": "Integrations, Onboarding"}, "contract": {"next_renewal": "2026-08-04", "renewal_process": "Automatic Renewal", "last_start": "2024-08-04", "earliest": "2010-06-17", "active_count": 2.0}, "health": {"sentiment": "OPEN", "engagement_score": 100.0, "services_engagement": 100.0, "nps": 0, "last_nps_sent": "2026-04-17", "at_risk_alerts": 0, "risk_signals": []}, "strategy": {"renewal_strategy": "<p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Current Renewal Date of 8/4.\u00a0Will begin discussions in Q2 while also monitoring License Compliance. Close by end of Q2 with License Monitoring</span></p><p><br></p><p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Will also make hard sell for Managed Services as part of next Renewal while mentioning this during year. 2024 Renewal (8/4)</span></p>", "expansion_opportunities": "<p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Onboarding Portal and License Expansion. Opp: Yes</span></p><p><br></p><p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Managed Services Hours (based on Support Cases) Adam and John will PUSH hard for MS Hours !!! Opp: No, but WILL be 2024 !</span></p><p><br></p><p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Global Opportunities \u2013 Figure a way to be involved. Determine in 2024</span></p>", "renewal_risks": "<p>Known: <span style=\"color: black; font-family: Inter; font-size: 10pt;\">Many, Many Support Cases in 2023/2024. Support Case Amounts:\u00a02023) 82\u00a0\u00a02024) 9</span></p>"}, "team": {"csm": "Andrew Pollard", "am": "Kara Sheridan", "epm": "Elizabeth Affholder", "support": "Kristian Monge", "services": "Randy Havel"}, "engagement": {"last_engagement_date": "2023-11-08", "last_site_review": "2026-05-12", "days_since_site_review": 20.0, "last_training": "2026-05-05", "days_since_training": 27.0}, "competitors": {"ats": "Jobvite", "onboarding": "SilkRoad Onboarding", "epm": "Cornerstone", "hris": "ADP"}}, {"id": "0016000000ItthZAAR", "name": "The Cleveland Clinic Foundation", "slug": "the-cleveland-clinic-foundation", "type": "Customer", "industry": "Medical & Surgical Hospitals", "employees": 48000, "tier": "Tier 1", "segment": "Enterprise", "website": "https://my.clevelandclinic.org/", "arr": {"total": 282575.65, "performance": 0, "recruiting": 0, "onboarding": 198031.68, "learning": 0, "managed_services": 56754.07, "other": 27789.9}, "products": {"active": "Managed Services, Onboarding, Other", "expired": "SDA"}, "contract": {"next_renewal": "2027-01-01", "renewal_process": null, "last_start": "2023-09-26", "earliest": "2012-12-28", "active_count": 3.0}, "health": {"sentiment": "OPEN", "engagement_score": 80.0, "services_engagement": 100.0, "nps": 0, "last_nps_sent": "2026-04-17", "at_risk_alerts": 0, "risk_signals": []}, "strategy": {"renewal_strategy": "<p><span style=\"font-size: 10pt; font-family: Arial;\">\u2022</span><span style=\"font-size: 10pt; font-family: Inter; color: black;\">Set up regular monthly calls w/ Melissa. Ongoing</span></p><p><br></p><p><span style=\"font-size: 10pt; font-family: Arial;\">\u2022</span><span style=\"font-size: 10pt; font-family: Inter; color: black;\">Understand business goals and plan ahead.</span><span style=\"font-size: 13.3333px; font-family: Inter; color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);\"> Ongoing</span></p><p><br></p><p><span style=\"font-size: 10pt; font-family: Arial;\">\u2022</span><span style=\"font-size: 10pt; font-family: Inter; color: black;\"> Set up next touch point (BR) call and include Zaid.</span><span style=\"font-size: 13.3333px; font-family: Inter; color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);\"> Ongoing</span></p>", "expansion_opportunities": "<p><span style=\"font-size: 10pt; font-family: Arial;\">\u2022</span><span style=\"font-size: 10pt; font-family: Inter; color: black;\">Texting? Portal work (services)</span></p>", "renewal_risks": "<p>Known or suspected? <span style=\"color: black; font-family: Inter; font-size: 10pt;\">Need to make end user experience easier per Zaid\u00a0</span></p>"}, "team": {"csm": "Andrew Pollard", "am": "Kara Sheridan", "epm": "Elizabeth Affholder", "support": "Kristian Monge", "sc": "Bill McGuire"}, "engagement": {"last_engagement_date": "2023-11-09", "last_site_review": "2026-01-07", "days_since_site_review": 145.0, "last_training": "2026-05-13", "days_since_training": 19.0}, "competitors": {"ats": "Workday", "onboarding": "SilkRoad Onboarding", "epm": "Workday", "hris": "Workday"}}, {"id": "0016000000ocSW4AAM", "name": "Partnership HealthPlan of California", "slug": "partnership-healthplan-of-california", "type": "Customer", "industry": "Non-Profit & Charitable Organizations", "employees": 982, "tier": "Tier 1", "segment": "Enterprise", "website": "www.partnershiphp.org", "arr": {"total": 228198.12, "performance": 57653.09, "recruiting": 0, "onboarding": 0, "learning": 170545.03, "managed_services": 0, "other": 0}, "products": {"active": "Performance, Learning", "expired": "Performance_WingSpan, Learning"}, "contract": {"next_renewal": "2029-07-01", "renewal_process": "Automatic Renewal", "last_start": "2026-03-31", "earliest": "2014-02-14", "active_count": 6.0}, "health": {"sentiment": "OPEN", "engagement_score": 60.0, "services_engagement": 75.0, "nps": 0, "last_nps_sent": "2026-04-18", "at_risk_alerts": 0, "risk_signals": []}, "strategy": {"renewal_strategy": null, "expansion_opportunities": "<p>Increase in licenses (learning &amp; WS) for renewal - client is growing </p>", "renewal_risks": null}, "team": {"csm": "Andrew Pollard", "am": "Kara Sheridan", "support": "Kristian Monge"}, "engagement": {"last_engagement_date": "2023-11-11", "last_site_review": "2026-04-23", "days_since_site_review": 39.0, "last_training": "2026-04-23", "days_since_training": 39.0}, "competitors": {"ats": "iCims", "onboarding": "?", "epm": "SilkRoad Performance", "hris": "ADP - Workforce Now"}}, {"id": "0016000000jpP6HAAU", "name": "Precise Systems, Inc.", "slug": "precise-systems-inc", "type": "Customer", "industry": "Architecture, Engineering & Design", "employees": 800, "tier": "Tier 2", "segment": "Enterprise", "website": "www.goprecise.com", "arr": {"total": 155000.0, "performance": 0, "recruiting": 0, "onboarding": 0, "learning": 0, "managed_services": 0, "other": 155000.0}, "products": {"active": "Recruiting, Onboarding, Other, Managed Services", "expired": "Recruiting, Onboarding"}, "contract": {"next_renewal": "2028-02-29", "renewal_process": "Automatic Renewal", "last_start": "2026-03-01", "earliest": "2012-11-09", "active_count": 2.0}, "health": {"sentiment": "OPEN", "engagement_score": 60.0, "services_engagement": 25.0, "nps": 6.0, "last_nps_sent": "2026-04-29", "at_risk_alerts": 1.0, "risk_signals": ["Active at-risk alert", "Detractor NPS (6.0)"]}, "strategy": {"renewal_strategy": "<p><span style=\"font-size: 10pt; font-family: Arial;\">\u2022</span><span style=\"font-size: 10pt; font-family: Inter; color: black;\">Verbal Commitment to 3-year renewal. By When?</span></p>", "expansion_opportunities": "<p><span style=\"font-size: 10pt; font-family: Arial;\">\u2022</span><span style=\"font-size: 10pt; font-family: Inter; color: black;\">Offer Letter in Onboarding. Just went live</span></p>", "renewal_risks": null}, "team": {"csm": "Andrew Pollard", "am": "Kara Sheridan", "support": "Kristian Monge"}, "engagement": {"last_engagement_date": "2023-11-13", "last_site_review": "2025-07-24", "days_since_site_review": 312.0, "last_training": "2026-03-19", "days_since_training": 74.0}, "competitors": {"ats": "SilkRoad Recruiting", "onboarding": "SilkRoad Onboarding", "epm": "SilkRoad Performance", "hris": "HeartBeat"}}, {"id": "0016000000jrhz1AAA", "name": "Public Health Management Corporation", "slug": "public-health-management-corporation", "type": "Customer", "industry": "Non-Profit & Charitable Organizations", "employees": 2500, "tier": "Tier 2", "segment": "Enterprise", "website": "www.phmc.org", "arr": {"total": 111328.98, "performance": 0, "recruiting": 0, "onboarding": 0, "learning": 111328.98, "managed_services": 0, "other": 0}, "products": {"active": "Learning", "expired": "Learning"}, "contract": {"next_renewal": "2026-10-30", "renewal_process": "Automatic Renewal", "last_start": "2025-10-06", "earliest": "2013-09-30", "active_count": 1.0}, "health": {"sentiment": "OPEN", "engagement_score": 20.0, "services_engagement": 0.0, "nps": 0, "last_nps_sent": null, "at_risk_alerts": 0, "risk_signals": ["Critical engagement (20.0%)"]}, "strategy": {"renewal_strategy": null, "expansion_opportunities": null, "renewal_risks": null}, "team": {"csm": "Andrew Pollard", "am": "Kara Sheridan", "epm": "Elizabeth Affholder", "support": "Kristian Monge"}, "engagement": {"last_engagement_date": "2023-11-12", "last_site_review": null, "days_since_site_review": null, "last_training": null, "days_since_training": null}, "competitors": {"ats": "Ultirecruit", "onboarding": "?", "epm": "?", "hris": "UltiPro"}}, {"id": "0016000000Iu34aAAB", "name": "UnityPoint Health-Meriter", "slug": "unitypoint-health-meriter", "type": "Customer", "industry": "Hospitals & Physicians Clinics", "employees": 975, "tier": "Tier 2", "segment": "Enterprise", "website": "https://www.unitypoint.org/madison/default.aspx", "arr": {"total": 108605.0, "performance": 108605.0, "recruiting": 0, "onboarding": 0, "learning": 0, "managed_services": 0, "other": 0}, "products": {"active": "Performance", "expired": "Learning, Performance_WingSpan"}, "contract": {"next_renewal": "2028-01-01", "renewal_process": "Automatic Renewal", "last_start": "2025-12-12", "earliest": "2013-04-22", "active_count": 1.0}, "health": {"sentiment": "OPEN", "engagement_score": 40.0, "services_engagement": 25.0, "nps": 3.0, "last_nps_sent": "2026-04-17", "at_risk_alerts": 0, "risk_signals": ["Low engagement (40.0%)", "Detractor NPS (3.0)"]}, "strategy": {"renewal_strategy": "<ul><li>They are contracted w Performance through end of 2025. Will make sure I get on Kiah&#39;s calendar and have already expressed the importance of having her attend our regular cadence calls. She has expressed her desire to meet so will hold her to that. Create consistent relationship and show value by providing support and communication regularly.</li></ul>", "expansion_opportunities": "<ul><li>With Kiah&#39;s help, will get Brian introduced into Unity Point group to see if opportunity to have this part of the org use us for performance management as well.</li></ul>", "renewal_risks": "<ul><li>Only risk is if the organization as a whole decides to move everything over to Lawson which is their current HRIS.</li></ul>"}, "team": {"csm": "Andrew Pollard", "am": "Kara Sheridan", "epm": "Elizabeth Affholder", "support": "Kristian Monge", "services": "Randy Havel"}, "engagement": {"last_engagement_date": "2023-11-03", "last_site_review": "2026-03-18", "days_since_site_review": 75.0, "last_training": "2026-03-11", "days_since_training": 82.0}, "competitors": {"ats": "BrassRing", "onboarding": "Workday", "epm": "SilkRoad Performance", "hris": "Lawson"}}, {"id": "0016000000ItvaFAAR", "name": "Sheppard, Mullin, Richter & Hampton LLP", "slug": "sheppard-mullin-richter-and-hampton-llp", "type": "Customer", "industry": "Law Firms & Legal Services", "employees": 1000, "tier": "Tier 3", "segment": "Enterprise", "website": "https://www.sheppard.com/", "arr": {"total": 97000.0, "performance": 0, "recruiting": 0, "onboarding": 77000.0, "learning": 0, "managed_services": 20000.0, "other": 0}, "products": {"active": "Onboarding, Managed Services", "expired": null}, "contract": {"next_renewal": "2027-10-01", "renewal_process": null, "last_start": "2024-08-23", "earliest": "2024-08-21", "active_count": 1.0}, "health": {"sentiment": "OPEN", "engagement_score": 50.0, "services_engagement": 100.0, "nps": 0, "last_nps_sent": "2026-04-23", "at_risk_alerts": 0, "risk_signals": []}, "strategy": {"renewal_strategy": null, "expansion_opportunities": null, "renewal_risks": null}, "team": {"csm": "Andrew Pollard", "am": "Kara Sheridan", "support": "Kristian Monge"}, "engagement": {"last_engagement_date": "2023-11-11", "last_site_review": "2025-12-05", "days_since_site_review": 178.0, "last_training": "2026-04-28", "days_since_training": 34.0}, "competitors": {"ats": "VI Desktop", "onboarding": "SilkRoad Onboarding", "epm": "?", "hris": "UltiPro"}}, {"id": "0013200001Aj2FdAAJ", "name": "Tri Pointe Homes", "slug": "tri-pointe-homes", "type": "Customer", "industry": "Commercial & Residential Construction", "employees": 1579, "tier": "Tier 3", "segment": "Enterprise", "website": "www.tripointegroup.com", "arr": {"total": 89245.92, "performance": 65485.92, "recruiting": 0, "onboarding": 0, "learning": 0, "managed_services": 23760.0, "other": 0}, "products": {"active": "Managed Services, Performance", "expired": "Performance, Performance_WingSpan, Onboarding"}, "contract": {"next_renewal": "2026-12-01", "renewal_process": "Automatic Renewal", "last_start": "2024-12-01", "earliest": "2015-09-18", "active_count": 2.0}, "health": {"sentiment": "OPEN", "engagement_score": 75.0, "services_engagement": 100.0, "nps": 0, "last_nps_sent": "2026-04-18", "at_risk_alerts": 0, "risk_signals": []}, "strategy": {"renewal_strategy": "<p><span style=\"font-size: 10pt; font-family: Arial;\">\u2022</span><span style=\"font-size: 10pt; font-family: Inter; color: black;\">Establish Monthly meetings. February</span></p><p><span style=\"font-size: 10pt; font-family: Arial;\">\u2022</span><span style=\"font-size: 10pt; font-family: Inter; color: black;\">Ask for it. March</span></p>", "expansion_opportunities": "<p>OTC. Opp: no. Not interested</p>", "renewal_risks": "<p>Known or suspected? <span style=\"color: black; font-family: Inter; font-size: 10pt;\">Lost recruiting to iCIMS</span></p><p><span style=\"color: black; font-family: Inter; font-size: 10pt;\">Known or suspected? </span><span style=\"font-family: Arial; font-size: 10pt;\">\u2022</span><span style=\"font-family: Inter; font-size: 10pt; color: black;\">All new Leadership Team</span></p>"}, "team": {"csm": "Andrew Pollard", "am": "Kara Sheridan", "epm": "Elizabeth Affholder", "support": "Kristian Monge", "sc": "Bill McGuire", "services": "Randy Havel"}, "engagement": {"last_engagement_date": "2023-11-11", "last_site_review": "2025-07-30", "days_since_site_review": 306.0, "last_training": "2026-03-10", "days_since_training": 83.0}, "competitors": {"ats": "iCims", "onboarding": "SilkRoad Onboarding", "epm": "SilkRoad Agile Performance", "hris": "Kronos"}}, {"id": "0016000000ItvbzAAB", "name": "Wilmer Cutler Pickering Hale and Dorr LLP", "slug": "wilmer-cutler-pickering-hale-and-dorr-llp", "type": "Customer", "industry": "Law Firms & Legal Services", "employees": 2350, "tier": "Tier 3", "segment": "Enterprise", "website": "www.wilmerhale.com", "arr": {"total": 84925.41, "performance": 0, "recruiting": 42372.74, "onboarding": 33328.84, "learning": 0, "managed_services": 0, "other": 9223.83}, "products": {"active": "Other, Onboarding, Recruiting", "expired": "Onboarding, Recruiting"}, "contract": {"next_renewal": "2028-04-01", "renewal_process": "Automatic Renewal", "last_start": "2026-02-20", "earliest": "2011-06-30", "active_count": 2.0}, "health": {"sentiment": "OPEN", "engagement_score": 75.0, "services_engagement": 75.0, "nps": 0, "last_nps_sent": "2026-04-21", "at_risk_alerts": 0, "risk_signals": []}, "strategy": {"renewal_strategy": null, "expansion_opportunities": null, "renewal_risks": null}, "team": {"csm": "Andrew Pollard", "am": "Kara Sheridan", "epm": "Elizabeth Affholder", "support": "Kristian Monge"}, "engagement": {"last_engagement_date": "2023-11-11", "last_site_review": null, "days_since_site_review": null, "last_training": "2026-05-08", "days_since_training": 24.0}, "competitors": {"ats": "SilkRoad Recruiting", "onboarding": "SilkRoad Onboarding", "epm": "?", "hris": "Oracle"}}, {"id": "0016000000Iu2jxAAB", "name": "Johnson, Mirmiran & Thompson, Inc.", "slug": "johnson-mirmiran-and-thompson-inc", "type": "Customer", "industry": "Architecture, Engineering & Design", "employees": 2700, "tier": "Tier 3", "segment": "Enterprise", "website": "http://www.jmt.com/", "arr": {"total": 84545.46, "performance": 0, "recruiting": 40560.63, "onboarding": 43984.83, "learning": 0, "managed_services": 0, "other": 0}, "products": {"active": "Recruiting, Onboarding", "expired": "Talent Center, Onboarding, Recruiting"}, "contract": {"next_renewal": "2027-11-05", "renewal_process": "Automatic Renewal", "last_start": "2025-11-05", "earliest": "2010-11-05", "active_count": 2.0}, "health": {"sentiment": "OPEN", "engagement_score": 100.0, "services_engagement": 100.0, "nps": 0, "last_nps_sent": "2026-04-17", "at_risk_alerts": 0, "risk_signals": []}, "strategy": {"renewal_strategy": null, "expansion_opportunities": null, "renewal_risks": null}, "team": {"csm": "Andrew Pollard", "am": "Kara Sheridan", "epm": "Elizabeth Affholder", "support": "Kristian Monge"}, "engagement": {"last_engagement_date": "2023-11-11", "last_site_review": "2026-03-02", "days_since_site_review": 91.0, "last_training": "2026-04-06", "days_since_training": 56.0}, "competitors": {"ats": "SilkRoad Recruiting", "onboarding": "SilkRoad Onboarding", "epm": "?", "hris": "Other Vendor"}}, {"id": "0016000000N4dFpAAJ", "name": "MarketAxess Corporation", "slug": "marketaxess-corporation", "type": "Customer", "industry": "Lending & Brokerage", "employees": 859, "tier": "Tier 3", "segment": "Enterprise", "website": "www.marketaxess.com", "arr": {"total": 78462.0, "performance": 76840.0, "recruiting": 0, "onboarding": 0, "learning": 0, "managed_services": 0, "other": 1622.0}, "products": {"active": "Performance, Other", "expired": "Performance_WingSpan"}, "contract": {"next_renewal": "2027-05-24", "renewal_process": "Automatic Renewal", "last_start": "2026-05-21", "earliest": "2012-05-24", "active_count": 1.0}, "health": {"sentiment": "OPEN", "engagement_score": 100.0, "services_engagement": 50.0, "nps": 0, "last_nps_sent": "2026-05-28", "at_risk_alerts": 0, "risk_signals": []}, "strategy": {"renewal_strategy": null, "expansion_opportunities": null, "renewal_risks": null}, "team": {"csm": "Andrew Pollard", "am": "Kara Sheridan", "epm": "Elizabeth Affholder", "support": "Kristian Monge", "services": "Randy Havel"}, "engagement": {"last_engagement_date": "2023-11-11", "last_site_review": "2025-12-05", "days_since_site_review": 178.0, "last_training": "2025-11-14", "days_since_training": 199.0}, "competitors": {"ats": "Greenhouse", "onboarding": "Ultipro", "epm": "SilkRoad Performance", "hris": "UltiPro"}}, {"id": "0016000000Iu2YSAAZ", "name": "Viejas Casino & Resort", "slug": "viejas-casino-and-resort", "type": "Customer", "industry": "Gambling & Gaming", "employees": 1962, "tier": "Tier 3", "segment": "Enterprise", "website": "https://viejas.com/", "arr": {"total": 77334.85, "performance": 0, "recruiting": 50929.96, "onboarding": 23622.67, "learning": 0, "managed_services": 0, "other": 2782.22}, "products": {"active": "Onboarding, Recruiting, Other", "expired": "Recruiting, Onboarding, Integrations"}, "contract": {"next_renewal": "2026-09-01", "renewal_process": "Automatic Renewal", "last_start": "2024-06-03", "earliest": "2013-06-18", "active_count": 2.0}, "health": {"sentiment": "OPEN", "engagement_score": 75.0, "services_engagement": 50.0, "nps": 0, "last_nps_sent": "2026-04-21", "at_risk_alerts": 0, "risk_signals": []}, "strategy": {"renewal_strategy": null, "expansion_opportunities": null, "renewal_risks": null}, "team": {"csm": "Andrew Pollard", "am": "Kara Sheridan", "support": "Hazel Laude"}, "engagement": {"last_engagement_date": "2023-11-13", "last_site_review": "2026-01-08", "days_since_site_review": 144.0, "last_training": null, "days_since_training": null}, "competitors": {"ats": "SilkRoad Recruiting", "onboarding": "SilkRoad Onboarding", "epm": "Halogen", "hris": "Lawson"}}, {"id": "001Vs00000pI2ArIAK", "name": "Cleveland Clinic London, Ltd", "slug": "cleveland-clinic-london-ltd", "type": "Customer", "industry": "Medical & Surgical Hospitals", "employees": 24, "tier": "Tier 1", "segment": "Enterprise", "website": "https://clevelandcliniclondon.uk/", "arr": {"total": 25562.88, "performance": 0, "recruiting": 0, "onboarding": 0, "learning": 0, "managed_services": 25562.88, "other": 0}, "products": {"active": "Managed Services", "expired": null}, "contract": {"next_renewal": "2027-04-23", "renewal_process": null, "last_start": "2026-03-25", "earliest": "2025-08-06", "active_count": 1.0}, "health": {"sentiment": "OPEN", "engagement_score": 80.0, "services_engagement": 25.0, "nps": 0, "last_nps_sent": null, "at_risk_alerts": 0, "risk_signals": []}, "strategy": {"renewal_strategy": null, "expansion_opportunities": null, "renewal_risks": null}, "team": {"csm": "Andrew Pollard", "epm": "Elizabeth Affholder", "support": "Kristian Monge"}, "engagement": {"last_engagement_date": null, "last_site_review": null, "days_since_site_review": null, "last_training": null, "days_since_training": null}, "competitors": {"ats": "?", "onboarding": "?", "epm": "?", "hris": "?"}}, {"id": "0016000000ItyfJAAR", "name": "Framatome Inc.", "slug": "framatome-inc", "type": "Customer", "industry": "Industrial Machinery & Equipment", "employees": 18000, "tier": "Tier 3", "segment": "Enterprise", "website": "framatome.com", "arr": {"total": 17500.0, "performance": 0, "recruiting": 17500.0, "onboarding": 0, "learning": 0, "managed_services": 0, "other": 0}, "products": {"active": "Recruiting", "expired": "Onboarding, Recruiting"}, "contract": {"next_renewal": "2028-01-01", "renewal_process": "Automatic Renewal", "last_start": "2026-03-20", "earliest": "2016-12-07", "active_count": 1.0}, "health": {"sentiment": "OPEN", "engagement_score": 0, "services_engagement": 0.0, "nps": 0, "last_nps_sent": "2025-12-19", "at_risk_alerts": 0, "risk_signals": ["Critical engagement (0%)"]}, "strategy": {"renewal_strategy": "<p>1) Framatome is signed through 3/31/2025 for both ONB and REC. Will begin Renewal </p><p>2) Discussions in early Q4-2024. Continue to monitor License Compliance for ONB Events.  Heather Ramsey is the Decision Maker and Signee from Framatome.</p>", "expansion_opportunities": "<p>1) Q1-2024 Monitoring ONB Event Overages. Have meeting scheduled with Heather Ramsey on 2/26 to discuss overages and potential to add a new amount for mid-contract adjustment.</p><p>2) Have been discussing with Framatome since late 2022 and throughout 2023 a new Onboarding Portal and Event for their FoxGuard Division. Opportunity has been created and will continue to update and discuss further.</p><p>3) Continue conversations for ONB Portals and Employee experience enhancements.</p><p>4) Potential for REC License increase as they continue to grow.</p><p>5) Onboarding expansion with their US and Global Locations in France, Germany and China</p><p>6) Managed Services has been reviewed and discussed on multiple occasions but budget constraints limit this.  We believe there is still value to pursue a small MS Hours package which would enable for an overhaul and upgrade of their ONB and REC Portals and Environment.</p>", "renewal_risks": "<p>1) For their Europe Locations, they use a separate ATS - Talentsoft</p><p>2) Framatome has always been VERY reluctant to spend $&#39;s on mid-large scale projects - budget restrictions.</p><p>3) For their Other Vendors listed in SF, Framatome uses the following:</p><p>LMS:  Percipio</p><p>ERP:  Portfolio</p><p>Background Checks:  Accurate</p>"}, "team": {"csm": "Andrew Pollard", "am": "Kara Sheridan", "epm": "Elizabeth Affholder", "support": "Kristian Monge"}, "engagement": {"last_engagement_date": "2023-11-14", "last_site_review": null, "days_since_site_review": null, "last_training": null, "days_since_training": null}, "competitors": {"ats": "SilkRoad Recruiting", "onboarding": "SilkRoad Onboarding", "epm": "Other Vendor", "hris": "UltiPro"}}, {"id": "0016000000Iu3biAAB", "name": "Bud Antle, Inc.", "slug": "bud-antle-inc", "type": "Customer", "industry": "Grocery Retail", "employees": 36581, "tier": "Data Repository/Limited License", "segment": "Corporate", "website": "www.dole.com", "arr": {"total": 4500.0, "performance": 0, "recruiting": 4500.0, "onboarding": 0, "learning": 0, "managed_services": 0, "other": 0}, "products": {"active": "Recruiting", "expired": "Performance, Onboarding, Recruiting"}, "contract": {"next_renewal": null, "renewal_process": "Automatic Renewal", "last_start": "2026-02-27", "earliest": "2012-12-07", "active_count": 1.0}, "health": {"sentiment": "OPEN", "engagement_score": 100.0, "services_engagement": 100.0, "nps": 0, "last_nps_sent": "2026-04-23", "at_risk_alerts": 0, "risk_signals": []}, "strategy": {"renewal_strategy": null, "expansion_opportunities": null, "renewal_risks": null}, "team": {"csm": "Andrew Pollard", "am": "Kara Sheridan", "support": "Hazel Laude"}, "engagement": {"last_engagement_date": "2023-11-13", "last_site_review": "2025-10-31", "days_since_site_review": 213.0, "last_training": "2025-10-31", "days_since_training": 213.0}, "competitors": {"ats": "SilkRoad Recruiting", "onboarding": "SilkRoad Onboarding", "epm": "SilkRoad Performance", "hris": "?"}}];
+const summary = {"total_accounts": 16, "total_arr": 2091688.87, "arr_by_product": {"onboarding": 856017.12, "recruiting": 315368.83, "performance": 308584.01, "learning": 281874.01, "managed_services": 126076.95, "other": 203767.95}, "renewals_2026": [{"account": "GroupM", "date": "2026-08-04", "arr": 314000.0}, {"account": "Public Health Management Corporation", "date": "2026-10-30", "arr": 111328.98}, {"account": "Tri Pointe Homes", "date": "2026-12-01", "arr": 89245.92}, {"account": "Viejas Casino & Resort", "date": "2026-09-01", "arr": 77334.85}], "at_risk_count": 4};
+
+// KPIs
+const kpiGrid = document.getElementById('kpi-grid');
+const totalARR = summary.total_arr;
+const avgEngagement = Math.round(accounts.reduce((s, a) => s + (a.health.engagement_score || 0), 0) / accounts.length);
+const atRiskCount = summary.at_risk_count;
+const renewals2026 = summary.renewals_2026;
+const renewalARR = renewals2026.reduce((s, r) => s + r.arr, 0);
+
+const kpis = [
+  { label: 'Total ARR', value: '$' + (totalARR / 1000000).toFixed(2) + 'M', sub: accounts.length + ' accounts', cls: '' },
+  { label: 'Avg Engagement', value: avgEngagement + '%', sub: 'Across portfolio', cls: avgEngagement >= 60 ? 'ok' : avgEngagement >= 40 ? 'warn' : 'risk' },
+  { label: 'At-Risk Accounts', value: atRiskCount, sub: 'Low engagement / NPS detractors', cls: atRiskCount > 0 ? 'risk' : 'ok' },
+  { label: '2026 Renewals', value: renewals2026.length, sub: '$' + Math.round(renewalARR/1000) + 'K exposed', cls: 'warn' },
+  { label: 'Tier 1 Accounts', value: accounts.filter(a => a.tier === 'Tier 1').length, sub: '$' + Math.round(accounts.filter(a => a.tier === 'Tier 1').reduce((s,a) => s + a.arr.total, 0)/1000) + 'K ARR', cls: '' },
+];
+kpis.forEach(k => {
+  kpiGrid.innerHTML += '<div class="kpi-card ' + k.cls + '"><div class="label">' + k.label + '</div><div class="value">' + k.value + '</div><div class="sub">' + k.sub + '</div></div>';
+});
+
+// Team with hover tooltips
+const teamGrid = document.getElementById('team-grid');
+const teamData = {"Andrew Pollard": {"role": "Customer Success Manager", "accounts": ["NYU Langone Health (NYULH)", "GroupM", "The Cleveland Clinic Foundation", "Partnership HealthPlan of California", "Precise Systems, Inc.", "Public Health Management Corporation", "UnityPoint Health-Meriter", "Sheppard, Mullin, Richter & Hampton LLP", "Tri Pointe Homes", "Wilmer Cutler Pickering Hale and Dorr LLP", "Johnson, Mirmiran & Thompson, Inc.", "MarketAxess Corporation", "Viejas Casino & Resort", "Cleveland Clinic London, Ltd", "Framatome Inc.", "Bud Antle, Inc."]}, "Kara Sheridan": {"role": "Enterprise Account Manager", "accounts": ["NYU Langone Health (NYULH)", "GroupM", "The Cleveland Clinic Foundation", "Partnership HealthPlan of California", "Precise Systems, Inc.", "Public Health Management Corporation", "UnityPoint Health-Meriter", "Sheppard, Mullin, Richter & Hampton LLP", "Tri Pointe Homes", "Wilmer Cutler Pickering Hale and Dorr LLP", "Johnson, Mirmiran & Thompson, Inc.", "MarketAxess Corporation", "Viejas Casino & Resort", "Framatome Inc.", "Bud Antle, Inc."]}, "Elizabeth Affholder": {"role": "Enterprise Program Manager", "accounts": ["NYU Langone Health (NYULH)", "GroupM", "The Cleveland Clinic Foundation", "Public Health Management Corporation", "UnityPoint Health-Meriter", "Tri Pointe Homes", "Wilmer Cutler Pickering Hale and Dorr LLP", "Johnson, Mirmiran & Thompson, Inc.", "MarketAxess Corporation", "Cleveland Clinic London, Ltd", "Framatome Inc."]}, "Kristian Monge": {"role": "Client Support Specialist", "accounts": ["NYU Langone Health (NYULH)", "GroupM", "The Cleveland Clinic Foundation", "Partnership HealthPlan of California", "Precise Systems, Inc.", "Public Health Management Corporation", "UnityPoint Health-Meriter", "Sheppard, Mullin, Richter & Hampton LLP", "Tri Pointe Homes", "Wilmer Cutler Pickering Hale and Dorr LLP", "Johnson, Mirmiran & Thompson, Inc.", "MarketAxess Corporation", "Cleveland Clinic London, Ltd", "Framatome Inc."]}, "Hazel Laude": {"role": "Sr Technical Support Specialist", "accounts": ["Viejas Casino & Resort", "Bud Antle, Inc."]}, "Bill McGuire": {"role": "Sr Solution Engineer", "accounts": ["The Cleveland Clinic Foundation", "Tri Pointe Homes"]}, "Randy Havel": {"role": "Senior Services Consultant", "accounts": ["GroupM", "UnityPoint Health-Meriter", "Tri Pointe Homes", "MarketAxess Corporation"]}};
+
+const teamDisplay = [
+  { key: 'Andrew Pollard', roleLabel: 'CSM (Owner)' },
+  { key: 'Kara Sheridan', roleLabel: 'Account Manager' },
+  { key: 'Elizabeth Affholder', roleLabel: 'Enterprise Program Manager' },
+  { key: 'Kristian Monge', roleLabel: 'Client Support Specialist' },
+  { key: 'Hazel Laude', roleLabel: 'Sr Technical Support' },
+  { key: 'Bill McGuire', roleLabel: 'Sr Solution Engineer' },
+  { key: 'Randy Havel', roleLabel: 'Services Consultant' },
+];
+
+teamDisplay.forEach(t => {
+  const data = teamData[t.key];
+  const acctCount = data.accounts.length;
+  const acctList = data.accounts.map(a => '<li>' + a + '</li>').join('');
+  teamGrid.innerHTML += '<div class="team-card">' +
+    '<div class="role">' + t.roleLabel + '</div>' +
+    '<div class="t-name">' + t.key + '</div>' +
+    '<div class="coverage">' + acctCount + ' of 16 accounts</div>' +
+    '<div class="tooltip">' +
+      '<div class="tt-title">' + t.key + '</div>' +
+      '<div class="tt-role">' + data.role + '</div>' +
+      '<ul class="tt-accounts">' + acctList + '</ul>' +
+      '<div class="tt-count">' + acctCount + ' accounts covered</div>' +
+    '</div>' +
+  '</div>';
+});
+
+// Renewal cards
+const renewalCards = document.getElementById('renewal-cards');
+renewals2026.sort((a, b) => a.date.localeCompare(b.date)).forEach(r => {
+  renewalCards.innerHTML += '<div class="renewal-card"><div class="date">' + r.date + '</div><div class="r-name">' + r.account + '</div><div class="arr">$' + Math.round(r.arr).toLocaleString() + '</div></div>';
+});
+
+// Account table
+function renderTable(accts) {
+  const tbody = document.getElementById('account-tbody');
+  tbody.innerHTML = '';
+  accts.forEach(a => {
+    const tierClass = a.tier === 'Tier 1' ? 't1' : a.tier === 'Tier 2' ? 't2' : a.tier === 'Tier 3' ? 't3' : 'dr';
+    const eng = a.health.engagement_score || 0;
+    const engClass = eng >= 70 ? 'high' : eng >= 40 ? 'mid' : 'low';
+    let status = '';
+    if (a.health.risk_signals.length > 0) {
+      status = '<span class="risk-badge at-risk"><i class="fa-solid fa-triangle-exclamation"></i> ' + a.health.risk_signals[0] + '</span>';
+    } else if (eng >= 75) {
+      status = '<span class="risk-badge healthy"><i class="fa-solid fa-check"></i> Healthy</span>';
+    } else {
+      status = '<span class="risk-badge warning"><i class="fa-solid fa-minus"></i> Monitor</span>';
+    }
+    const products = (a.products.active || '').split(', ').filter(p => p).map(p => '<span class="product-tag">' + p + '</span>').join('');
+    tbody.innerHTML += '<tr>' +
+      '<td><a class="account-name" href="' + a.slug + '/index.html">' + a.name + '</a><br><span style="font-size:11px;color:var(--color-text-muted)">' + (a.industry || '') + '</span></td>' +
+      '<td><span class="tier-badge ' + tierClass + '">' + (a.tier || 'N/A') + '</span></td>' +
+      '<td class="arr-cell">$' + Math.round(a.arr.total).toLocaleString() + '</td>' +
+      '<td><div class="products-cell">' + products + '</div></td>' +
+      '<td style="font-family:var(--font-mono);font-size:12px;">' + (a.contract.next_renewal || 'N/A') + '</td>' +
+      '<td><div class="engagement-bar"><div class="fill ' + engClass + '" style="width:' + eng + '%"></div></div><span style="font-size:12px;font-family:var(--font-mono)">' + eng + '%</span></td>' +
+      '<td>' + status + '</td></tr>';
+  });
+}
+renderTable(accounts);
+
+// Filters
+const filterBar = document.getElementById('filter-bar');
+['All', 'Tier 1', 'Tier 2', 'Tier 3', 'At Risk', 'Renewing 2026'].forEach((t, i) => {
+  filterBar.innerHTML += '<button class="filter-btn ' + (i===0?'active':'') + '" data-filter="' + t + '">' + t + '</button>';
+});
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const f = btn.dataset.filter;
+    if (f === 'All') renderTable(accounts);
+    else if (f === 'At Risk') renderTable(accounts.filter(a => a.health.risk_signals.length > 0));
+    else if (f === 'Renewing 2026') renderTable(accounts.filter(a => a.contract.next_renewal && a.contract.next_renewal.includes('2026')));
+    else renderTable(accounts.filter(a => a.tier === f));
+  });
+});
+
+// Sorting
+let sortDir = {};
+document.querySelectorAll('[data-sort]').forEach(th => {
+  th.addEventListener('click', () => {
+    const key = th.dataset.sort;
+    sortDir[key] = !sortDir[key];
+    const sorted = [...accounts].sort((a, b) => {
+      let va, vb;
+      if (key === 'name') { va = a.name; vb = b.name; }
+      else if (key === 'tier') { va = a.tier || 'z'; vb = b.tier || 'z'; }
+      else if (key === 'arr') { va = a.arr.total; vb = b.arr.total; }
+      else if (key === 'renewal') { va = a.contract.next_renewal || 'z'; vb = b.contract.next_renewal || 'z'; }
+      else if (key === 'engagement') { va = a.health.engagement_score; vb = b.health.engagement_score; }
+      return sortDir[key] ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
+    });
+    renderTable(sorted);
+  });
+});
+
+// Charts - ARR by Product with account detail tooltips
+const productAccounts = {"Onboarding": [{"name": "GroupM", "arr": 314000.0}, {"name": "The Cleveland Clinic Foundation", "arr": 198031.68}, {"name": "NYU Langone Health (NYULH)", "arr": 166049.1}, {"name": "Sheppard, Mullin, Richter & Hampton LLP", "arr": 77000.0}, {"name": "Johnson, Mirmiran & Thompson, Inc.", "arr": 43984.83}, {"name": "Wilmer Cutler Pickering Hale and Dorr LLP", "arr": 33328.84}, {"name": "Viejas Casino & Resort", "arr": 23622.67}], "Recruiting": [{"name": "NYU Langone Health (NYULH)", "arr": 159505.5}, {"name": "Viejas Casino & Resort", "arr": 50929.96}, {"name": "Wilmer Cutler Pickering Hale and Dorr LLP", "arr": 42372.74}, {"name": "Johnson, Mirmiran & Thompson, Inc.", "arr": 40560.63}, {"name": "Framatome Inc.", "arr": 17500.0}, {"name": "Bud Antle, Inc.", "arr": 4500.0}], "Performance": [{"name": "UnityPoint Health-Meriter", "arr": 108605.0}, {"name": "MarketAxess Corporation", "arr": 76840.0}, {"name": "Tri Pointe Homes", "arr": 65485.92}, {"name": "Partnership HealthPlan of California", "arr": 57653.09}], "Learning": [{"name": "Partnership HealthPlan of California", "arr": 170545.03}, {"name": "Public Health Management Corporation", "arr": 111328.98}], "Managed Svcs": [{"name": "The Cleveland Clinic Foundation", "arr": 56754.07}, {"name": "Cleveland Clinic London, Ltd", "arr": 25562.88}, {"name": "Tri Pointe Homes", "arr": 23760.0}, {"name": "Sheppard, Mullin, Richter & Hampton LLP", "arr": 20000.0}], "Other": [{"name": "Precise Systems, Inc.", "arr": 155000.0}, {"name": "The Cleveland Clinic Foundation", "arr": 27789.9}, {"name": "Wilmer Cutler Pickering Hale and Dorr LLP", "arr": 9223.83}, {"name": "NYU Langone Health (NYULH)", "arr": 7350.0}, {"name": "Viejas Casino & Resort", "arr": 2782.22}, {"name": "MarketAxess Corporation", "arr": 1622.0}]};
+
+Highcharts.chart('chart-arr-product', {
+  chart: { type: 'pie', backgroundColor: 'transparent' },
+  title: { text: null },
+  tooltip: {
+    useHTML: true,
+    formatter: function() {
+      const accts = productAccounts[this.point.name] || [];
+      let html = '<div style="font-size:12px;max-width:280px;">';
+      html += '<b>' + this.point.name + '</b><br>';
+      if (this.point.name === 'Other') {
+        html += '<span style="color:#8993a4;font-size:11px;">Includes: Integrations, Additional Offerings, Talent Center, Connect</span><br><br>';
+      }
+      html += '<b>$' + Math.round(this.point.y).toLocaleString() + '</b> (' + this.point.percentage.toFixed(1) + '%)<br><br>';
+      html += '<div style="border-top:1px solid #e2e8f0;padding-top:6px;margin-top:4px;">';
+      accts.forEach(function(a) {
+        html += '<div style="display:flex;justify-content:space-between;padding:2px 0;font-size:11px;">';
+        html += '<span>' + a.name + '</span>';
+        html += '<span style="font-family:monospace;margin-left:12px;">$' + Math.round(a.arr).toLocaleString() + '</span>';
+        html += '</div>';
+      });
+      html += '</div></div>';
+      return html;
+    }
+  },
+  plotOptions: {
+    pie: {
+      innerSize: '55%',
+      dataLabels: { enabled: true, format: '{point.name}<br>${point.y:,.0f}', style: { fontSize: '11px', color: '#44546f' } },
+    }
+  },
+  colors: ['#2563eb', '#16a34a', '#7c3aed', '#d97706', '#0284c7', '#64748b'],
+  series: [{
+    name: 'ARR',
+    data: [
+      { name: 'Onboarding', y: summary.arr_by_product.onboarding },
+      { name: 'Recruiting', y: summary.arr_by_product.recruiting },
+      { name: 'Performance', y: summary.arr_by_product.performance },
+      { name: 'Learning', y: summary.arr_by_product.learning },
+      { name: 'Managed Svcs', y: summary.arr_by_product.managed_services },
+      { name: 'Other', y: summary.arr_by_product.other },
+    ]
+  }],
+  credits: { enabled: false },
+});
+
+// Renewal timeline scatter with abbreviations
+const abbrevMap = {"NYU Langone Health (NYULH)": "NYU Langone", "GroupM": "GroupM", "The Cleveland Clinic Foundation": "CCF", "Partnership HealthPlan of California": "PHCA", "Precise Systems, Inc.": "Precise Sys", "Public Health Management Corporation": "PHMC", "UnityPoint Health-Meriter": "UnityPoint", "Sheppard, Mullin, Richter & Hampton LLP": "Sheppard Mullin", "Tri Pointe Homes": "Tri Pointe", "Wilmer Cutler Pickering Hale and Dorr LLP": "WilmerHale", "Johnson, Mirmiran & Thompson, Inc.": "JMT", "MarketAxess Corporation": "MarketAxess", "Viejas Casino & Resort": "Viejas", "Cleveland Clinic London, Ltd": "CC London", "Framatome Inc.": "Framatome", "Bud Antle, Inc.": "Bud Antle"};
+
+const renewalData = accounts
+  .filter(a => a.contract.next_renewal)
+  .map(a => ({ name: a.name, abbrev: abbrevMap[a.name] || a.name.substring(0, 10), x: new Date(a.contract.next_renewal).getTime(), y: a.arr.total }))
+  .sort((a, b) => a.x - b.x);
+
+Highcharts.chart('chart-renewals', {
+  chart: { type: 'scatter', backgroundColor: 'transparent', zoomType: 'x' },
+  title: { text: null },
+  xAxis: { type: 'datetime', title: { text: null }, gridLineWidth: 1, gridLineColor: '#f1f5f9' },
+  yAxis: { title: { text: 'ARR ($)' }, labels: { format: '${value:,.0f}' }, gridLineColor: '#f1f5f9' },
+  tooltip: { useHTML: true, headerFormat: '', pointFormat: '<b>{point.name}</b><br>Renewal: {point.x:%b %Y}<br>ARR: <b>${point.y:,.0f}</b>' },
+  plotOptions: {
+    scatter: {
+      marker: { radius: 8, fillColor: '#2563eb', lineWidth: 2, lineColor: '#fff' },
+      dataLabels: {
+        enabled: true,
+        format: '{point.abbrev}',
+        style: { fontSize: '10px', fontWeight: '500', color: '#44546f', textOutline: '2px white' },
+        y: -14
+      }
+    }
+  },
+  series: [{ name: 'Accounts', data: renewalData, keys: ['name', 'abbrev', 'x', 'y'] }],
+  legend: { enabled: false },
+  credits: { enabled: false },
+});
+</script>
+</body>
+</html>
