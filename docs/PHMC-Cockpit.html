@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light only">
+<title>PHMC — CSM Account Cockpit</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;background:#f0f2f7;color:#1a1f2e;overflow-x:hidden;font-size:14px}
+.hdr{background:#1a1f2e;color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.hdr-left{display:flex;align-items:center;gap:14px}
+.hdr-logo{width:32px;height:32px;border-radius:8px;background:#e63946;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0}
+.hdr-name{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.hdr-sub{font-size:12px;color:#94a3b8;margin-top:1px}
+.hdr-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.3px}
+.badge-tier{background:#3b4260;color:#c8d0e7}
+.badge-seg{background:#1e3a5f;color:#93c5fd}
+.badge-renewal{background:#7c3aed;color:#ede9fe}
+.hdr-date{font-size:11px;color:#64748b}
+.kpi-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;padding:12px 16px;background:#f8f9fb;border-bottom:1px solid #e2e8f0}
+.kpi-card{background:#fff;border-radius:10px;padding:12px 14px;border:1px solid #e8eaf0;position:relative}
+.kpi-label{font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.kpi-value{font-size:22px;font-weight:800;margin:4px 0 2px;letter-spacing:-.5px;color:#1a1f2e}
+.kpi-sub{font-size:11px;color:#94a3b8}
+.kpi-red .kpi-value{color:#dc2626}
+.kpi-amber .kpi-value{color:#d97706}
+.kpi-green .kpi-value{color:#059669}
+.tab-bar{display:flex;gap:2px;background:#e2e8f0;border-radius:10px;padding:4px;margin:12px 16px 0;overflow-x:auto;white-space:nowrap;position:sticky;top:0;z-index:100}
+.tab-btn{padding:9px 15px;border:none;background:transparent;color:#64748b;font-size:12px;font-weight:600;border-radius:7px;cursor:pointer;white-space:nowrap;transition:all .15s}
+.tab-btn.active{background:#fff;color:#1a1f2e;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.tab-panel{display:none;padding:14px 16px 24px;overflow:visible}
+.tab-panel.active{display:block}
+.section{background:#fff;border-radius:12px;border:1px solid #e8eaf0;margin-bottom:14px;overflow:visible}
+.section-hdr{padding:14px 16px 0;display:flex;align-items:center;gap:8px;border-bottom:1px solid #f1f5f9;padding-bottom:10px;margin-bottom:0}
+.section-title{font-size:13px;font-weight:700;color:#1a1f2e;letter-spacing:-.1px}
+.section-body{padding:14px 16px;overflow:visible}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.card{background:#f8f9fb;border-radius:9px;padding:12px 14px;border:1px solid #eef0f4}
+.card-title{font-size:12px;font-weight:700;color:#374151;margin-bottom:6px}
+.card-text{font-size:12px;color:#4b5563;line-height:1.55}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:#f8f9fb;text-align:left;padding:8px 10px;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid #e8eaf0}
+td{padding:8px 10px;border-bottom:1px solid #f1f5f9;color:#374151;vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f8f9fb}
+.status-pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:.3px}
+.s-open{background:#fee2e2;color:#dc2626}
+.s-closed{background:#dcfce7;color:#15803d}
+.s-wait{background:#fef3c7;color:#d97706}
+.s-won{background:#dcfce7;color:#15803d}
+.s-lost{background:#fee2e2;color:#dc2626}
+.s-active{background:#dbeafe;color:#1d4ed8}
+.s-solutioning{background:#ede9fe;color:#7c3aed}
+.risk-card{border-radius:10px;padding:14px 16px;margin-bottom:10px;border-left:4px solid #e8eaf0;position:relative}
+.risk-red{background:#fff5f5;border-left-color:#dc2626}
+.risk-amber{background:#fffbeb;border-left-color:#f59e0b}
+.risk-green{background:#f0fdf4;border-left-color:#22c55e}
+.risk-title{font-size:13px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.risk-body{font-size:12px;color:#4b5563;line-height:1.55}
+.risk-change{font-size:11px;color:#6b7280;margin-top:8px;padding-top:8px;border-top:1px solid #e8eaf0}
+.action-card{border-radius:10px;padding:14px 16px;margin-bottom:10px;background:#fff;border:1px solid #e8eaf0;display:flex;gap:14px;align-items:flex-start}
+.action-num{width:28px;height:28px;border-radius:50%;background:#7c3aed;color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.action-body{}
+.action-title{font-size:13px;font-weight:700;color:#1a1f2e;margin-bottom:3px}
+.action-why{font-size:12px;color:#4b5563;margin-bottom:6px;line-height:1.45}
+.action-next{font-size:11px;color:#7c3aed;font-weight:600;padding:4px 10px;background:#f5f3ff;border-radius:6px;display:inline-block}
+.health-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;overflow:visible}
+.health-card{background:#f8f9fb;border-radius:9px;padding:12px;text-align:center;border:1px solid #eef0f4;position:relative;overflow:visible}
+.health-val{font-size:24px;font-weight:800;margin:4px 0 2px}
+.health-lbl{font-size:11px;color:#6b7280;font-weight:600}
+.health-sub{font-size:10px;color:#9ca3af;margin-top:2px}
+.h-red{color:#dc2626}
+.h-amber{color:#f59e0b}
+.h-green{color:#059669}
+.h-gray{color:#9ca3af}
+.tip-wrap{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:#e8eaf0;color:#6b7280;font-size:9px;font-weight:800;cursor:help;position:relative;margin-left:5px;vertical-align:middle}
+.tip-box{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:240px;padding:10px 12px;background:#1a1f2e;color:#fff;font-size:11px;font-weight:400;line-height:1.5;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:999;white-space:normal;text-align:left}
+.tip-wrap:hover .tip-box{display:block}
+.person-card{background:#f8f9fb;border-radius:10px;padding:12px 14px;border:1px solid #eef0f4;display:flex;gap:12px;align-items:flex-start}
+.person-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0;background:#3b82f6}
+.person-name{font-size:13px;font-weight:700;color:#1a1f2e}
+.person-title{font-size:11px;color:#64748b;margin-bottom:4px}
+.person-note{font-size:11px;color:#374151;line-height:1.45}
+.role-badge{display:inline-block;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:700;margin-bottom:4px}
+.r-champion{background:#dbeafe;color:#1d4ed8}
+.r-exec{background:#ede9fe;color:#6d28d9}
+.r-technical{background:#dcfce7;color:#15803d}
+.r-target{background:#fef3c7;color:#92400e}
+.r-csm{background:#f1f5f9;color:#475569}
+.opp-card{background:#f8f9fb;border-radius:10px;padding:12px 14px;border:1px solid #eef0f4;margin-bottom:10px}
+.opp-title{font-size:13px;font-weight:700;color:#1a1f2e;margin-bottom:6px}
+.opp-row{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:#4b5563}
+.opp-field{display:flex;flex-direction:column;gap:1px}
+.opp-field-lbl{font-size:10px;color:#9ca3af;font-weight:600;text-transform:uppercase}
+.opp-field-val{font-size:12px;font-weight:600;color:#1a1f2e}
+.roadmap-t1{background:#fff;border:1px solid #ddd6fe;border-left:4px solid #7c3aed;border-radius:9px;padding:12px 14px;margin-bottom:10px}
+.roadmap-t2{padding:6px 0;font-size:12px;color:#374151;border-bottom:1px solid #f1f5f9}
+.roadmap-expand{background:#f5f3ff;border:1px solid #ddd6fe;border-radius:9px;padding:12px 14px;margin-bottom:8px}
+.rm-badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:800;margin-right:6px}
+.rm-shipped{background:#dcfce7;color:#15803d}
+.rm-coming{background:#dbeafe;color:#1d4ed8}
+.rm-expand{background:#ede9fe;color:#6d28d9}
+.source-note{font-size:10px;color:#94a3b8;margin-top:8px}
+.arw{color:#94a3b8;margin:0 3px}
+a{color:#3b82f6;text-decoration:none}
+a:hover{text-decoration:underline}
+.empty-state{text-align:center;padding:24px;color:#94a3b8;font-size:12px}
+.kpi-delta{font-size:10px;margin-top:1px}
+.kpi-delta.up{color:#059669}
+.kpi-delta.dn{color:#dc2626}
+.kpi-delta.flat{color:#94a3b8}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-left">
+    <div class="hdr-logo">P</div>
+    <div>
+      <div class="hdr-name">Public Health Management Corporation</div>
+      <div class="hdr-sub">www.phmc.org &nbsp;|&nbsp; Philadelphia, PA &nbsp;|&nbsp; 2,500 employees &nbsp;|&nbsp; Non-Profit Public Health</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <span class="badge badge-tier">TIER 2 CSM</span>
+    <span class="badge badge-seg">ENTERPRISE</span>
+    <span class="badge badge-renewal">&#128197; RENEWS OCT 30, 2026</span>
+    <div class="hdr-date">Refreshed: Mon Jun 8, 2026</div>
+  </div>
+</div>
+
+<!-- KPI STRIP -->
+<div class="kpi-strip">
+  <div class="kpi-card kpi-amber">
+    <div class="kpi-label">ARR</div>
+    <div class="kpi-value">$111,329</div>
+    <div class="kpi-sub">Learning only &bull; +10% YoY</div>
+  </div>
+  <div class="kpi-card kpi-amber">
+    <div class="kpi-label">Renewal</div>
+    <div class="kpi-value">149 days</div>
+    <div class="kpi-sub">Oct 30, 2026 &bull; Stage 5</div>
+  </div>
+  <div class="kpi-card kpi-red">
+    <div class="kpi-label">Engagement Score</div>
+    <div class="kpi-value">20%</div>
+    <div class="kpi-sub">Customer Engagement (SFDC)</div>
+  </div>
+  <div class="kpi-card kpi-red">
+    <div class="kpi-label">Services Engagement</div>
+    <div class="kpi-value">0%</div>
+    <div class="kpi-sub">No services utilization</div>
+  </div>
+  <div class="kpi-card kpi-amber">
+    <div class="kpi-label">Active Cases (12mo)</div>
+    <div class="kpi-value">46</div>
+    <div class="kpi-sub">All moderate &bull; 2 open</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Cross-Sell Score</div>
+    <div class="kpi-value kpi-green" style="color:#059669">99</div>
+    <div class="kpi-sub">12.7yr tenure &bull; 1 product</div>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab(0)">&#9889; Actions</button>
+  <button class="tab-btn" onclick="switchTab(1)">Account Intel</button>
+  <button class="tab-btn" onclick="switchTab(2)">Use Case</button>
+  <button class="tab-btn" onclick="switchTab(3)">People</button>
+  <button class="tab-btn" onclick="switchTab(4)">Contracts</button>
+  <button class="tab-btn" onclick="switchTab(5)">Product</button>
+  <button class="tab-btn" onclick="switchTab(6)">Usage</button>
+  <button class="tab-btn" onclick="switchTab(7)">Cases</button>
+  <button class="tab-btn" onclick="switchTab(8)">Risk</button>
+</div>
+
+<!-- TAB 0: ACTIONS -->
+<div class="tab-panel active" id="tab-0">
+
+  <div class="action-card">
+    <div class="action-num">1</div>
+    <div class="action-body">
+      <div class="action-title">&#128197; Schedule Renewal Meeting with Rachel Fleishman — This Week</div>
+      <div class="action-why">Renewal is Oct 30 (149 days). Stage 5 opp ($111,321) is stalled — your NextStep says "trying to schedule a meeting." Rachel Fleishman (Director, Staff Development) is the designated contact. No meetings are on record in Chorus for 12+ months. CEO Mike Pearson retires June 30, which will trigger new vendor scrutiny. Get the meeting locked in before the CEO transition disrupts access.</div>
+      <div class="action-next">&#8594; Email rfleishman@phmc.org + Brianne Thomas (bthomas@phmc.org). Offer two dates this week.</div>
+    </div>
+  </div>
+
+  <div class="action-card">
+    <div class="action-num">2</div>
+    <div class="action-body">
+      <div class="action-title">&#9888; CEO Transition Alert — Engage Celeste Collins Before June 30</div>
+      <div class="action-why">PHMC CEO Michael Pearson retires June 30, 2026 — 22 days from now. A CEO search is underway via Criterion Search Group. The incoming CEO will not have a relationship with Rival. Celeste Collins (Chief People &amp; Inclusion) is your executive sponsor inside PHMC and needs to be positioned as the internal champion to brief the new CEO. This is the most urgent relationship risk ahead of the Oct renewal.</div>
+      <div class="action-next">&#8594; Contact Celeste Collins (collins@phmc.org). Request executive briefing call. Provide value narrative for incumbent CEO to hand off.</div>
+    </div>
+  </div>
+
+  <div class="action-card">
+    <div class="action-num">3</div>
+    <div class="action-body">
+      <div class="action-title">&#128203; Complete Site Review — Overdue (No Record on File)</div>
+      <div class="action-why">Site_Review_Overdue__c = TRUE and Last_Site_Review_Date__c = NULL — no site review has ever been logged in SFDC. PHMC runs 200+ programs across 70+ locations branded as "PHMC University." A site review demonstrates platform value before renewal negotiations and surfaces expansion opportunities (70 locations = content/division-level management needs).</div>
+      <div class="action-next">&#8594; Schedule site review call with Brianne Thomas (bthomas@phmc.org). Agenda: current usage, compliance training workflow, expansion features demo.</div>
+    </div>
+  </div>
+
+  <div class="action-card">
+    <div class="action-num">4</div>
+    <div class="action-body">
+      <div class="action-title">&#127775; Cross-Sell Opportunity — Services Engagement at 0%</div>
+      <div class="action-why">Services_Engagement_Score = 0%, Cross_Sell_Score = 99 (maximum). PHMC has never engaged professional services despite running complex compliance training ("EEO Training," "Active Shooter," certification pathways) across 2,500+ employees in a highly regulated sector. The 2026 Federal funding environment intensifies their compliance documentation burden — services help them get more out of Rival Learn while Rival gains expansion ARR. Previous Managed Services opp was Closed Lost in 2022 ($36K).</div>
+      <div class="action-next">&#8594; Introduce services options during site review call. Frame around compliance audit readiness + federal grant reporting requirements.</div>
+    </div>
+  </div>
+
+  <div class="action-card">
+    <div class="action-num">5</div>
+    <div class="action-body">
+      <div class="action-title">&#128200; Send NPS Survey — Never Sent</div>
+      <div class="action-why">Last_NPS_Sent__c = NULL. Average NPS Score = 0.0 (no data). PHMC has been a customer for 12.7 years with no NPS capture. With renewal in 149 days and a CEO transition underway, getting a formal health signal now is essential. A promoter NPS from Brianne Thomas or Rachel Fleishman can anchor the renewal conversation.</div>
+      <div class="action-next">&#8594; Coordinate with CSM ops to deploy NPS survey to bthomas@phmc.org and rfleishman@phmc.org this week.</div>
+    </div>
+  </div>
+
+  <!-- Engagement Health Cards -->
+  <div class="section">
+    <div class="section-hdr">
+      <div class="section-title">Engagement Health
+        <span class="tip-wrap">?<span class="tip-box">Composite of 4 SFDC health scores. Sources: Customer_Engagement_Score__c, Services_Engagement_Score_Percent__c, Site_Review_Overdue__c, Onsite_F2F_Overdue__c. Updated daily by SFDC automation.</span></span>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="health-grid">
+        <div class="health-card">
+          <div class="health-val h-red">20%</div>
+          <div class="health-lbl">Customer Engagement
+            <span class="tip-wrap">?<span class="tip-box">SFDC: CustomerEngagementScoreNUMBER__c = 0.20. Measures breadth of Rival product engagement. Benchmark: 80%+ = healthy. Source: Customer_Engagement_Score__c</span></span>
+          </div>
+          <div class="health-sub">&#128308; Critical — single product, low utilization visibility</div>
+        </div>
+        <div class="health-card">
+          <div class="health-val h-red">0%</div>
+          <div class="health-lbl">Services Engagement
+            <span class="tip-wrap">?<span class="tip-box">SFDC: Services_Engagement_Score_Percent__c = 0%. Measures % of available professional services utilized. 0% = no services ever engaged. Source: Services_Engagement_Score_Percent__c</span></span>
+          </div>
+          <div class="health-sub">&#128308; No professional services utilized</div>
+        </div>
+        <div class="health-card">
+          <div class="health-val h-red">&#9888;</div>
+          <div class="health-lbl">Site Review Status
+            <span class="tip-wrap">?<span class="tip-box">SFDC: Site_Review_Overdue__c = TRUE. Last_Site_Review_Date__c = NULL (never completed). Site reviews are periodic CSM-led sessions reviewing platform health and roadmap. Source: Site_Review_Overdue__c</span></span>
+          </div>
+          <div class="health-sub">&#128308; OVERDUE — never completed</div>
+        </div>
+        <div class="health-card">
+          <div class="health-val h-red">&#9888;</div>
+          <div class="health-lbl">F2F Meeting Status
+            <span class="tip-wrap">?<span class="tip-box">SFDC: Onsite_F2F_Overdue__c = TRUE. Last_Onsite_F2F_Date__c = NULL (no on-site meeting on record). Onsite F2F = in-person or executive-level strategic meeting. Source: Onsite_F2F_Overdue__c</span></span>
+          </div>
+          <div class="health-sub">&#128308; OVERDUE — no F2F on record</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TAB 1: ACCOUNT INTEL -->
+<div class="tab-panel" id="tab-1">
+
+  <div class="two-col">
+    <div class="section">
+      <div class="section-hdr"><div class="section-title">Company Overview</div></div>
+      <div class="section-body">
+        <div class="card" style="margin-bottom:10px">
+          <div class="card-title">What They Are</div>
+          <div class="card-text">Public Health Management Corporation (PHMC) is a Philadelphia-based nonprofit public health institute founded in 1973. PHMC creates and sustains healthier communities through direct service, partnerships, innovation, policy research, technical assistance, and workforce development. They operate 200+ programs across 70+ locations in the Delaware Valley (Philadelphia + Delaware), serving approximately 350,000 clients annually.</div>
+        </div>
+        <div class="card" style="margin-bottom:10px">
+          <div class="card-title">Organizational Structure</div>
+          <div class="card-text">PHMC is the parent organization over a network of subsidiaries and programs:
+          <br>&bull; <b>PHMC Health</b> — FQHCs (Federally Qualified Health Centers)
+          <br>&bull; <b>Turning Points for Children (TPFC)</b> — child welfare programs
+          <br>&bull; <b>Joseph J. Peters Institute</b> — behavioral health
+          <br>&bull; <b>Health Promotion Council</b> — health advocacy; won $100K Tobacco Award 2026
+          <br>&bull; <b>Center for Autism</b> — autism services
+          <br>&bull; <b>PHMC Public Health Campus on Cedar</b> — community health hub
+          <br>&bull; <b>Pathways to Recovery</b> — substance use recovery (expanding 2026)
+          <br>&bull; <b>Community Behavioral Health (CVCA)</b> — behavioral health subsidiary</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Key Facts</div>
+          <div class="card-text">
+            <b>Founded:</b> 1973 (53 years)<br>
+            <b>Employees:</b> ~2,500<br>
+            <b>Revenue:</b> $281.5M<br>
+            <b>Locations:</b> 70+ across Philadelphia &amp; Delaware Valley<br>
+            <b>Clients Served:</b> ~350,000 annually<br>
+            <b>Platform Brand:</b> "PHMC University" (PHMC U)<br>
+            <b>Rival Tenure:</b> 12.7 years (since ~2013)<br>
+            <b>SDA Client:</b> No<br>
+            <b>Segment:</b> Enterprise / AM Segment B
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section" style="margin-bottom:14px">
+        <div class="section-hdr"><div class="section-title">&#9888; CEO Transition — CRITICAL</div></div>
+        <div class="section-body">
+          <div class="risk-card risk-red">
+            <div class="risk-title">&#128308; Leadership Vacuum: June 30, 2026</div>
+            <div class="risk-body">President &amp; CEO Michael K. Pearson retires June 30, 2026 — 22 days from today. Board has retained Criterion Search Group. The incoming CEO will inherit all vendor contracts including Rival Learn at $111K/year — and they did not buy it. New CEOs routinely audit vendor spend as part of their first 90 days.<br><br>Mike Pearson was appointed July 1, 2023 and is Philadelphia Magazine's "150 Most Influential People" (2024 Equity Champion). Celeste Collins (Chief People &amp; Inclusion) is the best positioned internal champion to brief the successor.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-hdr"><div class="section-title">Market Dynamics</div></div>
+        <div class="section-body">
+          <table>
+            <thead><tr><th>When</th><th>Event</th><th>HR Implication</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>2026</td>
+                <td>CEO Mike Pearson retires June 30; search underway</td>
+                <td>Vendor relationship reset. Incoming CEO will audit all contracts. No relationship = vulnerability.</td>
+              </tr>
+              <tr>
+                <td>2025–26</td>
+                <td>Federal HHS budget: $31.3B proposed cut vs FY25; NIH ~$18B less</td>
+                <td>PHMC depends on federal grants. Funding uncertainty may trigger cost reviews. BUT compliance training burden increases as staff must document competency for remaining grants.</td>
+              </tr>
+              <tr>
+                <td>2026</td>
+                <td>Pathways to Recovery expanding (new location: 1200 Callowhill)</td>
+                <td>New program = new employee cohort = new onboarding/compliance training needs on PHMC U.</td>
+              </tr>
+              <tr>
+                <td>2026</td>
+                <td>PHMC Health FQHCs recognized for Equitable Health collaboration</td>
+                <td>FQHC accreditation requires documented workforce training — strengthens LMS dependency.</td>
+              </tr>
+              <tr>
+                <td>2025</td>
+                <td>PHMC Public Health Campus on Cedar opened new entrance</td>
+                <td>Continued facility growth = more distributed workforce to train.</td>
+              </tr>
+              <tr>
+                <td>2024</td>
+                <td>Leadership appointments: Sara Molina-Robinson CPO; Patty Griffin CCO; David Fair TPFC ED</td>
+                <td>Multiple new leaders = onboarding training needs. TPFC leadership change may affect subsidiary Rival usage.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="source-note">Sources: phmc.org, AAMC, TFAH federal funding reports</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-hdr"><div class="section-title">Competitive Position (Public Health Nonprofit Peers)</div></div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>Organization</th><th>Revenue</th><th>Scope</th><th>Key Moves 2025–26</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>PHMC</b> (Rival Customer)</td>
+            <td>$281M</td>
+            <td>Delaware Valley (70+ sites)</td>
+            <td>CEO transition; federal funding exposure; new programs</td>
+          </tr>
+          <tr>
+            <td>Public Health Institute (PHI)</td>
+            <td>~$400M</td>
+            <td>National/International</td>
+            <td>Expanding global programs; less PA-focused</td>
+          </tr>
+          <tr>
+            <td>Community Health Network of PA</td>
+            <td>Smaller</td>
+            <td>Statewide PA</td>
+            <td>FQHC focused; different market segment</td>
+          </tr>
+          <tr>
+            <td>Thomas Jefferson U. Hospital (Board member)</td>
+            <td>Academic Medical Center</td>
+            <td>Philadelphia</td>
+            <td>PHMC Board member (Christopher Cullom, Treasurer) — relationship asset</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- TAB 2: USE CASE -->
+<div class="tab-panel" id="tab-2">
+
+  <div class="section">
+    <div class="section-hdr"><div class="section-title">Executive Summary</div></div>
+    <div class="section-body">
+      <div class="card-text" style="font-size:13px;line-height:1.65;padding:4px 0">
+        PHMC uses Rival Learn ("PHMC University") as its centralized LMS for 2,500+ employees across 70+ locations and multiple subsidiaries. The platform drives mandatory compliance training (EEO, Active Shooter, certifications), new hire orientation content, and ongoing professional development in a heavily regulated public health sector. After 12.7 years on the platform, Rival Learn is deeply embedded as the infrastructure behind PHMC's workforce compliance documentation — a critical requirement for federal grant reporting. Case patterns show active, operational use of the LMS: notification configuration, course assignment management, reporting, and content administration occur regularly (46 cases in 12 months). The key risk is that this deep operational dependency has never been parlayed into a strategic relationship — no site review, no F2F, no services engagement, no NPS. PHMC does not know the value of what Rival provides; they just know the system works.
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="section">
+      <div class="section-hdr"><div class="section-title">Per-Product Value Card: Rival Learn</div></div>
+      <div class="section-body">
+        <div class="card" style="margin-bottom:8px">
+          <div class="card-title">Use Case</div>
+          <div class="card-text">Centralized LMS for 2,500+ employees across 70+ locations and 8+ subsidiary organizations. Platform is branded "PHMC University." Hosts mandatory compliance, certification, new hire orientation, and professional development content.</div>
+        </div>
+        <div class="card" style="margin-bottom:8px">
+          <div class="card-title">Pain It Solves</div>
+          <div class="card-text">
+            &bull; Federal grant compliance requires documented workforce training records<br>
+            &bull; Distributed workforce (70 sites) needs centralized training delivery<br>
+            &bull; Multiple subsidiaries require consistent compliance baseline across the org<br>
+            &bull; Mandatory training types: EEO, Active Shooter, certifications, FQHC requirements
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:8px">
+          <div class="card-title">Value Delivered</div>
+          <div class="card-text">
+            &bull; Compliance documentation for federal/state grant reporting<br>
+            &bull; Centralized course catalog with branded experience ("PHMC U")<br>
+            &bull; Notification automation for expiring certifications<br>
+            &bull; Reporting on completions across subsidiaries<br>
+            &bull; 12.7 years of institutional knowledge embedded in the platform
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Risk to Value</div>
+          <div class="card-text">
+            &bull; CEO transition (June 30) may prompt vendor review<br>
+            &bull; Federal funding cuts may pressure cost reduction<br>
+            &bull; Low strategic engagement means value isn't visible to leadership<br>
+            &bull; 0% services engagement = capabilities being left on the table
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-hdr"><div class="section-title">Expansion Vectors</div></div>
+      <div class="section-body">
+        <table>
+          <thead><tr><th>Product</th><th>Observed Pain</th><th>Entry Point</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><b>Rival Workflow (Onboarding)</b></td>
+              <td>2,500+ employees across 70 sites; program expansions (Pathways to Recovery 2026); multiple new leadership hires</td>
+              <td>Site review: show how Workflow automates new hire process across subsidiaries. Link to PHMC U content already in Learn.</td>
+            </tr>
+            <tr>
+              <td><b>Rival Perform</b></td>
+              <td>New CPO (Sara Molina-Robinson), new ED roles — performance management need at program director level</td>
+              <td>Ask Celeste Collins about performance review processes for 2,500 employees. Pain = manual or spreadsheet-based.</td>
+            </tr>
+            <tr>
+              <td><b>Managed Services</b></td>
+              <td>46 cases/year, all moderate — admin capacity is consumed by operational support</td>
+              <td>Position services as "admin relief" — content builds, configuration, advanced analytics setup. Prior lost opp ($36K) is a reference point.</td>
+            </tr>
+            <tr>
+              <td><b>Advanced Analytics (Learn)</b></td>
+              <td>Cases show reporting requests ("Generate Report," "Number of Students Completed") — admins manually pulling data</td>
+              <td>2026.3 release: Advanced Analytics license management. Show automated reporting vs case-driven manual pulls.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="source-note">Entry points verified against SFDC case history and market intelligence. Unverified: Perform product fit — needs discovery.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-hdr"><div class="section-title">Commercial Summary</div></div>
+    <div class="section-body">
+      <div class="three-col">
+        <div class="card">
+          <div class="card-title">Switching Cost</div>
+          <div class="card-text">HIGH. 12.7 years of course content, user data, certification records, and subsidiary configurations embedded in "PHMC U." Re-platforming would require data migration + content rebuild across 8+ subsidiaries + retraining 2,500 employees. Federal grant reporting would need continuity. Switching cost perception is the key asset — it must be surfaced before renewal.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Whitespace</div>
+          <div class="card-text">LARGE. PHMC currently pays $111K for Learn only. Workflow, Perform, and Managed Services represent 3 additional product lines. Cross_Sell_Score = 99 (maximum). At even 1 expansion product, ARR could reach $200K+. Largest barrier: no strategic conversation has occurred in 12+ months.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Renewal Confidence</div>
+          <div class="card-text">MODERATE (not locked). Stage 5 — $111,321. But no meeting scheduled, CEO retiring June 30, engagement scores are red. If Andrew locks in Rachel + Celeste before end of June, renewal is likely routine. If CEO transition happens with no Rival relationship in place, risk elevates to HIGH.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TAB 3: PEOPLE -->
+<div class="tab-panel" id="tab-3">
+
+  <div class="section">
+    <div class="section-hdr"><div class="section-title">Key Stakeholders</div></div>
+    <div class="section-body">
+      <div class="two-col">
+
+        <div class="person-card" style="margin-bottom:10px">
+          <div class="person-avatar" style="background:#7c3aed">CC</div>
+          <div>
+            <div class="role-badge r-exec">EXEC SPONSOR</div>
+            <div class="person-name">Celeste Collins</div>
+            <div class="person-title">Chief People &amp; Inclusion Officer &bull; collins@phmc.org &bull; (215) 985-2500</div>
+            <div class="person-note">CHRO equivalent. Owns workforce development and people strategy. Key executive sponsor for Rival Learn. With CEO retiring June 30, Celeste is the most critical relationship to secure before transition — she will brief the incoming CEO on all vendor relationships.</div>
+          </div>
+        </div>
+
+        <div class="person-card" style="margin-bottom:10px">
+          <div class="person-avatar" style="background:#3b82f6">RF</div>
+          <div>
+            <div class="role-badge r-champion">PRIMARY CHAMPION</div>
+            <div class="person-name">Rachel Fleishman</div>
+            <div class="person-title">Director, Staff Development &bull; rfleishman@phmc.org &bull; (215) 731-2404</div>
+            <div class="person-note">Andrew's designated renewal contact. NextStep: "Trying to schedule meeting with Rachel." Day-to-day learning strategy owner. Likely the internal advocate for Rival Learn at the program level. Priority contact for renewal meeting.</div>
+          </div>
+        </div>
+
+        <div class="person-card" style="margin-bottom:10px">
+          <div class="person-avatar" style="background:#059669">BT</div>
+          <div>
+            <div class="role-badge r-technical">PLATFORM ADMIN</div>
+            <div class="person-name">Brianne Thomas</div>
+            <div class="person-title">Director of Learning Technology &bull; bthomas@phmc.org &bull; (267) 773-4354</div>
+            <div class="person-note">Primary LMS administrator for "PHMC University." Files most support cases. Has the deepest platform expertise at PHMC. Should be included in site review and roadmap conversations. Most recent SFDC contact modification — actively engaged.</div>
+          </div>
+        </div>
+
+        <div class="person-card" style="margin-bottom:10px">
+          <div class="person-avatar" style="background:#d97706">MM</div>
+          <div>
+            <div class="role-badge r-technical">IT LEADERSHIP</div>
+            <div class="person-name">Michael McCain</div>
+            <div class="person-title">Chief Information Officer &bull; mmccain@phmc.org</div>
+            <div class="person-note">CIO — technology decisions ultimately run through him. If CEO transition brings vendor review, CIO will be in the room. Not currently engaged by Rival. Potential blocker or accelerator depending on relationship status.</div>
+          </div>
+        </div>
+
+        <div class="person-card" style="margin-bottom:10px">
+          <div class="person-avatar" style="background:#9ca3af">GS</div>
+          <div>
+            <div class="role-badge r-champion">HR TEAM</div>
+            <div class="person-name">Gertrude Scutt</div>
+            <div class="person-title">HRBP &bull; gscutt@phmc.org &bull; (215) 985-2508</div>
+            <div class="person-note">HR Business Partner. Likely involved in compliance training assignment and tracking. Not yet directly engaged by Rival. Potential reference contact for services conversations.</div>
+          </div>
+        </div>
+
+        <div class="person-card" style="margin-bottom:10px">
+          <div class="person-avatar" style="background:#6366f1">JD</div>
+          <div>
+            <div class="role-badge r-target">EXPANSION TARGET</div>
+            <div class="person-name">Julian Domanico</div>
+            <div class="person-title">Talent Acquisition Director &bull; jdomanico@phmc.org &bull; 215-526-7780</div>
+            <div class="person-note">TA Director — potential Rival Recruit / Workflow contact for expansion. With 70+ locations and frequent hiring (PHMC runs hiring events), TA is an active function. Not engaged by Rival.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="section">
+      <div class="section-hdr"><div class="section-title">Rival Account Team</div></div>
+      <div class="section-body">
+        <div class="person-card" style="margin-bottom:8px">
+          <div class="person-avatar" style="background:#1a1f2e">AP</div>
+          <div>
+            <div class="role-badge r-csm">CSM — OWNER</div>
+            <div class="person-name">Andrew Pollard</div>
+            <div class="person-title">Customer Success Manager</div>
+            <div class="person-note">Owns the active renewal opp ($111,321, Stage 5). Currently working to schedule renewal meeting with Rachel Fleishman.</div>
+          </div>
+        </div>
+        <div class="person-card">
+          <div class="person-avatar" style="background:#475569">PG</div>
+          <div>
+            <div class="role-badge r-csm">PRIOR CSM</div>
+            <div class="person-name">Erin Gould</div>
+            <div class="person-title">Former CSM (last activity: 2024)</div>
+            <div class="person-note">Last logged CSM tasks were 2024. Renewal history included Courtney Oiler (FY24), Bernard Jackson (FY25). Andrew is current owner for FY26 renewal.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-hdr"><div class="section-title">ZoomInfo Contact Intelligence</div></div>
+      <div class="section-body">
+        <div class="card">
+          <div class="card-title">ZoomInfo Search Result</div>
+          <div class="card-text">HR department contacts search via ZoomInfo returned 0 results for phmc.org domain. PHMC is a nonprofit — limited ZoomInfo coverage for internal HR function. SFDC contacts are the authoritative source for this account.<br><br><b>Contacts verified via SFDC:</b> 22 contacts on record. Top HR contacts identified above. CIO Michael McCain and TA Director Julian Domanico are priority targets for expansion conversations not yet in Rival's engagement history.</div>
+        </div>
+        <div class="source-note">Verify: ZoomInfo company match returned "Masters in Public Health" site (ID 43452525) — data aligned with PHMC but naming discrepancy noted. Scoops: none available for this nonprofit.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TAB 4: CONTRACTS -->
+<div class="tab-panel" id="tab-4">
+
+  <div class="section">
+    <div class="section-hdr"><div class="section-title">Active Contract</div></div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>Contract #</th><th>Status</th><th>Start Date</th><th>End Date</th><th>Renewal Term</th><th>SFDC</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>00018891</b></td>
+            <td><span class="status-pill s-active">ACTIVATED</span></td>
+            <td>Oct 6, 2025</td>
+            <td>Oct 29, 2026</td>
+            <td>12 months</td>
+            <td><a href="https://silkroad.lightning.force.com/lightning/r/Contract/00018891/view" target="_blank">View &#8599;</a></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="source-note">1 active contract. Product: Learning only. ARR: $111,328.98. Auto-renews at 12-month term.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-hdr"><div class="section-title">Active Renewal Opportunity</div></div>
+    <div class="section-body">
+      <div class="opp-card">
+        <div class="opp-title">Public Health Management Corporation - Renewal Opportunity <span class="status-pill s-solutioning" style="margin-left:8px">STAGE 5: RENEWAL SOLUTIONING</span></div>
+        <div class="opp-row">
+          <div class="opp-field"><div class="opp-field-lbl">Amount</div><div class="opp-field-val">$111,321</div></div>
+          <div class="opp-field"><div class="opp-field-lbl">Close Date</div><div class="opp-field-val">Oct 29, 2026</div></div>
+          <div class="opp-field"><div class="opp-field-lbl">Type</div><div class="opp-field-val">Renewal</div></div>
+          <div class="opp-field"><div class="opp-field-lbl">Owner</div><div class="opp-field-val">Andrew Pollard</div></div>
+          <div class="opp-field"><div class="opp-field-lbl">Days to Close</div><div class="opp-field-val">149 days</div></div>
+        </div>
+        <div style="margin-top:10px;padding:8px 12px;background:#fef3c7;border-radius:7px;font-size:12px;color:#92400e">
+          <b>NextStep:</b> "I'm trying to schedule a meeting with the contact (Rachel)" — ACTION NEEDED TODAY
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-hdr"><div class="section-title">Renewal History</div></div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>Fiscal Year</th><th>Stage</th><th>Amount</th><th>Close Date</th><th>Owner</th><th>YoY Growth</th></tr></thead>
+        <tbody>
+          <tr><td>FY2026 (Active)</td><td><span class="status-pill s-solutioning">Stage 5</span></td><td>$111,321</td><td>Oct 29, 2026</td><td>Andrew Pollard</td><td>—</td></tr>
+          <tr><td>FY2025</td><td><span class="status-pill s-won">Closed Won</span></td><td>$111,329</td><td>Oct 2, 2025</td><td>Bernard Jackson</td><td>+10.1%</td></tr>
+          <tr><td>FY2024</td><td><span class="status-pill s-won">Closed Won</span></td><td>$101,126</td><td>Oct 24, 2024</td><td>Courtney Oiler</td><td>+9.9%</td></tr>
+          <tr><td>FY2023</td><td><span class="status-pill s-won">Closed Won</span></td><td>$91,933</td><td>Oct 19, 2023</td><td>Adam Kuchyt</td><td>+9.9%</td></tr>
+          <tr><td>FY2022</td><td><span class="status-pill s-won">Closed Won</span></td><td>$83,575</td><td>Sep 30, 2022</td><td>Crystal Randall</td><td>+15.7%</td></tr>
+          <tr><td>FY2021</td><td><span class="status-pill s-won">Closed Won</span></td><td>$72,262</td><td>Aug 4, 2021</td><td>Crystal Randall</td><td>—</td></tr>
+        </tbody>
+      </table>
+      <div class="source-note">Consistent ~10% YoY ARR growth. Pattern: renewal happens on time each October. No churn. CSM has changed 5 times in 5 years.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-hdr"><div class="section-title">Historical Expansion Attempts</div></div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>Name</th><th>Stage</th><th>Amount</th><th>Date</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>Learning Services Add-On</td><td><span class="status-pill s-won">Closed Won</span></td><td>$3,500</td><td>Jun 2023</td><td>Small add-on. Owner: John Sauter.</td></tr>
+          <tr><td>Managed Services</td><td><span class="status-pill s-lost">Closed Lost</span></td><td>$36,000</td><td>Jun 2022</td><td>Closed Lost — reason unknown. Revisit in site review context.</td></tr>
+          <tr><td>LMS Qualification/Training Record Optimization</td><td><span class="status-pill s-won">Closed Won</span></td><td>$1,750</td><td>Sep 2021</td><td>Small services engagement. Owner: John Sauter.</td></tr>
+          <tr><td>Learning Add-On</td><td><span class="status-pill s-won">Closed Won</span></td><td>$3,716</td><td>Aug 2021</td><td>Product add-on.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- TAB 5: PRODUCT -->
+<div class="tab-panel" id="tab-5">
+
+  <div class="section">
+    <div class="section-hdr"><div class="section-title">Active Products</div></div>
+    <div class="section-body">
+      <div class="three-col">
+        <div class="card">
+          <div class="card-title">&#9989; Rival Learn (Active)</div>
+          <div class="card-text">ARR: $111,329. Deployed as "PHMC University." Used for mandatory compliance training, certifications, EEO, Active Shooter, and professional development across 2,500 employees at 70+ locations. 46 cases in 12 months — actively used operationally.</div>
+        </div>
+        <div class="card" style="background:#fff5f5;border-color:#fecaca">
+          <div class="card-title">&#10060; Rival Workflow (Not Subscribed)</div>
+          <div class="card-text">$0 ARR. PHMC has 2,500 employees across multiple subsidiaries with active hiring (recurring hiring events). Onboarding workflow automation is a natural cross-sell given Learn tenure. Cross_Sell_Score = 99.</div>
+        </div>
+        <div class="card" style="background:#fff5f5;border-color:#fecaca">
+          <div class="card-title">&#10060; Rival Perform / Recruit (Not Subscribed)</div>
+          <div class="card-text">$0 ARR. New CPO (Sara Molina-Robinson) and TA Director (Julian Domanico) present opportunities for performance management and talent acquisition conversations. No prior expansion discussion documented.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-hdr"><div class="section-title">Product Roadmap — Rival Learn (Active Product)</div></div>
+    <div class="section-body">
+
+      <div style="margin-bottom:14px">
+        <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:8px">&#9733; TIER 1 — Direct Pain Match (Based on Case History)</div>
+
+        <div class="roadmap-t1">
+          <div style="margin-bottom:6px"><span class="rm-badge rm-shipped">SHIPPED</span><b>Expanded Analytics Downloads — Unlimited Rows</b> <span style="font-size:11px;color:#6b7280">Learn 2025.14 (Dec 2025)</span></div>
+          <div style="font-size:12px;color:#374151;line-height:1.5">Analytics exports are no longer limited to 5,000 rows. Admins can download complete datasets for full learning activity analysis.</div>
+          <div style="font-size:12px;color:#7c3aed;margin-top:6px;padding:6px 8px;background:#f5f3ff;border-radius:6px"><b>PHMC Pain:</b> Cases show repeated manual reporting requests — "Generate Report: Number of Students Completed Courses," "PHMCU training records." Brianne Thomas files these cases regularly. This feature directly eliminates manual report-pulling for federal grant compliance documentation.</div>
+        </div>
+
+        <div class="roadmap-t1">
+          <div style="margin-bottom:6px"><span class="rm-badge rm-shipped">SHIPPED</span><b>Course Publishing Redesign — End-to-End Workflow</b> <span style="font-size:11px;color:#6b7280">Learn 2025.13 (Dec 2025)</span></div>
+          <div style="font-size:12px;color:#374151;line-height:1.5">Modernized course creation and publishing workflow. New Course Page, streamlined publishing, redesigned interface, improved search and filtering, integrated preview.</div>
+          <div style="font-size:12px;color:#7c3aed;margin-top:6px;padding:6px 8px;background:#f5f3ff;border-radius:6px"><b>PHMC Pain:</b> Cases reference course configuration issues ("GL- Course Stuck in In Progress," "Course Assignment- Membership Inclusion"). Streamlined publishing workflow reduces admin errors and speeds time-to-launch for new compliance courses — critical for FQHC accreditation and grant compliance cycles.</div>
+        </div>
+
+        <div class="roadmap-t1">
+          <div style="margin-bottom:6px"><span class="rm-badge rm-shipped">SHIPPED</span><b>Notification Granular Control — eCourse Exemptions</b> <span style="font-size:11px;color:#6b7280">Learn 2025.14 (Dec 2025)</span></div>
+          <div style="font-size:12px;color:#374151;line-height:1.5">Admins can now exclude specific eCourses from automated notifications, giving finer control over who receives automated messages.</div>
+          <div style="font-size:12px;color:#7c3aed;margin-top:6px;padding:6px 8px;background:#f5f3ff;border-radius:6px"><b>PHMC Pain:</b> Multiple cases about notifications: "PHMC EEO Training Notifications," "GL- Notifications," "FW: Important Information Regarding Your Expiring Training," "FW: Your Employee's Training Is Now Past Due." PHMC clearly has complex notification management needs across a large, distributed workforce.</div>
+        </div>
+
+        <div class="roadmap-t1">
+          <div style="margin-bottom:6px"><span class="rm-badge rm-shipped">SHIPPED</span><b>Shared Libraries for Content — Cross-Team Asset Reuse</b> <span style="font-size:11px;color:#6b7280">Learn 2025.14 (Dec 2025)</span></div>
+          <div style="font-size:12px;color:#374151;line-height:1.5">Admins can view and select all organization-wide content when creating courses — not just personally uploaded items. Reduces duplicate work across teams.</div>
+          <div style="font-size:12px;color:#7c3aed;margin-top:6px;padding:6px 8px;background:#f5f3ff;border-radius:6px"><b>PHMC Pain:</b> With 8+ subsidiaries (TPFC, PHMC Health, Joseph J. Peters, etc.), each subsidiary likely creates similar content. Shared libraries allow a single version of EEO training to be shared across all subsidiaries rather than maintained separately.</div>
+        </div>
+
+        <div class="roadmap-t1">
+          <div style="margin-bottom:6px"><span class="rm-badge rm-shipped">SHIPPED</span><b>Advanced Analytics License Management</b> <span style="font-size:11px;color:#6b7280">Learn 2026.3 (Mar 2026)</span></div>
+          <div style="font-size:12px;color:#374151;line-height:1.5">Improved Advanced Analytics license management — easier to adjust analytics access as reporting needs grow. Contact CSM or Rival Support to discuss available options.</div>
+          <div style="font-size:12px;color:#7c3aed;margin-top:6px;padding:6px 8px;background:#f5f3ff;border-radius:6px"><b>PHMC Pain:</b> Federal grant reporting requires documented training completion analytics at scale. Current setup appears to drive manual case-based reporting. Advanced Analytics license upgrade is a natural services conversation during site review.</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:14px">
+        <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:8px">TIER 2 — General Learn Updates</div>
+        <div class="roadmap-t2"><span class="rm-badge rm-shipped">SHIPPED</span> <b>Performance Improvements — Reporting &amp; Analytics</b> <span style="font-size:11px;color:#9ca3af">2026.2 — Faster load times for high-usage reporting areas</span></div>
+        <div class="roadmap-t2"><span class="rm-badge rm-shipped">SHIPPED</span> <b>Rival Learn Branding Updates</b> <span style="font-size:11px;color:#9ca3af">2026.1 — Browser tab titles updated to Rival brand</span></div>
+        <div class="roadmap-t2"><span class="rm-badge rm-shipped">SHIPPED</span> <b>Learning Journey Certificates</b> <span style="font-size:11px;color:#9ca3af">2025.9 — Learners can view/download certificates; powers Certificates tab in My Training</span></div>
+        <div class="roadmap-t2"><span class="rm-badge rm-shipped">SHIPPED</span> <b>Training Activity View (Consolidated Reporting)</b> <span style="font-size:11px;color:#9ca3af">2025.11 — Single reporting layer for all training activity metadata</span></div>
+        <div class="roadmap-t2"><span class="rm-badge rm-shipped">SHIPPED</span> <b>Bug Fixes: Learning Journey, Weblink Preview, Content-New</b> <span style="font-size:11px;color:#9ca3af">2026.2 — Stability improvements across authoring tools</span></div>
+      </div>
+
+      <div>
+        <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:8px">EXPANSION — Products Not Owned (Pain-Matched)</div>
+        <div class="roadmap-expand">
+          <div style="margin-bottom:4px"><span class="rm-badge rm-expand">EXPANSION</span><b>Rival Workflow — New Hire Onboarding Automation</b></div>
+          <div style="font-size:12px;color:#374151;line-height:1.5">Automates multi-step onboarding workflows with branded portals, conditional logic, and division-specific configurations. Connects to Rival Learn for seamless Day-1 training assignment.<br><b>Pain Addressed:</b> PHMC runs recurring hiring events (Oct, Nov 2025 documented). With 70+ locations and expanding programs, manual onboarding across subsidiaries is a coordination burden. Cross_Sell_Score = 99.</div>
+        </div>
+        <div class="roadmap-expand">
+          <div style="margin-bottom:4px"><span class="rm-badge rm-expand">EXPANSION</span><b>Rival Learn — Managed Services</b></div>
+          <div style="font-size:12px;color:#374151;line-height:1.5">Professional services for content builds, platform configuration, and advanced analytics setup.<br><b>Pain Addressed:</b> 46 cases/year of operational support suggests admin capacity constraints. Prior Managed Services opp was Closed Lost ($36K, 2022). Services Engagement = 0%. Federal compliance documentation burden is intensifying — services accelerates outcomes.</div>
+        </div>
+      </div>
+      <div class="source-note">Sources: rival-hr.com/release-note/ (Learn 2025.9, 2025.11, 2025.13, 2025.14, 2026.1, 2026.2, 2026.3). Pain signals cross-referenced with SFDC case history. Roadmap items not yet public marked Verify: before sharing with customer.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TAB 6: USAGE -->
+<div class="tab-panel" id="tab-6">
+
+  <div class="section">
+    <div class="section-hdr"><div class="section-title">LifeSuite Product Usage Telemetry</div></div>
+    <div class="section-body">
+      <div class="three-col" style="grid-template-columns:repeat(4,1fr);margin-bottom:14px">
+        <div class="health-card">
+          <div class="health-val h-gray">N/A</div>
+          <div class="health-lbl">Unique Logins (L30D)</div>
+          <div class="health-sub">LifeSuite tracks Onboarding events only — PHMC has Learning, not Onboarding. Zeros are expected, not a usage concern.</div>
+        </div>
+        <div class="health-card">
+          <div class="health-val h-gray">N/A</div>
+          <div class="health-lbl">Events (12mo)</div>
+          <div class="health-sub">Learning platform usage is NOT captured in LifeSuite_Product_Usage__c object. Usage visible only via Learn platform admin.</div>
+        </div>
+        <div class="health-card">
+          <div class="health-val h-gray">N/A</div>
+          <div class="health-lbl">Events (30d)</div>
+          <div class="health-sub">Verify: Request usage report from Brianne Thomas or pull from Learn Admin Portal directly during site review.</div>
+        </div>
+        <div class="health-card">
+          <div class="health-val">46</div>
+          <div class="health-lbl">Support Cases (12mo)</div>
+          <div class="health-sub">Active platform use indicated by case volume — users experiencing real workflows, not dormant.</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:10px">
+        <div class="card-title">Usage Signal Interpretation</div>
+        <div class="card-text">
+          <b>What we know:</b> LifeSuite (SFDC usage object) tracks Onboarding events only. PHMC's active product is Learning, not Onboarding. The 30 usage records pulled all show zero values — this is expected behavior for a Learning-only account, NOT a platform adoption concern.<br><br>
+          <b>Proxy signal — Support cases:</b> 46 cases in 12 months across multiple workflows (notifications, course assignment, reporting, access issues, content glitches) indicates consistent, active platform use. Case subjects reveal:
+          <br>&bull; <b>Compliance training active:</b> "EEO Training," "Active Shooter," "Every Story Matters," certification expiry management
+          <br>&bull; <b>Reporting in use:</b> "Generate Report: Number of Students Completed Courses," "PHMCU training records"
+          <br>&bull; <b>Notification automation in use:</b> 5+ cases about training reminders/expiry notifications
+          <br>&bull; <b>Platform branded:</b> "PHMC U," "PHMC University" — high adoption signal (they've named it)
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Open Questions — Verify During Site Review</div>
+        <div class="card-text">
+          &bull; How many active users / learners are on PHMC U?<br>
+          &bull; What is total course completion count in the last 12 months?<br>
+          &bull; Which subsidiaries have their own course catalogs vs shared?<br>
+          &bull; How are compliance completion rates tracked and reported for grant applications?<br>
+          &bull; Are certifications/qualifications used (case: "Qualification on Trainings")?<br>
+          &bull; Is the Learning Journey feature in use or just standard courses?
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-hdr"><div class="section-title">Instance Details</div></div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>Field</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Platform Brand</td><td><b>PHMC University (PHMC U)</b></td></tr>
+          <tr><td>Active Product</td><td>Rival Learn (Learning)</td></tr>
+          <tr><td>Usage Region</td><td>United States</td></tr>
+          <tr><td>Specific Countries</td><td>United States</td></tr>
+          <tr><td>Primary Admin</td><td>Brianne Thomas (Director of Learning Technology)</td></tr>
+          <tr><td>User Base</td><td>~2,500 employees across 70+ locations</td></tr>
+          <tr><td>Subsidiaries</td><td>TPFC, PHMC Health, CVCA, Joseph J. Peters, Center for Autism, others</td></tr>
+          <tr><td>Compliance Training Types</td><td>EEO, Active Shooter, "Every Story Matters," certifications, expiry management</td></tr>
+          <tr><td>LifeSuite Usage Records</td><td>30 records — all zeros (correct for Learning-only account; Onboarding not subscribed)</td></tr>
+          <tr><td>SDA Client</td><td>No</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- TAB 7: CASES -->
+<div class="tab-panel" id="tab-7">
+
+  <div class="section">
+    <div class="section-hdr"><div class="section-title">Open Cases</div></div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>#</th><th>Subject</th><th>Status</th><th>Priority</th><th>Created</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>00997868</td>
+            <td>closed tickets</td>
+            <td><span class="status-pill s-wait">Waiting Client</span></td>
+            <td>Moderate</td>
+            <td>Jun 1, 2026</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="source-note">1 open case as of Jun 8, 2026. 00997801 (GL - Course Stuck in In Progress) closed Jun 8.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-hdr"><div class="section-title">Recent Cases — Last 30 Days</div></div>
+    <div class="section-body">
+      <table>
+        <thead><tr><th>#</th><th>Subject</th><th>Status</th><th>Created</th><th>Closed</th><th>Days Open</th></tr></thead>
+        <tbody>
+          <tr><td>00997990</td><td>Active shooter</td><td><span class="status-pill s-closed">Closed</span></td><td>Jun 3</td><td>Jun 3</td><td>0</td></tr>
+          <tr><td>00997801</td><td>GL- Course Stuck in In Progress</td><td><span class="status-pill s-closed">Closed</span></td><td>May 28</td><td>Jun 8</td><td>11</td></tr>
+          <tr><td>00997527</td><td>GL- Notifications</td><td><span class="status-pill s-closed">Closed</span></td><td>May 19</td><td>May 26</td><td>7</td></tr>
+          <tr><td>00997526</td><td>PHMC Training access issue</td><td><span class="status-pill s-closed">Closed</span></td><td>May 19</td><td>May 20</td><td>1</td></tr>
+          <tr><td>00997517</td><td>Issue with PHMC U</td><td><span class="status-pill s-closed">Closed</span></td><td>May 18</td><td>May 26</td><td>8</td></tr>
+          <tr><td>00997432</td><td>PHMC EEO Training Notifications</td><td><span class="status-pill s-closed">Closed</span></td><td>May 14</td><td>May 19</td><td>5</td></tr>
+          <tr><td>00997429</td><td>Important Information Re: Expiring Training</td><td><span class="status-pill s-closed">Closed</span></td><td>May 14</td><td>May 15</td><td>1</td></tr>
+          <tr><td>00997211</td><td>GL- Generate Report- Students Completed</td><td><span class="status-pill s-closed">Closed</span></td><td>May 12</td><td>May 20</td><td>8</td></tr>
+          <tr><td>00997059</td><td>Employee Training Now Past Due</td><td><span class="status-pill s-closed">Closed</span></td><td>May 6</td><td>May 12</td><td>6</td></tr>
+          <tr><td>00996869</td><td>Every Story Matters training</td><td><span class="status-pill s-closed">Closed</span></td><td>Apr 29</td><td>May 1</td><td>2</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-hdr"><div class="section-title">12-Month Case Analysis</div></div>
+    <div class="section-body">
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">Volume &amp; Resolution</div>
+          <div class="card-text">
+            <b>Total Cases (12mo):</b> 46<br>
+            <b>Open:</b> 1 (2.2%)<br>
+            <b>Closed:</b> 44<br>
+            <b>Waiting Client:</b> 1<br>
+            <b>All Priority:</b> 3-Moderate (no P1 or P2 critical cases)<br>
+            <b>Typical Resolution:</b> 1–8 days<br>
+            <b>Fastest Close:</b> Same day (0 days)<br>
+            <b>Longest Open:</b> 11 days (00997801 — Course Stuck)
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Case Category Patterns</div>
+          <div class="card-text">
+            <b>Notifications / Expiry Management:</b> ~30% of cases — recurring pattern around training reminders and expiry alerts. PHMC manages a large certification lifecycle.<br>
+            <b>Reporting:</b> ~20% — admins need completion/compliance reports regularly.<br>
+            <b>Course Configuration:</b> ~25% — assignments, course setup, GL issues.<br>
+            <b>Access / Login:</b> ~15% — training access issues for employees.<br>
+            <b>Content:</b> ~10% — course glitches, stuck progress, content issues.<br><br>
+            <b>Implication:</b> No product-level defects driving escalations. Volume is consistent with active use of a large, distributed training program.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TAB 8: RISK -->
+<div class="tab-panel" id="tab-8">
+
+  <div class="risk-card risk-red">
+    <div class="risk-title">&#128308; CEO Transition — June 30, 2026</div>
+    <div class="risk-body">
+      <b>What:</b> President &amp; CEO Michael K. Pearson retires June 30, 2026 — 22 days from today. A CEO search is underway (Criterion Search Group). PHMC's Board vice chair John McMeekin is leading the search committee.<br><br>
+      <b>Evidence:</b> PHMC press release (May 2026): "PHMC Seeks New President and CEO." Pearson was appointed July 1, 2023 and will retire exactly 3 years into his tenure.<br><br>
+      <b>Why It's a Risk:</b> The incoming CEO did not purchase Rival Learn. Standard 90-day vendor review by new executive. Rival has no executive relationship at PHMC — no F2F meeting on record, no NPS captured, no QBR history. The account is relationship-orphaned at the exact moment a new buyer is walking in the door.<br><br>
+      <b>Compounding Factor:</b> CEO transition coincides with renewal 149 days out. If the new CEO inherits a vendor that no one has briefed them on, the default action is cost scrutiny.
+    </div>
+    <div class="risk-change"><b>What would move this to Amber:</b> Andrew meets with Celeste Collins before June 30 and confirms she will brief the incoming CEO on Rival's value. Executive sponsor relationship is formalized and documented.</div>
+  </div>
+
+  <div class="risk-card risk-red">
+    <div class="risk-title">&#128308; Relationship Engagement — No Strategic Activity in 12+ Months</div>
+    <div class="risk-body">
+      <b>What:</b> Customer Engagement Score = 20% (SFDC). No site review ever completed. No F2F meeting on record. Last Chorus engagement for PHMC: none found in recent call history. Last CSM activity log: 2024 (Erin Gould).<br><br>
+      <b>Evidence:</b> Site_Review_Overdue__c = TRUE, Last_Site_Review_Date__c = NULL. Onsite_F2F_Overdue__c = TRUE, Last_Onsite_F2F_Date__c = NULL. Chorus: 0 recorded engagements. SFDC tasks: last meaningful activity 2024.<br><br>
+      <b>Why It's a Risk:</b> Account is on autopilot. PHMC interacts with Rival only via support cases. No strategic relationship means the renewal is purely transactional — susceptible to competitive displacement, budget cuts, or procurement-driven price challenges.
+    </div>
+    <div class="risk-change"><b>What would move this to Amber:</b> Renewal meeting scheduled and completed with Rachel Fleishman AND Brianne Thomas. Site review booked within 30 days. Celeste Collins engaged for executive briefing.</div>
+  </div>
+
+  <div class="risk-card risk-amber">
+    <div class="risk-title">&#128993; Federal Funding Environment — 2025–2026 HHS Cuts</div>
+    <div class="risk-body">
+      <b>What:</b> Sweeping federal HHS/NIH funding cuts in 2025–2026. Proposed FY26 HHS budget down $31.3B. Multiple grant freezes, clawbacks, and hiring freezes at state/local health departments. PHMC is heavily grant-funded.<br><br>
+      <b>Evidence:</b> TFAH Report (Sep 2025): "Health departments in states and localities nationwide are facing severe budget reductions." AAMC FY26 budget analysis. Federal court actions blocking specific grant suspensions.<br><br>
+      <b>Why It's a Risk:</b> If PHMC loses 10–20% of federal grant revenue, cost reduction reviews follow. Rival Learn at $111K/year is a discretionary line item that could be scrutinized. However, the COUNTERVAILING FORCE is that compliance training documentation is increasingly tied to grant requirements — cutting the LMS may jeopardize remaining grants.<br><br>
+      <b>Opportunity Signal:</b> PHMC needs MORE compliance training capability in this environment, not less. Frame Rival Learn as grant-compliance infrastructure.
+    </div>
+    <div class="risk-change"><b>What would move this to Green:</b> Andrew confirms with Rachel/Celeste that Rival Learn is tied to specific grant compliance requirements. Document use cases that demonstrate Rival as required infrastructure.</div>
+  </div>
+
+  <div class="risk-card risk-amber">
+    <div class="risk-title">&#128993; Commercial Risk — No CSM Renewal Strategy on File</div>
+    <div class="risk-body">
+      <b>What:</b> CSM_Renewal_Strategy__c = NULL. No documented strategy for the FY26 renewal ($111,321 at Stage 5).<br><br>
+      <b>Evidence:</b> SFDC field is blank. Next step is only "trying to schedule meeting with Rachel."<br><br>
+      <b>Why It's a Risk:</b> 149 days to close without a strategy documented or a meeting scheduled is late-stage. Prior CSMs have gotten renewals done in October — but the CEO transition and engagement deficit make this renewal higher-touch than usual. Without a documented strategy, Andrew is improvising through the most vulnerable renewal cycle in the account's history.
+    </div>
+    <div class="risk-change"><b>What would move this to Green:</b> Andrew documents renewal strategy in SFDC after the first meeting with Rachel. Include: pricing discussion framework, expansion ask, executive champion plan, competitive displacement defense.</div>
+  </div>
+
+  <div class="risk-card risk-amber">
+    <div class="risk-title">&#128993; Services Engagement = 0% — Value Gap</div>
+    <div class="risk-body">
+      <b>What:</b> Services_Engagement_Score_Percent__c = 0%. No professional services ever utilized in PHMC's 12.7-year tenure. One services opportunity closed lost in 2022 ($36K Managed Services).<br><br>
+      <b>Evidence:</b> SFDC services score. Historical opp: "Public Health Management Corporation - Public Health Management - Managed Services" — Closed Lost Jun 2022.<br><br>
+      <b>Why It's a Risk:</b> Without services adoption, PHMC admin team handles everything via support cases — 46 cases/year. When cases fail to resolve quickly, it erodes platform perception. Services also represents Rival's best retention mechanism: accounts with active services relationships churn at significantly lower rates.
+    </div>
+    <div class="risk-change"><b>What would move this to Green:</b> Services conversation included in site review. Identify 1 discrete services engagement (e.g., Advanced Analytics setup, content optimization) at reasonable entry price.</div>
+  </div>
+
+  <div class="risk-card risk-green">
+    <div class="risk-title">&#9989; Platform Tenure &amp; Switching Cost — Strong</div>
+    <div class="risk-body">
+      <b>What:</b> 12.7 years of continuous tenure (since ~2013). Rival Learn is deployed as "PHMC University" — branded platform deeply embedded in the organization.<br><br>
+      <b>Evidence:</b> Tenure_Earliest_product__c = 4,634 days. Cases reference "PHMC U" and "PHMC University." Consistent renewal at 10% YoY ARR growth for 5 consecutive years.<br><br>
+      <b>Why It's Green:</b> Migration cost is enormous — 12+ years of course content, certification records, user data, subsidiary configurations, and branded employee experience. No competitor can offer PHMC continuity of record at a switching cost that makes sense.
+    </div>
+    <div class="risk-change"><b>Maintain by:</b> Surfacing this value explicitly in renewal meeting. Quantify: "13 years of training history, 200+ courses, 2,500 employees trained — this is PHMC's institutional memory for workforce compliance."</div>
+  </div>
+
+  <div class="risk-card risk-green">
+    <div class="risk-title">&#9989; Workday Assessment — Not a Risk</div>
+    <div class="risk-body">
+      <b>What:</b> No Workday signals detected in SFDC, Chorus, or market intel for PHMC.<br><br>
+      <b>Evidence:</b> Renewal_Risks_Competitive_Threats__c = NULL. No Workday mentions in case subjects. PHMC is a nonprofit — Workday's core HCM market is typically commercial enterprise. No ZoomInfo scoops referencing HCM consolidation.<br><br>
+      <b>Assessment:</b> No current Workday consolidation risk for PHMC. PHMC's size (2,500 employees, $281M nonprofit revenue) and sector (public health nonprofit) is less typical of Workday's penetration. The embedded "PHMC University" branding further indicates deep Learn commitment.
+    </div>
+    <div class="risk-change"><b>Monitor:</b> Ask during renewal meeting whether they use any HRIS/HCM platform and whether they're evaluating HCM consolidation. Incoming CEO could bring different technology preferences.</div>
+  </div>
+
+</div>
+
+<script>
+function switchTab(n) {
+  var panels = document.querySelectorAll('.tab-panel');
+  var btns = document.querySelectorAll('.tab-btn');
+  for (var i = 0; i < panels.length; i++) { panels[i].classList.remove('active'); }
+  for (var i = 0; i < btns.length; i++) { btns[i].classList.remove('active'); }
+  document.getElementById('tab-' + n).classList.add('active');
+  for (var i = 0; i < btns.length; i++) {
+    if (btns[i].getAttribute('onclick') === 'switchTab(' + n + ')') {
+      btns[i].classList.add('active'); break;
+    }
+  }
+}
+</script>
+</body>
+</html>

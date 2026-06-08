@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light only">
+<title>Partnership HealthPlan of California — CSM Account Cockpit</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f7; color: #1a1f2e; overflow-x: hidden; font-size: 13px; }
+a { color: #2563eb; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* HEADER */
+.header { background: #1a3a5c; color: #fff; padding: 16px 20px 14px; }
+.header-top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.header-title { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+.header-sub { font-size: 12px; color: #a8bdd6; margin-top: 3px; }
+.header-meta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+.hbadge { background: rgba(255,255,255,0.12); color: #e0eaf7; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 12px; white-space: nowrap; }
+.hbadge.green { background: #16a34a; color: #fff; }
+.hbadge.amber { background: #d97706; color: #fff; }
+.hbadge.red { background: #dc2626; color: #fff; }
+
+/* KPI STRIP */
+.kpi-strip { display: flex; gap: 1px; background: #d1d5db; border-bottom: 1px solid #c8cbd4; }
+.kpi-card { flex: 1; min-width: 120px; background: #fff; padding: 12px 14px 10px; }
+.kpi-label { font-size: 10px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 4px; }
+.kpi-value { font-size: 20px; font-weight: 700; color: #1a1f2e; margin-top: 3px; }
+.kpi-sub { font-size: 10px; color: #9ca3af; margin-top: 2px; }
+.kpi-value.green { color: #16a34a; }
+.kpi-value.amber { color: #d97706; }
+.kpi-value.red { color: #dc2626; }
+
+/* TAB BAR */
+.tab-bar-wrap { background: #fff; border-bottom: 2px solid #e5e7eb; position: sticky; top: 0; z-index: 100; }
+.tab-bar { display: flex; overflow-x: auto; padding: 0 16px; white-space: nowrap; gap: 0; }
+.tab-btn { padding: 12px 16px; border: none; background: transparent; color: #6b7280; font-size: 12px; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: color 0.15s; white-space: nowrap; }
+.tab-btn:hover { color: #1a1f2e; }
+.tab-btn.active { color: #1a3a5c; border-bottom-color: #1a3a5c; }
+
+/* TAB PANELS */
+.tab-panel { display: none; padding: 16px 16px 32px; }
+.tab-panel.active { display: block; }
+
+/* CARDS & SECTIONS */
+.section { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; margin-bottom: 14px; overflow: visible; }
+.section-title { font-size: 12px; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 6px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+
+/* ACTION CARDS */
+.action-card { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #1a3a5c; border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; }
+.action-card.urgent { border-left-color: #dc2626; }
+.action-card.high { border-left-color: #d97706; }
+.action-card.medium { border-left-color: #2563eb; }
+.action-num { font-size: 10px; font-weight: 700; color: #9ca3af; margin-bottom: 4px; }
+.action-title { font-size: 13px; font-weight: 700; color: #1a1f2e; margin-bottom: 4px; }
+.action-why { font-size: 12px; color: #4b5563; margin-bottom: 8px; line-height: 1.5; }
+.action-next { font-size: 11px; font-weight: 600; color: #1a3a5c; background: #eff6ff; padding: 6px 10px; border-radius: 6px; }
+
+/* ENGAGEMENT HEALTH */
+.health-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; overflow: visible; }
+.health-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; position: relative; overflow: visible; }
+.health-metric { font-size: 22px; font-weight: 700; margin-bottom: 2px; }
+.health-label { font-size: 11px; color: #6b7280; font-weight: 500; display: flex; align-items: center; gap: 4px; }
+.health-sub { font-size: 10px; color: #9ca3af; margin-top: 3px; }
+.health-metric.green { color: #16a34a; }
+.health-metric.amber { color: #d97706; }
+.health-metric.red { color: #dc2626; }
+
+/* TOOLTIP */
+.metric-tip { display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; border-radius: 50%; background: #e5e7eb; color: #6b7280; font-size: 9px; font-weight: 700; cursor: help; position: relative; }
+.metric-tip .tip-box { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); width: 240px; padding: 10px 12px; background: #1a1f2e; color: #f3f4f6; font-size: 11px; font-weight: 400; line-height: 1.5; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.25); z-index: 1000; white-space: normal; }
+.metric-tip:hover .tip-box { display: block; }
+
+/* TABLES */
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th { text-align: left; font-size: 10px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.4px; padding: 8px 10px; background: #f9fafb; border-bottom: 1px solid #e5e7eb; }
+td { padding: 8px 10px; border-bottom: 1px solid #f3f4f6; vertical-align: top; color: #374151; line-height: 1.45; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #f9fafb; }
+
+/* BADGES */
+.badge { display: inline-flex; align-items: center; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+.badge-green { background: #dcfce7; color: #15803d; }
+.badge-red { background: #fee2e2; color: #b91c1c; }
+.badge-amber { background: #fef3c7; color: #92400e; }
+.badge-blue { background: #dbeafe; color: #1d4ed8; }
+.badge-purple { background: #f3e8ff; color: #7c3aed; }
+.badge-gray { background: #f3f4f6; color: #374151; }
+.badge-teal { background: #ccfbf1; color: #0f766e; }
+
+/* CONTACT CARDS */
+.contact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.contact-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; }
+.contact-avatar { width: 36px; height: 36px; border-radius: 50%; background: #1a3a5c; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+.contact-name { font-size: 12px; font-weight: 700; color: #1a1f2e; }
+.contact-title { font-size: 11px; color: #6b7280; margin-bottom: 5px; }
+.contact-intel { font-size: 11px; color: #374151; font-style: italic; background: #fff; border-radius: 4px; padding: 4px 6px; border-left: 2px solid #1a3a5c; margin-top: 5px; line-height: 1.4; }
+
+/* RISK CARDS */
+.risk-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; }
+.risk-card.red { border-left: 4px solid #dc2626; background: #fff8f8; }
+.risk-card.amber { border-left: 4px solid #d97706; background: #fffcf5; }
+.risk-card.green { border-left: 4px solid #16a34a; background: #f8fff8; }
+.risk-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.risk-title { font-size: 13px; font-weight: 700; color: #1a1f2e; }
+.risk-body { font-size: 12px; color: #4b5563; line-height: 1.55; margin-bottom: 8px; }
+.risk-change { font-size: 11px; font-weight: 600; color: #374151; background: #f3f4f6; padding: 6px 10px; border-radius: 6px; }
+
+/* ROADMAP */
+.roadmap-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 13px 15px; margin-bottom: 10px; }
+.roadmap-card.tier1 { border-left: 4px solid #2563eb; }
+.roadmap-card.expansion { border-left: 4px solid #7c3aed; background: #fdf4ff; }
+.roadmap-title { font-size: 12px; font-weight: 700; color: #1a1f2e; margin-bottom: 4px; }
+.roadmap-desc { font-size: 11px; color: #4b5563; line-height: 1.5; margin-bottom: 6px; }
+.roadmap-relevance { font-size: 11px; color: #1d4ed8; background: #eff6ff; padding: 5px 8px; border-radius: 5px; font-weight: 500; }
+.tier2-list { list-style: none; }
+.tier2-list li { padding: 6px 0; border-bottom: 1px solid #f3f4f6; font-size: 12px; color: #374151; display: flex; align-items: center; gap: 8px; }
+.tier2-list li:last-child { border-bottom: none; }
+
+/* CHART BARS */
+.bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.bar-label { font-size: 11px; color: #4b5563; width: 120px; flex-shrink: 0; text-align: right; }
+.bar-track { flex: 1; background: #f3f4f6; border-radius: 4px; height: 8px; }
+.bar-fill { height: 8px; border-radius: 4px; background: #2563eb; }
+.bar-val { font-size: 11px; color: #374151; width: 40px; }
+
+/* MISC */
+.flag { font-size: 11px; color: #b45309; background: #fffbeb; border: 1px solid #fed7aa; border-radius: 4px; padding: 3px 8px; display: inline-block; margin-top: 4px; }
+.source-note { font-size: 10px; color: #9ca3af; margin-top: 6px; font-style: italic; }
+.divider { border: none; border-top: 1px solid #f3f4f6; margin: 12px 0; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.stat-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #f9fafb; font-size: 12px; }
+.stat-row:last-child { border-bottom: none; }
+.stat-label { color: #6b7280; }
+.stat-value { color: #1a1f2e; font-weight: 600; }
+.pill { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; margin: 2px; }
+.cs-note { font-size: 11px; background: #f1f5f9; border-radius: 6px; padding: 8px 12px; color: #334155; line-height: 1.5; border-left: 3px solid #94a3b8; margin-top: 8px; }
+.shipped { background: #dcfce7; color: #166534; }
+.coming { background: #dbeafe; color: #1e40af; }
+.beta { background: #f3e8ff; color: #6b21a8; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="header-title">Partnership HealthPlan of California</div>
+      <div class="header-sub">Fairfield, CA &nbsp;·&nbsp; Non-Profit Medi-Cal Managed Care &nbsp;·&nbsp; 982 Employees &nbsp;·&nbsp; SFDC: 0016000000ocSW4AAM</div>
+    </div>
+    <div style="text-align:right;font-size:11px;color:#a8bdd6;">Monday Full Refresh<br>Jun 8, 2026</div>
+  </div>
+  <div class="header-meta">
+    <span class="hbadge">Tier 1 Enterprise</span>
+    <span class="hbadge">Performance + Learning</span>
+    <span class="hbadge">12+ Year Tenure</span>
+    <span class="hbadge amber">F2F Overdue</span>
+    <span class="hbadge">Renewal Jul 1, 2029 (1,124 days)</span>
+    <span class="hbadge">CSM: Andrew Pollard</span>
+    <span class="hbadge">AE: Kara Sheridan</span>
+  </div>
+</div>
+
+<!-- KPI STRIP -->
+<div class="kpi-strip">
+  <div class="kpi-card">
+    <div class="kpi-label">ARR<span class="metric-tip">?<span class="tip-box">Subscription_ARR_ALL_PRODUCTS__c (SFDC). Total active recurring revenue across all products.</span></span></div>
+    <div class="kpi-value">$228K</div>
+    <div class="kpi-sub">$57.7K Perf · $170.5K Learn</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Engagement<span class="metric-tip">?<span class="tip-box">Customer_Engagement_Score__c (SFDC). 60 = 60% engagement score. Scale 0–100. Combines product usage, support activity, and CSM interaction signals.</span></span></div>
+    <div class="kpi-value amber">60%</div>
+    <div class="kpi-sub">Svc Engagement: 75%</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">NPS<span class="metric-tip">?<span class="tip-box">Average_NPS_Score_SFDC__c (SFDC). 0 = no NPS response on record. Last sent Apr 18, 2026. Next send Oct 15, 2026.</span></span></div>
+    <div class="kpi-value amber">0</div>
+    <div class="kpi-sub">Last sent Apr 18 · No response</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Health Score<span class="metric-tip">?<span class="tip-box">Overall_Health_Score__c (SFDC). Null = not yet calculated in SFDC. Product health, relationship health, and engagement sub-scores all null. Flag for investigation.</span></span></div>
+    <div class="kpi-value amber">—</div>
+    <div class="kpi-sub">Not set in SFDC</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Open Cases</div>
+    <div class="kpi-value">2</div>
+    <div class="kpi-sub">43 cases / 12mo</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Renewal</div>
+    <div class="kpi-value green">Jul 1, 2029</div>
+    <div class="kpi-sub">1,124 days · 6 contracts</div>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar-wrap">
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab(0)">Actions</button>
+    <button class="tab-btn" onclick="switchTab(1)">Account Intel</button>
+    <button class="tab-btn" onclick="switchTab(2)">Use Case</button>
+    <button class="tab-btn" onclick="switchTab(3)">People</button>
+    <button class="tab-btn" onclick="switchTab(4)">Contracts</button>
+    <button class="tab-btn" onclick="switchTab(5)">Product</button>
+    <button class="tab-btn" onclick="switchTab(6)">Usage</button>
+    <button class="tab-btn" onclick="switchTab(7)">Cases</button>
+    <button class="tab-btn" onclick="switchTab(8)">Risk</button>
+  </div>
+</div>
+
+<!-- TAB 0: ACTIONS -->
+<div class="tab-panel active" id="tab-0">
+  <div class="section">
+    <div class="section-title">Priority Actions — Week of Jun 8, 2026</div>
+    <div class="action-card urgent">
+      <div class="action-num">ACTION 1 · URGENT</div>
+      <div class="action-title">Schedule Onsite F2F — F2F Overdue, Last Visit Never Recorded</div>
+      <div class="action-why">Onsite_F2F_Overdue__c = TRUE and Last_Onsite_F2F_Date__c = NULL. There is no recorded in-person visit in SFDC for this Tier 1 Enterprise account. This is a direct relationship health risk. With Medi-Cal policy pressure in 2026 and a new CEO in seat (Sonja Bjork), PHC is in a leadership transition period. In-person executive relationship investment is the highest-ROI activity ahead of the 2029 renewal cycle.</div>
+      <div class="action-next">Schedule onsite visit with Naomi Gordon (CHRO) and leadership team. Target: Fairfield HQ. Agenda: CARES program expansion, Performance roadmap, DEI initiative status, executive relationship building.</div>
+    </div>
+    <div class="action-card high">
+      <div class="action-num">ACTION 2 · HIGH</div>
+      <div class="action-title">Close the CARES Disability Provider Training Module (Case 00998019)</div>
+      <div class="action-why">Active High-priority case opened Jun 4 for "Build &amp; Deploy Disability Provider Training Module in CARES." This is a services expansion — PHC is building out mandatory provider compliance training using Rival Learn. Multiple active email threads (Jun 4–5) with Sarah Hill, Blair Brandow, and Andrew. This is a high-visibility deliverable directly tied to PHC's regulatory compliance program.</div>
+      <div class="action-next">Follow up with Blair Brandow on SOW pricing (Case 00995258 LinkedIn Course Import is also pending). Confirm training module build timeline and ensure services delivery is on track before next monthly meeting.</div>
+    </div>
+    <div class="action-card high">
+      <div class="action-num">ACTION 3 · HIGH</div>
+      <div class="action-title">Push the DEI Expansion Opportunity — Stalled at Stage 1 Since Aug 2025</div>
+      <div class="action-why">Opp "PHC - DEI Expansion" (Stage 1 Discovery, $0, owner Kara Sheridan) has been open since Aug 25, 2025 — 287 days with no progression. The Agile Upgrade opp (Stage 2, $8.4K) was opened Nov 2025 and remains at Stage 2. Both represent near-term expansion revenue. PHC's Cross_Sell_Score__c = 99 — highest tier, indicating SFDC identifies this as a high-probability expansion account.</div>
+      <div class="action-next">Align with Kara on current status of DEI and Agile expansions. Was there an executive conversation? If stalled on budget, use CARES volume (provider training) as proof of expanding use case and re-engage. Bring updated ROI data to F2F visit.</div>
+    </div>
+    <div class="action-card medium">
+      <div class="action-num">ACTION 4 · MEDIUM</div>
+      <div class="action-title">Complete SFDC Health Score Population — All Fields Null</div>
+      <div class="action-why">Overall_Health_Score__c, Product_Health_Score__c, and Relationship_Health_Score__c are all NULL. For a Tier 1 Enterprise account at $228K ARR, these fields are required for proper risk management, forecasting, and QBR preparation. NPS response also missing (sent Apr 18, no reply received).</div>
+      <div class="action-next">Update health scores based on current intelligence in this cockpit. Follow up with PHC contacts to ensure NPS survey was received and prompt response. Target: all three health scores populated before next weekly review.</div>
+    </div>
+    <div class="action-card medium">
+      <div class="action-num">ACTION 5 · MEDIUM</div>
+      <div class="action-title">Explore Rival Performance Upgrade — Agile License Expansion Stalled</div>
+      <div class="action-why">PHC has a pending "Agile Upgrade" opp at Stage 2 ($8,400, due Oct 2026). They currently use Performance WingSpan (legacy). Expiring product flag on "Performance_WingSpan, Learning" suggests license evolution conversation is needed. New Performance features (Goal Cascading, AI Competency Generator) could accelerate this conversation during the F2F visit.</div>
+      <div class="action-next">Prepare Performance demo for CHRO Naomi Gordon showing WingSpan→Agile value path. Tie to PHC's workforce development mission and CalAIM compliance training requirements.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Engagement Health</div>
+    <div class="health-grid">
+      <div class="health-card">
+        <div class="health-metric amber">60%</div>
+        <div class="health-label">Customer Engagement <span class="metric-tip">?<span class="tip-box">Customer_Engagement_Score__c = 60.0 (SFDC). Scale 0–100. Combines product usage, support, and CSM touchpoint signals. 60 = moderate engagement. Below 70 is a flag for Tier 1 accounts.</span></span></div>
+        <div class="health-sub">CustomerEngagementScoreNUMBER__c = 0.6</div>
+      </div>
+      <div class="health-card">
+        <div class="health-metric green">75%</div>
+        <div class="health-label">Services Engagement <span class="metric-tip">?<span class="tip-box">Services_Engagement_Score_Percent__c = 75% (SFDC). Measures engagement with services delivery, training builds, and professional services activity. 75% is healthy for a services-active account.</span></span></div>
+        <div class="health-sub">Active CARES training programs</div>
+      </div>
+      <div class="health-card">
+        <div class="health-metric amber">0</div>
+        <div class="health-label">NPS Score <span class="metric-tip">?<span class="tip-box">Average_NPS_Score_SFDC__c = 0 (SFDC). NPS scale -100 to +100. 0 = no survey response on file. Last sent Apr 18, 2026. Next send Oct 15, 2026. Not a detractor score — simply no response captured yet.</span></span></div>
+        <div class="health-sub">No response on record</div>
+      </div>
+      <div class="health-card">
+        <div class="health-metric red">—</div>
+        <div class="health-label">Overall Health Score <span class="metric-tip">?<span class="tip-box">Overall_Health_Score__c = NULL (SFDC). Not yet populated. Product_Health_Score__c and Relationship_Health_Score__c are also null. Action required: populate based on current account intelligence.</span></span></div>
+        <div class="health-sub">Not populated in SFDC</div>
+      </div>
+    </div>
+    <div style="margin-top:10px;font-size:11px;color:#6b7280;padding:0 4px;">
+      Last Site Review: Apr 23, 2026 (46 days ago) — Not overdue &nbsp;|&nbsp; Last Onsite F2F: Never recorded &nbsp;·&nbsp; <strong style="color:#dc2626;">OVERDUE</strong> &nbsp;|&nbsp; At-Risk Alerts: 0 &nbsp;|&nbsp; SDA Client: No &nbsp;|&nbsp; CSM Renewal Strategy: Not set
+    </div>
+  </div>
+</div>
+
+<!-- TAB 1: ACCOUNT INTEL -->
+<div class="tab-panel" id="tab-1">
+  <div class="two-col">
+    <div>
+      <div class="section">
+        <div class="section-title">Company Overview</div>
+        <div class="stat-row"><span class="stat-label">Legal Name</span><span class="stat-value">Partnership HealthPlan of California</span></div>
+        <div class="stat-row"><span class="stat-label">Type</span><span class="stat-value">Non-Profit County Organized Health System (COHS)</span></div>
+        <div class="stat-row"><span class="stat-label">Founded</span><span class="stat-value">1994 (Solano County) — 32 years</span></div>
+        <div class="stat-row"><span class="stat-label">Headquarters</span><span class="stat-value">4665 Business Center Dr, Fairfield, CA</span></div>
+        <div class="stat-row"><span class="stat-label">Regional Office</span><span class="stat-value">2525 Airpark Drive, Redding, CA</span></div>
+        <div class="stat-row"><span class="stat-label">Employees (SFDC/ZI)</span><span class="stat-value">982 (ZI range: 500–1,000)</span></div>
+        <div class="stat-row"><span class="stat-label">Annual Revenue</span><span class="stat-value">$110.6M (ZI) / Budget ~$2.8B (2022)</span></div>
+        <div class="stat-row"><span class="stat-label">Members Served</span><span class="stat-value">950,000+ Medi-Cal beneficiaries</span></div>
+        <div class="stat-row"><span class="stat-label">Service Area</span><span class="stat-value">24 Northern California counties</span></div>
+        <div class="stat-row"><span class="stat-label">Parent / Subsidiary</span><span class="stat-value">Independent — no parent entity (ZoomInfo: no parent ID)</span></div>
+        <div class="stat-row"><span class="stat-label">Locations</span><span class="stat-value">28 locations (ZoomInfo)</span></div>
+        <div class="stat-row"><span class="stat-label">Accreditation</span><span class="stat-value">NCQA Accredited (dual)</span></div>
+        <div class="stat-row"><span class="stat-label">SFDC Tenure</span><span class="stat-value">~12.3 years (Tenure_Earliest_product__c = 4,497 days)</span></div>
+        <p class="cs-note">Partnership HealthPlan is the <strong>largest Medi-Cal Managed Care Plan in Northern California</strong>. It contracts with the State to administer Medi-Cal benefits through local providers. As a COHS, it is the exclusive managed care plan for its 24-county territory — members cannot opt out. The organization is governed by a Board of Commissioners comprising locally elected officials, provider representatives, and patient advocates.</p>
+      </div>
+      <div class="section">
+        <div class="section-title">Department Breakdown (ZoomInfo)</div>
+        <div class="bar-row"><span class="bar-label">Medical &amp; Health</span><div class="bar-track"><div class="bar-fill" style="width:72%;background:#1a3a5c;"></div></div><span class="bar-val">294</span></div>
+        <div class="bar-row"><span class="bar-label">Operations</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:#2563eb;"></div></div><span class="bar-val">413</span></div>
+        <div class="bar-row"><span class="bar-label">IT</span><div class="bar-track"><div class="bar-fill" style="width:38%;background:#16a34a;"></div></div><span class="bar-val">157</span></div>
+        <div class="bar-row"><span class="bar-label">Legal</span><div class="bar-track"><div class="bar-fill" style="width:27%;background:#d97706;"></div></div><span class="bar-val">112</span></div>
+        <div class="bar-row"><span class="bar-label">Finance</span><div class="bar-track"><div class="bar-fill" style="width:22%;background:#7c3aed;"></div></div><span class="bar-val">89</span></div>
+        <div class="bar-row"><span class="bar-label">Human Resources</span><div class="bar-track"><div class="bar-fill" style="width:17%;background:#dc2626;"></div></div><span class="bar-val">71</span></div>
+        <div class="bar-row"><span class="bar-label">Engineering &amp; Tech</span><div class="bar-track"><div class="bar-fill" style="width:18%;background:#0891b2;"></div></div><span class="bar-val">76</span></div>
+        <div class="bar-row"><span class="bar-label">C-Suite</span><div class="bar-track"><div class="bar-fill" style="width:6%;background:#374151;"></div></div><span class="bar-val">24</span></div>
+        <p class="source-note">Source: ZoomInfo Enrich — Jun 2026</p>
+      </div>
+    </div>
+    <div>
+      <div class="section">
+        <div class="section-title">Market Dynamics</div>
+        <table>
+          <thead><tr><th>When</th><th>Event</th><th>HR Implication</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="white-space:nowrap;font-size:11px;">Jan 2026</td>
+              <td>Medi-Cal changes for undocumented adults; PHC launched "Keep Your Medi-Cal" campaign</td>
+              <td>Surge in member-facing communication, provider education. Drives demand for PHC's CARES training modules — validates Rival Learn's core use case.</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap;font-size:11px;">2026–2028</td>
+              <td>Federal HR 1 bill + CA state budget cuts: new eligibility rules, work requirements, more frequent renewals</td>
+              <td>PHC staff facing significant compliance training load. Provider education requirements are escalating. Rival Learn is the platform delivering this compliance content — high strategic value.</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap;font-size:11px;">Apr 2026</td>
+              <td>CA DHCS released plan to support Medi-Cal members through federal changes; streamlined renewals</td>
+              <td>PHC as a COHS must train its provider network and internal staff on new processes. Training &amp; development team (Kalei Spangler, Naz Sattari) is under heavy workload.</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap;font-size:11px;">2025</td>
+              <td>Dr. Colleen Townsend wins ACAP "Making a Difference" Award (Jun 2025)</td>
+              <td>PHC is a recognized leader in the COHS space. Culture of clinical excellence and workforce development — aligns with Rival's healthcare focus.</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap;font-size:11px;">2024–2025</td>
+              <td>Leadership transition: Elizabeth Gibboney named CEO (Jul 2024 press), then Sonja Bjork confirmed as current CEO</td>
+              <td>Vendor relationships reset with new CEO. Sonja Bjork is current executive; MACPAC commissioner — policy-minded leader. Rival's role in compliance training is a strategic alignment message.</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap;font-size:11px;">2026</td>
+              <td>PHC Member Scholarship Program announced (2026) — supporting Medi-Cal members pursuing healthcare careers</td>
+              <td>Demonstrates workforce pipeline investment. PHC is building future workforce — internal Learning &amp; Development is a strategic priority (supports Rival Learn expansion).</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="section-title">Competitive Landscape</div>
+        <table>
+          <thead><tr><th>Peer Plan</th><th>Geography</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>Partnership HealthPlan (PHC)</td><td>24 N. CA counties</td><td>Largest COHS in N. CA — 950K+ members</td></tr>
+            <tr><td>Inland Empire Health Plan (IEHP)</td><td>San Bernardino, Riverside</td><td>Similar COHS structure, also large employer</td></tr>
+            <tr><td>Gold Coast Health Plan</td><td>Ventura County</td><td>Smaller COHS peer</td></tr>
+            <tr><td>Central California Alliance for Health</td><td>Central CA</td><td>Non-profit COHS, comparable size</td></tr>
+          </tbody>
+        </table>
+        <p class="source-note">Source: Web research + Wikipedia — Jun 2026</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 2: USE CASE -->
+<div class="tab-panel" id="tab-2">
+  <div class="section">
+    <div class="section-title">Executive Summary</div>
+    <p style="font-size:13px;line-height:1.65;color:#1a1f2e;">Partnership HealthPlan of California uses <strong>Rival Learn (WingSpan)</strong> as its primary platform for provider education and employee compliance training, with <strong>Rival Performance (WingSpan)</strong> supporting its internal workforce performance management. The organization's flagship use case is the <strong>Partnership C.A.R.E.S. training program</strong> — a mandatory compliance training for external providers across 24 Northern California counties. PHC's Training &amp; Development function under CHRO Naomi Gordon is a power user of Rival Learn's course management, reporting, and content upload capabilities. The account has a 12-year tenure and represents a stable, mission-critical deployment — switching cost is high due to CARES program infrastructure and provider network training dependencies.</p>
+  </div>
+  <div class="grid-2">
+    <div class="section">
+      <div class="section-title">Rival Learn (WingSpan)</div>
+      <div class="stat-row"><span class="stat-label">ARR</span><span class="stat-value">$170,545</span></div>
+      <div class="stat-row"><span class="stat-label">Primary Use Case</span><span class="stat-value">Provider network compliance training (C.A.R.E.S.)</span></div>
+      <div class="stat-row"><span class="stat-label">Pain It Solves</span><span class="stat-value">Mandatory training for 24-county provider network; tracking completion and attestation across 950K+ member service area</span></div>
+      <div class="stat-row"><span class="stat-label">Value Delivered</span><span class="stat-value">CARES training completion reporting, eCourse uploads, LinkedIn Learning integration, certificate management, analytics reports</span></div>
+      <div class="stat-row"><span class="stat-label">Risk to Value</span><span class="stat-value">LifeSuite Onboard usage telemetry shows 0 events in all fields — suggesting platform data may not be feeding into the LifeSuite tracker for this account's Learn usage. Verify data mapping.</span></div>
+    </div>
+    <div class="section">
+      <div class="section-title">Rival Performance (WingSpan)</div>
+      <div class="stat-row"><span class="stat-label">ARR</span><span class="stat-value">$57,653</span></div>
+      <div class="stat-row"><span class="stat-label">Primary Use Case</span><span class="stat-value">Internal employee performance management</span></div>
+      <div class="stat-row"><span class="stat-label">Pain It Solves</span><span class="stat-value">Structured performance reviews for 982 employees across health plan operations, HR, clinical, and administrative departments</span></div>
+      <div class="stat-row"><span class="stat-label">Value Delivered</span><span class="stat-value">Performance cycle management; WingSpan (legacy) platform; pending Agile upgrade evaluation</span></div>
+      <div class="stat-row"><span class="stat-label">Risk to Value</span><span class="stat-value">Expired_Products__c includes "Performance_WingSpan" — legacy license expiring. Agile upgrade opp ($8.4K) stalled at Stage 2 since Nov 2025. No clear renewal path documented.</span></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title">Expansion Vectors</div>
+    <table>
+      <thead><tr><th>Product</th><th>Observed Pain Signal</th><th>Entry Point</th><th>Cross-Sell Score</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="badge badge-purple">Rival Workflow</span></td>
+          <td>CARES training module builds are manual services engagements. Workflow automation could self-serve onboarding/offboarding training triggers for PHC's 950K member provider network updates</td>
+          <td>CARES disability provider training module (Case 00998019) — expand from one-time service to automated workflow</td>
+          <td><span class="badge badge-green">99 (Max)</span></td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-blue">Rival Recruit</span></td>
+          <td>PHC has a Recruiter on staff (Tammy Mangabay) and current open IT Project Manager position. Ex-Recruiting in SilkRoad_Products__c history suggests past relationship</td>
+          <td>Re-introduce Rival Recruit to Naomi Gordon at F2F — position as healthcare talent acquisition solution</td>
+          <td><span class="badge badge-green">99 (Max)</span></td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-teal">DEI Add-On</span></td>
+          <td>Active DEI Expansion opp (Stage 1, $0, Kara Sheridan) open since Aug 2025 — 287 days stalled. PHC's mission-driven culture and NCQA accreditation suggest DEI training is a strategic priority</td>
+          <td>Tie to Naomi Gordon's workforce development mandate; connect to existing CARES compliance framework</td>
+          <td><span class="badge badge-amber">Expansion Opp</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="grid-3">
+    <div class="section" style="text-align:center;">
+      <div class="kpi-value" style="font-size:18px;">HIGH</div>
+      <div class="kpi-label" style="justify-content:center;margin-top:4px;">Switching Cost</div>
+      <div class="kpi-sub" style="text-align:center;margin-top:4px;">12-year tenure + CARES program infrastructure + provider network training = very high switching cost</div>
+    </div>
+    <div class="section" style="text-align:center;">
+      <div class="kpi-value green" style="font-size:18px;">$8.4K–$340K</div>
+      <div class="kpi-label" style="justify-content:center;margin-top:4px;">Whitespace / Open Opps</div>
+      <div class="kpi-sub" style="text-align:center;margin-top:4px;">Agile ($8.4K), DEI (TBD), Renewal potential ($340K per opp record)</div>
+    </div>
+    <div class="section" style="text-align:center;">
+      <div class="kpi-value green" style="font-size:18px;">Jul 1, 2029</div>
+      <div class="kpi-label" style="justify-content:center;margin-top:4px;">Renewal Status</div>
+      <div class="kpi-sub" style="text-align:center;margin-top:4px;">Stage 5 — 1,124 days out. Multiple renewal opps open. No next step defined.</div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 3: PEOPLE -->
+<div class="tab-panel" id="tab-3">
+  <div class="section">
+    <div class="section-title">PHC Executive Leadership (Verified — PHC Website + ZoomInfo)</div>
+    <div class="contact-grid">
+      <div class="contact-card">
+        <div class="contact-avatar">SB</div>
+        <div class="contact-name">Sonja Bjork</div>
+        <div class="contact-title">Chief Executive Officer</div>
+        <span class="badge badge-red" style="font-size:10px;">Executive Target</span>
+        <div class="contact-intel">Former COO/Deputy CEO — promoted from within. JD from UC Berkeley. MACPAC commissioner (federal Medicaid policy body). Policy-focused leader. Key message: Rival as compliance training infrastructure for federal Medi-Cal changes.</div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-avatar">NG</div>
+        <div class="contact-name">Naomi Gordon</div>
+        <div class="contact-title">Chief Human Resources Officer</div>
+        <span class="badge badge-blue" style="font-size:10px;">Primary Champion</span>
+        <div class="contact-intel">20-year PHC tenure (since 2006). Owns HR + Workforce Development. Direct sponsor of Rival. SFDC: Associate Director OD → Sr. Director → CHRO. ZoomInfo accuracy: 99/100. Board Chair, Learning &amp; Development Synergies at Local Health Plans of CA. Critical relationship — schedule F2F ASAP.</div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-avatar">TB</div>
+        <div class="contact-name">Tina Buop</div>
+        <div class="contact-title">Chief Information Officer</div>
+        <span class="badge badge-purple" style="font-size:10px;">IT Stakeholder</span>
+        <div class="contact-intel">Former CIO of HCA Healthcare division. Leads IT dept of 157. Data governance, AI development, security. Key stakeholder for integrations and system consolidation decisions.</div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-avatar">RL</div>
+        <div class="contact-name">Regina Littlefield</div>
+        <div class="contact-title">Sr. Director of HR</div>
+        <span class="badge badge-gray" style="font-size:10px;">HR Director</span>
+        <div class="contact-intel">Senior HR leadership below CHRO. Email: rlittlefield@partnershiphp.org · Phone: (707) 863-4565. Direct peer of Naomi Gordon's direct reports.</div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-avatar">JJ</div>
+        <div class="contact-name">Jill Johnson</div>
+        <div class="contact-title">Associate Director of Human Resources</div>
+        <span class="badge badge-gray" style="font-size:10px;">HR Operations</span>
+        <div class="contact-intel">Email: jjohnson@partnershiphp.org · Phone: (707) 863-4565. Day-to-day HR operations. Likely manages the HRIS administrator team.</div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-avatar">MP</div>
+        <div class="contact-name">Marya Parker</div>
+        <div class="contact-title">Sr. HRIS Administrator</div>
+        <span class="badge badge-teal" style="font-size:10px;">Technical Contact</span>
+        <div class="contact-intel">Email: mparker@partnershiphp.org · Mobile: (707) 330-2968. Primary HRIS technical admin — power user of Rival systems. Key contact for training configuration, reporting, and system issues.</div>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title">Training &amp; Development Team (Active Rival Users)</div>
+    <div class="contact-grid">
+      <div class="contact-card">
+        <div class="contact-avatar">KS</div>
+        <div class="contact-name">Kalei Spangler</div>
+        <div class="contact-title">Training Coordinator</div>
+        <span class="badge badge-blue" style="font-size:10px;">Day-to-Day Contact</span>
+        <div class="contact-intel">Email: kspangler@partnershiphp.org · Phone: (707) 420-7829. Likely manages CARES training delivery in Rival Learn. Key operational contact for course uploads, completions, reporting.</div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-avatar">NS</div>
+        <div class="contact-name">Naz Sattari</div>
+        <div class="contact-title">Supervisor, Health Equity Training</div>
+        <span class="badge badge-gray" style="font-size:10px;">Training Lead</span>
+        <div class="contact-intel">Email: nsattari@partnershiphp.org. Oversees health equity training programs — directly relevant to DEI expansion opportunity and CARES compliance modules.</div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-avatar">KC</div>
+        <div class="contact-name">Kristina Coester</div>
+        <div class="contact-title">Supervisor, Education &amp; Team Specialist</div>
+        <span class="badge badge-gray" style="font-size:10px;">Education Lead</span>
+        <div class="contact-intel">Email: kcoester@partnershiphp.org. Multiple SFDC records suggest she manages provider education programs. Key stakeholder for CARES training expansion.</div>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title">Rival Account Team</div>
+    <table>
+      <thead><tr><th>Name</th><th>Role</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Andrew Pollard</strong></td><td>CSM (Owner)</td><td>Primary relationship owner. Active on CARES completion reporting, renewal opps, account team update threads (Jun 2026).</td></tr>
+        <tr><td><strong>Kara Sheridan</strong></td><td>Account Executive</td><td>Owns expansion opps: DEI, Agile Upgrade, LinkedIn Course Upload (CW May 2026), WingSpan Expansion (CW Mar 2026).</td></tr>
+        <tr><td><strong>Bernard Jackson</strong></td><td>AE (Previous)</td><td>Last activity May 28 (PHC/DEI Rival Monthly Meeting in Chorus). Physical disability accommodations / auxiliary aids/services thread May 27–28.</td></tr>
+        <tr><td><strong>Sarah Hill</strong></td><td>Services / Support</td><td>Most active Rival contact — driving CARES training delivery, completion reporting, and case management (Jun 2026 high activity).</td></tr>
+        <tr><td><strong>Blair Brandow</strong></td><td>Services</td><td>Managing LinkedIn Course Import (Case 00995258, SOW Pricing status) and CARES module follow-ups.</td></tr>
+        <tr><td><strong>Michael de los Reyes</strong></td><td>Services</td><td>Account team update emails Jun 4, 2026.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="section">
+    <div class="section-title">ZoomInfo HR Leadership Targets</div>
+    <table>
+      <thead><tr><th>Name</th><th>Title</th><th>ZI Accuracy</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Naomi Gordon</strong></td><td>Chief Human Resources Officer</td><td><span class="badge badge-green">99/100</span></td><td>ZI ID: 13224580902. Valid May 27, 2026. Top decision-maker for Rival.</td></tr>
+        <tr><td><strong>Nancy Steffen</strong></td><td>Sr. Director, Quality &amp; Performance Improvement</td><td><span class="badge badge-amber">90/100</span></td><td>ZI ID: 9899683244. Relevant to Performance product and QBR conversations.</td></tr>
+        <tr><td><strong>David Lavine</strong></td><td>Associate Director, Workforce Development</td><td><span class="badge badge-green">94/100</span></td><td>ZI ID: 1740741528. Key for workforce development expansion strategy.</td></tr>
+      </tbody>
+    </table>
+    <p class="source-note">Source: ZoomInfo Search — Jun 2026. Accuracy scores indicate likelihood of reachable contact at this company.</p>
+  </div>
+</div>
+
+<!-- TAB 4: CONTRACTS -->
+<div class="tab-panel" id="tab-4">
+  <div class="section">
+    <div class="section-title">Active Contracts (6)</div>
+    <table>
+      <thead><tr><th>Contract #</th><th>Status</th><th>Start Date</th><th>End Date</th><th>Renewal Term</th><th>SFDC Link</th></tr></thead>
+      <tbody>
+        <tr><td>00018491</td><td><span class="badge badge-green">Activated</span></td><td>Sep 30, 2024</td><td>Dec 31, 2029</td><td>12 mo</td><td><a href="https://silkroad.lightning.force.com/lightning/r/Contract/800Vs00000FgMzgIAF/view" target="_blank">View</a></td></tr>
+        <tr><td>00018815</td><td><span class="badge badge-green">Activated</span></td><td>Jun 30, 2025</td><td><strong>Jun 30, 2026</strong></td><td>12 mo</td><td><a href="https://silkroad.lightning.force.com/lightning/r/Contract/800Vs00000Y8CDTIA3/view" target="_blank">View</a></td></tr>
+        <tr><td>00018816</td><td><span class="badge badge-green">Activated</span></td><td>Jul 1, 2025</td><td>Dec 31, 2029</td><td>12 mo</td><td><a href="https://silkroad.lightning.force.com/lightning/r/Contract/800Vs00000Y8IHFIA3/view" target="_blank">View</a></td></tr>
+        <tr><td>00019081</td><td><span class="badge badge-green">Activated</span></td><td>Mar 31, 2026</td><td>Jun 30, 2029</td><td>12 mo</td><td><a href="https://silkroad.lightning.force.com/lightning/r/Contract/800Vs000014jj9cIAA/view" target="_blank">View</a></td></tr>
+        <tr><td>00019080</td><td><span class="badge badge-green">Activated</span></td><td>Mar 31, 2026</td><td>Jun 30, 2029</td><td>12 mo</td><td><a href="https://silkroad.lightning.force.com/lightning/r/Contract/800Vs000014joCTIAY/view" target="_blank">View</a></td></tr>
+        <tr><td>00019094</td><td><span class="badge badge-green">Activated</span></td><td>May 6, 2026</td><td>Dec 31, 2029</td><td>12 mo</td><td><a href="https://silkroad.lightning.force.com/lightning/r/Contract/800Vs000019nywfIAA/view" target="_blank">View</a></td></tr>
+      </tbody>
+    </table>
+    <div class="flag">⚠ Contract 00018815 ends Jun 30, 2026 — 22 days from today. Verify renewal status and ensure it is auto-renewing or replaced by a newer contract.</div>
+    <p class="source-note">Source: SFDC Activated Contracts — Jun 8, 2026</p>
+  </div>
+  <div class="section">
+    <div class="section-title">Active Opportunities</div>
+    <div class="grid-2">
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+          <strong style="font-size:12px;color:#1a1f2e;">Renewal Opportunity #1</strong>
+          <span class="badge badge-blue">Stage 5 · 40%</span>
+        </div>
+        <div class="stat-row"><span class="stat-label">Amount</span><span class="stat-value">$340,000</span></div>
+        <div class="stat-row"><span class="stat-label">Potential ARR</span><span class="stat-value">$340,000</span></div>
+        <div class="stat-row"><span class="stat-label">Close Date</span><span class="stat-value">Dec 31, 2029</span></div>
+        <div class="stat-row"><span class="stat-label">Type</span><span class="stat-value">Renewal</span></div>
+        <div class="stat-row"><span class="stat-label">Owner</span><span class="stat-value">Andrew Pollard</span></div>
+        <div class="stat-row"><span class="stat-label">Created</span><span class="stat-value">Sep 30, 2024</span></div>
+        <a href="https://silkroad.lightning.force.com/lightning/r/Opportunity/006Vs000009riovIAA/view" target="_blank" style="font-size:11px;">View in SFDC</a>
+      </div>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+          <strong style="font-size:12px;color:#1a1f2e;">Renewal Opportunity #2</strong>
+          <span class="badge badge-blue">Stage 5 · 40%</span>
+        </div>
+        <div class="stat-row"><span class="stat-label">Amount</span><span class="stat-value">$98,176</span></div>
+        <div class="stat-row"><span class="stat-label">Potential ARR</span><span class="stat-value">$98,176</span></div>
+        <div class="stat-row"><span class="stat-label">Close Date</span><span class="stat-value">Dec 31, 2029</span></div>
+        <div class="stat-row"><span class="stat-label">Owner</span><span class="stat-value">Andrew Pollard</span></div>
+        <div class="stat-row"><span class="stat-label">Created</span><span class="stat-value">Jul 1, 2025</span></div>
+        <a href="https://silkroad.lightning.force.com/lightning/r/Opportunity/006Vs00000JF9BKIA1/view" target="_blank" style="font-size:11px;">View in SFDC</a>
+      </div>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+          <strong style="font-size:12px;color:#1a1f2e;">DEI Expansion</strong>
+          <span class="badge badge-gray">Stage 1 · 0%</span>
+        </div>
+        <div class="stat-row"><span class="stat-label">Amount</span><span class="stat-value">Not set</span></div>
+        <div class="stat-row"><span class="stat-label">Close Date</span><span class="stat-value">Dec 31, 2026</span></div>
+        <div class="stat-row"><span class="stat-label">Type</span><span class="stat-value">Add On · Existing Product</span></div>
+        <div class="stat-row"><span class="stat-label">Owner</span><span class="stat-value">Kara Sheridan</span></div>
+        <div class="stat-row"><span class="stat-label">Days Open</span><span class="stat-value" style="color:#d97706;">287 days</span></div>
+        <a href="https://silkroad.lightning.force.com/lightning/r/Opportunity/006Vs00000LVIcTIAX/view" target="_blank" style="font-size:11px;">View in SFDC</a>
+      </div>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+          <strong style="font-size:12px;color:#1a1f2e;">Agile Upgrade</strong>
+          <span class="badge badge-amber">Stage 2 · 20%</span>
+        </div>
+        <div class="stat-row"><span class="stat-label">Amount</span><span class="stat-value">$8,400</span></div>
+        <div class="stat-row"><span class="stat-label">Close Date</span><span class="stat-value">Oct 5, 2026</span></div>
+        <div class="stat-row"><span class="stat-label">Type</span><span class="stat-value">Add On · Existing Product</span></div>
+        <div class="stat-row"><span class="stat-label">Owner</span><span class="stat-value">Kara Sheridan</span></div>
+        <div class="stat-row"><span class="stat-label">Days Open</span><span class="stat-value">214 days</span></div>
+        <a href="https://silkroad.lightning.force.com/lightning/r/Opportunity/006Vs00000P4rliIAB/view" target="_blank" style="font-size:11px;">View in SFDC</a>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title">Recent Closed Won Highlights</div>
+    <table>
+      <thead><tr><th>Name</th><th>Amount</th><th>Closed</th><th>Type</th></tr></thead>
+      <tbody>
+        <tr><td>LinkedIn Course Upload</td><td>$4,500</td><td>May 6, 2026</td><td>Additional Offerings</td></tr>
+        <tr><td>Renewal Opportunity (Perf + Learn)</td><td>$178,092</td><td>Mar 31, 2026</td><td>Renewal</td></tr>
+        <tr><td>WingSpan Expansion</td><td>$59,364</td><td>Mar 31, 2026</td><td>Add On</td></tr>
+        <tr><td>Learning Renewal</td><td>$351,673</td><td>Jun 30, 2025</td><td>Renewal</td></tr>
+        <tr><td>Performance Renewal</td><td>$57,653</td><td>Jun 30, 2025</td><td>Renewal</td></tr>
+        <tr><td>Provider Learning/Performance Add</td><td>$1,310,000</td><td>Sep 27, 2024</td><td>Add On (Provider network)</td></tr>
+      </tbody>
+    </table>
+    <p class="source-note">Source: SFDC Opportunities — Jun 8, 2026</p>
+  </div>
+</div>
+
+<!-- TAB 5: PRODUCT -->
+<div class="tab-panel" id="tab-5">
+  <div class="section">
+    <div class="section-title">Active Projects &amp; In-Flight Work</div>
+    <table>
+      <thead><tr><th>Project</th><th>Status</th><th>Details</th><th>Owner</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>CARES Disability Provider Training Module</strong></td>
+          <td><span class="badge badge-amber">In Progress</span></td>
+          <td>Building &amp; deploying disability/auxiliary aide training module in CARES. Case 00998019 (High, open Jun 4, 2026).</td>
+          <td>Hazel Laude + Sarah Hill</td>
+        </tr>
+        <tr>
+          <td><strong>LinkedIn Learning Course Import</strong></td>
+          <td><span class="badge badge-amber">SOW Pricing</span></td>
+          <td>Importing LinkedIn Learning courses into Rival Learn. Case 00995258 (Low priority, SOW pricing stage). Closed Won opp $4,500 (May 2026).</td>
+          <td>Blair Brandow</td>
+        </tr>
+        <tr>
+          <td><strong>CARES May Completion Reporting</strong></td>
+          <td><span class="badge badge-green">Active</span></td>
+          <td>Monthly CARES training completion reports delivered to PHC. Andrew Pollard + Sarah Hill active on Jun 2–5, 2026 threads.</td>
+          <td>Andrew Pollard / Sarah Hill</td>
+        </tr>
+        <tr>
+          <td><strong>Performance Agile Upgrade</strong></td>
+          <td><span class="badge badge-gray">Stage 2 / Stalled</span></td>
+          <td>WingSpan → Agile upgrade evaluation. $8,400. Open since Nov 2025.</td>
+          <td>Kara Sheridan</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="section">
+    <div class="section-title">Product Roadmap — Rival Learn (Tier 1: Direct Pain Match)</div>
+    <div class="roadmap-card tier1">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span class="pill shipped">SHIPPED</span><span style="font-size:11px;color:#6b7280;">Jun 8, 2026</span>
+      </div>
+      <div class="roadmap-title">WORKFLOW Release 2026.2.12 — Forms Library Pagination + Smart Form Builder</div>
+      <div class="roadmap-desc">Forms Library pagination, Smart Form Builder Clone/Copy enhancement, I-9 compliance improvements, Bulk Action PDF fix. Staging Jun 8 → Production Jun 15.</div>
+      <div class="roadmap-relevance">Pain/Use Case: PHC's CARES training program involves extensive form-based compliance attestation for 950K+ member provider network. Smart Form Builder improvements directly reduce admin burden on Kalei Spangler's team for training module builds.</div>
+    </div>
+    <div class="roadmap-card tier1">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span class="pill shipped">SHIPPED</span><span style="font-size:11px;color:#6b7280;">Jun 1, 2026</span>
+      </div>
+      <div class="roadmap-title">WORKFLOW Release 2026.2.11 — Employee Portal Redesign + Bulk Action Beta</div>
+      <div class="roadmap-desc">Employee Portal complete redesign, I-9 improvements, Task Details (Beta) and Bulk Action (Beta) enhancements, Smart Forms and Dashboard Summary fixes.</div>
+      <div class="roadmap-relevance">Pain/Use Case: PHC cases show "GL: PartnershipCARESTraining - Roster and Attestation" and "Trouble with CARES access" — new Employee Portal UX directly addresses the access/navigation issues surfaced in support tickets.</div>
+    </div>
+    <div class="roadmap-card tier1">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span class="pill shipped">SHIPPED</span><span style="font-size:11px;color:#6b7280;">May 26, 2026</span>
+      </div>
+      <div class="roadmap-title">RECRUIT Release 2026.9 — PII Anonymization + AI Outreach Analytics</div>
+      <div class="roadmap-desc">PII anonymization settings (Beta), automated candidate import notifications, AI Outreach analytics, Source with ROSI search performance improvements.</div>
+      <div class="roadmap-relevance">Pain/Use Case: PHC has a Recruiter (Tammy Mangabay) on staff and Ex-Recruiting in their SilkRoad product history. Re-engage on recruiting capabilities — PII compliance particularly relevant for a government healthcare entity subject to HIPAA and CA privacy laws.</div>
+    </div>
+    <div class="roadmap-card tier1">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span class="pill coming">COMING</span><span style="font-size:11px;color:#6b7280;">Jun 15, 2026</span>
+      </div>
+      <div class="roadmap-title">WORKFLOW Release 2026.2.12 — I-9 Compliance Improvements</div>
+      <div class="roadmap-desc">Production release Jun 15. Continued I-9 improvements building on Release 2026.2.10 and 2026.2.11.</div>
+      <div class="roadmap-relevance">Pain/Use Case: PHC hires from a diverse workforce in Northern California. I-9 compliance is mandatory. Multiple form workflow improvements map to PHC's compliance-first culture and regulatory obligations as a government health plan contractor.</div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title">Product Roadmap — Tier 2 (General Interest)</div>
+    <ul class="tier2-list">
+      <li><span class="pill shipped">SHIPPED</span> May 18 — WORKFLOW 2026.2.10: I-9 &amp; E-Verify compliance updates, Task Details improvements</li>
+      <li><span class="pill shipped">SHIPPED</span> Apr 29 — RECRUIT 2026.8: Candidate Experience SMS opt-in, ROSI Outreach settings</li>
+      <li><span class="pill shipped">SHIPPED</span> Apr 20 — WORKFLOW 2026.1.08: Dashboard Summary enhancements, Bulk Action for forms, Malay &amp; Swedish language support</li>
+      <li><span class="pill shipped">SHIPPED</span> Apr 16 — RECRUIT 2026.7: Improved CX date picker, candidate navigation fixes</li>
+      <li><span class="pill shipped">SHIPPED</span> Apr 4 — WORKFLOW 2026.2.09: Task Details new experience, Bulk Action for forms, Forms Library search</li>
+    </ul>
+    <p class="source-note">Source: rival-hr.com/release-note/ — Jun 8, 2026</p>
+  </div>
+  <div class="section">
+    <div class="section-title">Expansion Products (Not Currently Licensed)</div>
+    <div class="roadmap-card expansion">
+      <div class="roadmap-title">Rival Workflow (Onboarding/Offboarding Automation)</div>
+      <div class="roadmap-desc">Automated employee lifecycle workflows — new hire onboarding, offboarding, transfers, promotions. Smart Forms, I-9, Employee Portal included.</div>
+      <div class="roadmap-relevance" style="color:#7c3aed;background:#f3e8ff;">Pain Signal: PHC manages 982 employees across 28 locations. CARES training module builds are currently manual service engagements. Workflow would automate training triggers for provider network updates. Cross_Sell_Score = 99.</div>
+    </div>
+    <div class="roadmap-card expansion">
+      <div class="roadmap-title">Rival Recruit (Talent Acquisition)</div>
+      <div class="roadmap-desc">AI-powered recruiting platform — ROSI sourcing, candidate experience, automated outreach, ATS integrations, PII compliance.</div>
+      <div class="roadmap-relevance" style="color:#7c3aed;background:#f3e8ff;">Pain Signal: PHC has Ex-Recruiting in SilkRoad history + active open positions (IT Project Manager, ZoomInfo scoop May 2026). Tammy Mangabay is active recruiter. ZI scoop confirms open hiring. Healthcare talent market is competitive in N. California.</div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 6: USAGE -->
+<div class="tab-panel" id="tab-6">
+  <div class="section">
+    <div class="section-title">LifeSuite Telemetry — Partnership HealthPlan (LS Code: PartnershipHP)</div>
+    <div class="health-grid">
+      <div class="health-card">
+        <div class="health-metric red">0</div>
+        <div class="health-label">Unique Logins (L30D)<span class="metric-tip">?<span class="tip-box">Unique_User_Logins_L30D_Onboard__c from LifeSuite_Product_Usage__c. All 30 records from May 9 – Jun 8, 2026 show 0. This is an Onboard-mapped field — PHC does not use Rival Onboarding. Learning/Performance usage likely tracked separately.</span></span></div>
+        <div class="health-sub">All 30 daily records = 0</div>
+      </div>
+      <div class="health-card">
+        <div class="health-metric red">0</div>
+        <div class="health-label">Events L12Mo (Onboard)<span class="metric-tip">?<span class="tip-box">Total_Events_Launched_Last_12Mos_Onboard__c. 0 across all records. PHC uses Learn + Performance, not Onboard. LifeSuite telemetry is Onboard-centric — no data for Learn/Performance usage in this object.</span></span></div>
+        <div class="health-sub">Onboard product not deployed</div>
+      </div>
+      <div class="health-card">
+        <div class="health-metric red">0</div>
+        <div class="health-label">Events L30D (Onboard)<span class="metric-tip">?<span class="tip-box">Total_Events_Launched_Last_30Ds_Onboard__c = 0. Confirms this telemetry object does not capture Learn or Performance activity. Verify if separate Learn usage data exists in another SFDC object or dashboard.</span></span></div>
+        <div class="health-sub">Not applicable — Learn product</div>
+      </div>
+      <div class="health-card">
+        <div class="health-metric amber">—</div>
+        <div class="health-label">Active Users<span class="metric-tip">?<span class="tip-box">Active_Users_Onboard__c = NULL across all records. Confirms LifeSuite Onboard telemetry is not the right data source for PHC Learn/Performance usage. Engagement Score of 60 suggests some usage signal exists elsewhere.</span></span></div>
+        <div class="health-sub">NULL — Verify Learn data source</div>
+      </div>
+    </div>
+    <div class="flag" style="margin-top:12px;">⚠ Usage Data Gap: All 30 LifeSuite telemetry records (May 9 – Jun 8, 2026) show 0 for all Onboard usage fields. PHC is a Learn + Performance customer — not an Onboard customer. LifeSuite_Product_Usage__c is Onboard-centric. Actual usage data for Learn and Performance resides in the Rival platform directly or a separate reporting object. Request platform usage report from services team before next QBR.</div>
+  </div>
+  <div class="section">
+    <div class="section-title">Usage Intelligence — What We Know From Cases</div>
+    <p style="font-size:12px;line-height:1.65;color:#374151;margin-bottom:12px;">Despite zero LifeSuite telemetry (which is Onboard-only), the <strong>case volume and activity log reveals active platform usage</strong>:</p>
+    <table>
+      <thead><tr><th>Signal</th><th>Evidence</th><th>Implication</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>CARES Training Active</strong></td>
+          <td>10+ cases Oct–Dec 2025 with "PartnershipCARESTraining" — login issues, attestation, completion tracking</td>
+          <td>Significant external user volume — providers across 24 counties accessing Learn platform for compliance training</td>
+        </tr>
+        <tr>
+          <td><strong>Monthly Completion Reports</strong></td>
+          <td>"May Partnership CARES Training Completion Report" — active Andrew Pollard thread Jun 2–4, 2026</td>
+          <td>Regular cadence of reporting deliverables. Customer actively tracking training completion as a compliance KPI</td>
+        </tr>
+        <tr>
+          <td><strong>Analytic Report Requests</strong></td>
+          <td>Case 00995873: "Learn - Analytic Report request" (Mar 2026, High priority)</td>
+          <td>PHC is actively using Learn analytics — positive engagement signal. Indicates administrative maturity with the platform</td>
+        </tr>
+        <tr>
+          <td><strong>Course Content Uploads</strong></td>
+          <td>LinkedIn Course Import (CW $4,500 May 2026), eCourse Upload (Dec 2025), Cultural &amp; Linguistic Training upload (Aug 2025)</td>
+          <td>Ongoing content expansion — PHC is investing in library growth, not just legacy content</td>
+        </tr>
+        <tr>
+          <td><strong>Provider Network Scale</strong></td>
+          <td>Cases reference external providers, Lassen Medical Clinics, Pit River Health Service, CommuniCare providers</td>
+          <td>PHC's Rival Learn deployment serves its entire provider network — external users, not just internal employees. Scale is significantly larger than 982-employee headcount suggests</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="section">
+    <div class="section-title">Services &amp; Site Review Status</div>
+    <div class="stat-row"><span class="stat-label">Last Site Review</span><span class="stat-value">Apr 23, 2026 (46 days ago)</span></div>
+    <div class="stat-row"><span class="stat-label">Site Review Overdue</span><span class="stat-value" style="color:#16a34a;">No</span></div>
+    <div class="stat-row"><span class="stat-label">Last Onsite F2F</span><span class="stat-value" style="color:#dc2626;">Never recorded in SFDC</span></div>
+    <div class="stat-row"><span class="stat-label">F2F Overdue</span><span class="stat-value" style="color:#dc2626;">Yes — OVERDUE</span></div>
+    <div class="stat-row"><span class="stat-label">Global Onboarding Score</span><span class="stat-value">99 (SFDC)</span></div>
+    <div class="stat-row"><span class="stat-label">Usage Region</span><span class="stat-value">United States (SFDC verified)</span></div>
+    <div class="stat-row"><span class="stat-label">SDA Client</span><span class="stat-value">No</span></div>
+  </div>
+</div>
+
+<!-- TAB 7: CASES -->
+<div class="tab-panel" id="tab-7">
+  <div class="section">
+    <div class="section-title">Open Cases</div>
+    <table>
+      <thead><tr><th>Case #</th><th>Subject</th><th>Priority</th><th>Created</th><th>Days Open</th><th>Owner</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><a href="https://silkroad.lightning.force.com/lightning/r/Case/500Vs00001EMfLqIAL/view" target="_blank">00998019</a></td>
+          <td>Build &amp; Deploy Disability Provider Training Module in CARES</td>
+          <td><span class="badge badge-red">High</span></td>
+          <td>Jun 4, 2026</td>
+          <td>4</td>
+          <td>Services Requests</td>
+        </tr>
+        <tr>
+          <td><a href="https://silkroad.lightning.force.com/lightning/r/Case/500Vs00000zjZPvIAM/view" target="_blank">00993256 (SOW)</a></td>
+          <td>LinkedIn Learning Course Import (SOW Pricing)</td>
+          <td><span class="badge badge-gray">Low</span></td>
+          <td>Mar 3, 2026</td>
+          <td>97</td>
+          <td>Blair Brandow</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="section">
+    <div class="section-title">Closed Cases — Last 12 Months (41 closed)</div>
+    <table>
+      <thead><tr><th>Case #</th><th>Subject</th><th>Priority</th><th>Created</th><th>Closed</th><th>Days to Close</th></tr></thead>
+      <tbody>
+        <tr><td>00997904</td><td>In Need of help</td><td><span class="badge badge-gray">Moderate</span></td><td>Jun 2</td><td>Jun 4</td><td>2</td></tr>
+        <tr><td>00996112</td><td>FW: password reset</td><td><span class="badge badge-gray">Moderate</span></td><td>Apr 2</td><td>Apr 3</td><td>1</td></tr>
+        <tr><td>00996099</td><td>GL - Password Reset</td><td><span class="badge badge-red">High</span></td><td>Apr 2</td><td>Apr 2</td><td>&lt;1</td></tr>
+        <tr><td>00995972</td><td>Learn | Username and password</td><td><span class="badge badge-gray">Moderate</span></td><td>Mar 30</td><td>Mar 30</td><td>&lt;1</td></tr>
+        <tr><td>00995873</td><td>Learn - Analytic Report request</td><td><span class="badge badge-red">High</span></td><td>Mar 25</td><td>Apr 13</td><td>19</td></tr>
+        <tr><td>00995826</td><td>GL - PDF or training courses</td><td><span class="badge badge-red">High</span></td><td>Mar 24</td><td>Mar 26</td><td>2</td></tr>
+        <tr><td>00995598</td><td>Trouble with CARES access</td><td><span class="badge badge-gray">Moderate</span></td><td>Mar 17</td><td>Mar 19</td><td>2</td></tr>
+        <tr><td>00994905</td><td>Invalid date format in training upload</td><td><span class="badge badge-red">High</span></td><td>Feb 19</td><td>Feb 24</td><td>5</td></tr>
+        <tr><td>00994875</td><td>GL - Updated email address issue</td><td><span class="badge badge-red">High</span></td><td>Feb 18</td><td>Feb 19</td><td>1</td></tr>
+        <tr><td>00994871</td><td>GL - Error with "Removed Selected"</td><td><span class="badge badge-red">High</span></td><td>Feb 18</td><td>Feb 20</td><td>2</td></tr>
+        <tr><td>00994800</td><td>GL | e-mail notice for training</td><td><span class="badge badge-gray">Moderate</span></td><td>Feb 17</td><td>Feb 19</td><td>2</td></tr>
+        <tr><td>00994668</td><td>GL - Need to reset username &amp; password</td><td><span class="badge badge-gray">Moderate</span></td><td>Feb 11</td><td>Feb 12</td><td>1</td></tr>
+        <tr><td>00993233</td><td>Partnership HealthPlan - Learn - CARES</td><td><span class="badge badge-gray">Moderate</span></td><td>Jan 23</td><td>Feb 2</td><td>10</td></tr>
+        <tr><td>00993207</td><td>Certificates (Discrepancy in Learning Journeys)</td><td><span class="badge badge-red">High</span></td><td>Jan 22</td><td>Jan 29</td><td>7</td></tr>
+        <tr><td>00992434</td><td>Unable to Complete Part 1 CARES Training</td><td><span class="badge badge-gray">Moderate</span></td><td>Dec 19, 2025</td><td>Mar 3, 2026</td><td>74</td></tr>
+        <tr><td>00992350</td><td>eCourse Upload and Custom Report Request</td><td><span class="badge badge-red">High</span></td><td>Dec 17, 2025</td><td>Feb 9, 2026</td><td>54</td></tr>
+        <tr><td>00985938</td><td>GL - Unable to Select All in Learn</td><td><span class="badge badge-red">High</span></td><td>Aug 28, 2025</td><td>Sep 18, 2025</td><td>21</td></tr>
+        <tr><td>00985753</td><td>GL - Cultural &amp; Linguistic Program Overview Training</td><td><span class="badge badge-gray">Moderate</span></td><td>Aug 25, 2025</td><td>Aug 28, 2025</td><td>3</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="section">
+    <div class="section-title">Case Analysis</div>
+    <div class="grid-2">
+      <div>
+        <div class="stat-row"><span class="stat-label">Total Cases (12mo)</span><span class="stat-value">43</span></div>
+        <div class="stat-row"><span class="stat-label">Open</span><span class="stat-value" style="color:#d97706;">2</span></div>
+        <div class="stat-row"><span class="stat-label">Closed</span><span class="stat-value" style="color:#16a34a;">41</span></div>
+        <div class="stat-row"><span class="stat-label">High Priority</span><span class="stat-value" style="color:#dc2626;">~18</span></div>
+        <div class="stat-row"><span class="stat-label">Moderate/Low</span><span class="stat-value">~25</span></div>
+        <div class="stat-row"><span class="stat-label">Typical Resolution</span><span class="stat-value">&lt;5 days</span></div>
+        <div class="stat-row"><span class="stat-label">Slowest Cases</span><span class="stat-value">74 days (CARES Part 1), 54 days (eCourse Upload)</span></div>
+      </div>
+      <div>
+        <p style="font-size:12px;color:#374151;line-height:1.6;"><strong>Pattern:</strong> The majority of cases are password resets, login issues, and training access problems — typical end-user support for a provider-facing training platform with 950K+ member service area. The higher-value cases are content-related (eCourse uploads, analytics reports, module builds) and indicate growing platform maturity. The 74-day CARES Part 1 case suggests a complex technical issue that took multiple weeks to resolve — worth reviewing for product-side root cause.</p>
+        <p style="font-size:12px;color:#374151;line-height:1.6;margin-top:8px;"><strong>Top Case Owner:</strong> Rica Lopez handles the majority of Learn cases. Hazel Laude handles technical/GL cases. Raymond Romero handles analytics. Blair Brandow handles services/SOW pricing items.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 8: RISK -->
+<div class="tab-panel" id="tab-8">
+  <div class="section">
+    <div class="section-title">Risk Assessment — Jun 8, 2026</div>
+
+    <div class="risk-card amber">
+      <div class="risk-header"><span style="font-size:18px;">🟡</span><span class="risk-title">Engagement Score Below Tier 1 Threshold</span></div>
+      <div class="risk-body">Customer_Engagement_Score__c = 60 (target 70+ for Tier 1 Enterprise). Overall health score is NULL — no formal health assessment has been completed. NPS was sent Apr 18, 2026 but no response captured. The account is operationally active (43 cases, regular CARES reporting) but the relationship layer — strategic conversations, executive touchpoints, onsite presence — is underdeveloped. No recorded F2F visit in SFDC history.</div>
+      <div class="risk-change">What would move this to green: Complete onsite F2F with Naomi Gordon, populate health scores, confirm NPS response or re-send. Target engagement score 70+ within 60 days.</div>
+    </div>
+
+    <div class="risk-card amber">
+      <div class="risk-header"><span style="font-size:18px;">🟡</span><span class="risk-title">Expansion Opportunities Stalled — DEI (287 days, Stage 1)</span></div>
+      <div class="risk-body">The DEI Expansion opp (Kara Sheridan) has been open since Aug 25, 2025 — 287 days at Stage 1 Discovery with $0 amount and no next step. The Agile Upgrade ($8.4K) has been at Stage 2 since Nov 2025 (214 days). Both represent near-term revenue and platform deepening. Cross_Sell_Score = 99 (maximum) — SFDC indicates high expansion probability, but deal pipeline is not converting. No coaching conversation on DEI/Agile documented.</div>
+      <div class="risk-change">What would move this to green: Joint AE + CSM conversation with Naomi Gordon at F2F to re-qualify DEI and Agile. Set amount, next step, and close timeline. If budget is the blocker, quantify ROI of current CARES usage as proof of platform value.</div>
+    </div>
+
+    <div class="risk-card amber">
+      <div class="risk-header"><span style="font-size:18px;">🟡</span><span class="risk-title">Performance Product Modernization Risk — WingSpan Legacy</span></div>
+      <div class="risk-body">Expired_Products__c = "Performance_WingSpan, Learning" — the legacy WingSpan Performance license is flagged as expired. PHC is currently on a legacy Performance platform. The Agile upgrade path ($8,400 opp, Stage 2) has not progressed. If PHC's CHRO or IT team begins an independent vendor evaluation for performance management while on a legacy product, Rival is in a vulnerable position. No CSM_Renewal_Strategy__c is set to guide this conversation.</div>
+      <div class="risk-change">What would move this to green: Confirm Agile upgrade timeline at F2F. Demo new Performance features (Goal Cascading, AI Competency Generator) tied to PHC's workforce development mission. Close Agile opp by Q3 2026.</div>
+    </div>
+
+    <div class="risk-card amber">
+      <div class="risk-header"><span style="font-size:18px;">🟡</span><span class="risk-title">Medi-Cal Policy Disruption — Enrollment Uncertainty 2026–2028</span></div>
+      <div class="risk-body">Federal H.R. 1 bill + CA state budget changes are creating significant Medi-Cal enrollment policy changes through 2028. While this is operationally challenging for PHC, it creates training demand (CARES expansion, provider education, disability compliance modules). However, significant budget pressure on state-funded health plans could lead to vendor consolidation reviews. PHC's $2.8B operating budget is largely state-funded — federal Medicaid cuts could compress administrative spend.</div>
+      <div class="risk-change">What would move this to green: Position Rival as regulatory compliance infrastructure, not discretionary software. CARES program dependency makes Rival a mission-critical budget line, not a cost-to-cut. Build this narrative in renewal conversations.</div>
+    </div>
+
+    <div class="risk-card green">
+      <div class="risk-header"><span style="font-size:18px;">🟢</span><span class="risk-title">Workday Risk Assessment — Not Applicable</span></div>
+      <div class="risk-body">No evidence of Workday deployment, expansion, or consolidation discussion in SFDC cases, activity log, or market intelligence for Partnership HealthPlan. PHC is a government-adjacent non-profit with COHS structure — SAP/Workday enterprise deployments are uncommon in this segment. No parent company; PHC is independent. No top-down vendor consolidation mandate risk identified. ZoomInfo scoops (May 2026) show open IT Project Manager position — no HRIS replacement signals.</div>
+      <div class="risk-change">Continue monitoring. If Workday appears in cases or calls, re-assess using the coexistence vs. consolidation framework.</div>
+    </div>
+
+    <div class="risk-card green">
+      <div class="risk-header"><span style="font-size:18px;">🟢</span><span class="risk-title">Commercial &amp; Renewal Health — Strong Foundation</span></div>
+      <div class="risk-body">Renewal date Jul 1, 2029 — 1,124 days out. Multiple renewal opps at Stage 5 (40% probability) with total potential ARR of $340K (vs. current $228K). Recent momentum: WingSpan Expansion $59K (Mar 2026), Renewal $178K (Mar 2026), LinkedIn Course Upload $4.5K (May 2026), Provider Add $1.31M (Sep 2024). 12-year customer with consistent renewal history. 6 active contracts. No competitive threat identified in SFDC.</div>
+      <div class="risk-change">Already green. Maintain momentum with F2F visit and expand renewal opp to Stage 6+ by Q4 2026. Ensure CSM_Renewal_Strategy__c is documented.</div>
+    </div>
+
+    <div class="risk-card amber">
+      <div class="risk-header"><span style="font-size:18px;">🟡</span><span class="risk-title">Usage Data Blind Spot — LifeSuite Telemetry Not Capturing Learn/Performance</span></div>
+      <div class="risk-body">All 30 LifeSuite telemetry records (May 9 – Jun 8, 2026) show 0 for all onboard usage metrics. This is because LifeSuite_Product_Usage__c is Onboard-centric and PHC uses Learn + Performance, not Onboard. The Customer_Engagement_Score of 60 must derive from other signals (cases, activity), but actual Learn platform usage (course completions, logins, content uploads) is not quantified in SFDC. This creates a data gap that makes health scoring, renewal conversations, and QBR preparation harder.</div>
+      <div class="risk-change">What would move this to green: Request platform usage export from PHC portal or Rival services team for Learn and Performance. Populate health scores. Use CARES monthly completion reports as a proxy until platform telemetry is mapped.</div>
+    </div>
+
+    <div class="risk-card green">
+      <div class="risk-header"><span style="font-size:18px;">🟢</span><span class="risk-title">Support Health — Responsive, High Volume but Well-Managed</span></div>
+      <div class="risk-body">43 cases in 12 months is a healthy volume for a platform serving 950K+ provider network members across 24 counties. Typical resolution time is 1–5 days. Most cases are routine (password resets, login issues). Two higher-complexity cases took longer (74 days, 54 days) but were closed. No escalation or CSAT issues flagged. Average_Support_CSAT_Score__c = NULL (not measured).</div>
+      <div class="risk-change">Already green. Consider implementing CSAT scoring for PHC to quantify support health. Would also give NPS context.</div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title">Risk Summary</div>
+    <table>
+      <thead><tr><th>Risk Factor</th><th>Status</th><th>Priority</th></tr></thead>
+      <tbody>
+        <tr><td>Engagement Score (60%) + No F2F</td><td><span class="badge badge-amber">Amber</span></td><td>P1 — Action this week</td></tr>
+        <tr><td>Expansion Opps Stalled (DEI, Agile)</td><td><span class="badge badge-amber">Amber</span></td><td>P1 — Joint AE+CSM conversation</td></tr>
+        <tr><td>Performance WingSpan Legacy + No Upgrade Path</td><td><span class="badge badge-amber">Amber</span></td><td>P2 — Address at F2F</td></tr>
+        <tr><td>Medi-Cal Budget Pressure 2026–2028</td><td><span class="badge badge-amber">Amber</span></td><td>P2 — Position as compliance infrastructure</td></tr>
+        <tr><td>Usage Data Blind Spot (LifeSuite)</td><td><span class="badge badge-amber">Amber</span></td><td>P3 — Request platform export</td></tr>
+        <tr><td>Workday / Competitive Threat</td><td><span class="badge badge-green">Green</span></td><td>No action — monitor</td></tr>
+        <tr><td>Commercial / Renewal Health</td><td><span class="badge badge-green">Green</span></td><td>Healthy — expand renewal opp</td></tr>
+        <tr><td>Support Health</td><td><span class="badge badge-green">Green</span></td><td>Healthy — consider CSAT tracking</td></tr>
+      </tbody>
+    </table>
+    <p class="source-note">Sources: SFDC Account Record, Cases, Opportunities, Contracts · ZoomInfo Enrich + Scoops · Web Research · Rival release notes. Refresh: Jun 8, 2026.</p>
+  </div>
+</div>
+
+<script>
+function switchTab(n) {
+  var panels = document.querySelectorAll('.tab-panel');
+  var btns = document.querySelectorAll('.tab-btn');
+  for (var i = 0; i < panels.length; i++) { panels[i].classList.remove('active'); }
+  for (var i = 0; i < btns.length; i++) { btns[i].classList.remove('active'); }
+  document.getElementById('tab-' + n).classList.add('active');
+  for (var i = 0; i < btns.length; i++) {
+    if (btns[i].getAttribute('onclick') === 'switchTab(' + n + ')') {
+      btns[i].classList.add('active'); break;
+    }
+  }
+}
+</script>
+</body>
+</html>
