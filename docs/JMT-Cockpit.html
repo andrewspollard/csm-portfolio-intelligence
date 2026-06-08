@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light only">
+<title>Johnson, Mirmiran &amp; Thompson &#8212; CSM Account Cockpit</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;background:#f4f5f7;color:#1a1f2e;overflow-x:hidden}
+.container{max-width:100%;padding:0 16px 32px}
+/* HEADER */
+.header{background:#1a1f2e;color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.header-left{display:flex;align-items:center;gap:14px}
+.header-logo{width:36px;height:36px;background:#3b5bdb;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:#fff;flex-shrink:0}
+.header-title{font-size:16px;font-weight:700;line-height:1.2}
+.header-sub{font-size:11px;color:#8b91a5;margin-top:2px}
+.header-meta{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.hmeta{text-align:right}
+.hmeta-label{font-size:10px;color:#8b91a5;text-transform:uppercase;letter-spacing:.5px}
+.hmeta-value{font-size:13px;font-weight:600;color:#fff}
+.badge{display:inline-block;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:600}
+.badge-green{background:#d3f9d8;color:#2b8a3e}
+.badge-amber{background:#fff3bf;color:#e67700}
+.badge-red{background:#ffe0e0;color:#c92a2a}
+.badge-blue{background:#dbe4ff;color:#3b5bdb}
+.badge-gray{background:#e9ecef;color:#495057}
+.badge-purple{background:#f3d9fa;color:#6741d9}
+/* KPI STRIP */
+.kpi-strip{display:flex;gap:10px;padding:14px 0 10px;overflow-x:auto;flex-wrap:wrap}
+.kpi-card{background:#fff;border:1px solid #e8eaf0;border-radius:10px;padding:12px 16px;min-width:130px;flex:1}
+.kpi-label{font-size:10px;color:#8b91a5;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.kpi-val{font-size:20px;font-weight:700;color:#1a1f2e}
+.kpi-sub{font-size:10px;color:#8b91a5;margin-top:2px}
+/* TAB BAR */
+.tab-wrap{position:sticky;top:0;z-index:100;background:#f4f5f7;padding:8px 0 4px}
+.tab-bar{display:flex;gap:2px;background:#e8eaf0;border-radius:10px;padding:4px;overflow-x:auto;white-space:nowrap}
+.tab-btn{padding:9px 14px;border:none;background:transparent;color:#5a6178;font-size:12px;font-weight:600;border-radius:7px;cursor:pointer;white-space:nowrap;transition:all .15s}
+.tab-btn:hover{color:#1a1f2e}
+.tab-btn.active{background:#fff;color:#1a1f2e;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+/* PANELS */
+.tab-panel{display:none;padding:16px 0;overflow:visible}
+.tab-panel.active{display:block}
+/* SECTIONS */
+.section{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:18px 20px;margin-bottom:14px;overflow:visible}
+.section-title{font-size:13px;font-weight:700;color:#1a1f2e;margin-bottom:14px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.4px}
+/* GRID */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+/* CARDS */
+.card{background:#f8f9fb;border:1px solid #e8eaf0;border-radius:8px;padding:12px 14px}
+.card-title{font-size:12px;font-weight:600;color:#1a1f2e;margin-bottom:6px}
+.card-val{font-size:22px;font-weight:700;color:#1a1f2e}
+.card-sub{font-size:11px;color:#8b91a5;margin-top:3px}
+/* ACTION CARDS */
+.action-card{border-left:4px solid #3b5bdb;background:#f8f9fb;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:10px}
+.action-card.red{border-color:#c92a2a}
+.action-card.amber{border-color:#e67700}
+.action-card.green{border-color:#2b8a3e}
+.action-title{font-size:13px;font-weight:700;color:#1a1f2e;margin-bottom:4px}
+.action-why{font-size:11px;color:#5a6178;margin-bottom:6px;line-height:1.5}
+.action-step{font-size:11px;color:#3b5bdb;font-weight:600}
+/* RISK CARDS */
+.risk-card{border:1px solid #e8eaf0;border-radius:10px;padding:14px 16px;margin-bottom:10px;overflow:visible}
+.risk-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.risk-icon{font-size:20px}
+.risk-title{font-size:13px;font-weight:700;color:#1a1f2e}
+.risk-body{font-size:11px;color:#5a6178;line-height:1.6;margin-bottom:8px}
+.risk-change{font-size:11px;color:#2b8a3e;font-weight:600}
+/* PEOPLE CARDS */
+.people-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.person-card{background:#f8f9fb;border:1px solid #e8eaf0;border-radius:10px;padding:14px 16px}
+.person-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;margin-bottom:8px;flex-shrink:0}
+.person-name{font-size:13px;font-weight:700;color:#1a1f2e}
+.person-title{font-size:11px;color:#8b91a5;margin-bottom:6px}
+.person-intel{font-size:11px;color:#5a6178;line-height:1.5}
+/* TABLES */
+.data-table{width:100%;border-collapse:collapse;font-size:12px}
+.data-table th{background:#f4f5f7;color:#5a6178;font-size:10px;text-transform:uppercase;letter-spacing:.4px;padding:8px 10px;text-align:left;border-bottom:1px solid #e8eaf0}
+.data-table td{padding:8px 10px;border-bottom:1px solid #f4f5f7;vertical-align:top}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:#f8f9fb}
+/* TOOLTIP */
+.metric-tip{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:#eef0f4;color:#8b91a5;font-size:9px;font-weight:700;cursor:help;position:relative;margin-left:4px;flex-shrink:0}
+.metric-tip .tip-box{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:240px;padding:9px 11px;background:#1a1f2e;color:#e8eaf0;font-size:10px;font-weight:400;line-height:1.5;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.2);z-index:9999;white-space:normal}
+.metric-tip:hover .tip-box{display:block}
+/* HEALTH GRID */
+.health-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;overflow:visible}
+.health-card{background:#f8f9fb;border:1px solid #e8eaf0;border-radius:10px;padding:12px;overflow:visible}
+.health-score{font-size:28px;font-weight:800;margin-bottom:2px}
+.health-label{font-size:10px;color:#8b91a5;text-transform:uppercase;letter-spacing:.4px;display:flex;align-items:center;gap:4px;overflow:visible}
+.health-sub{font-size:10px;color:#8b91a5;margin-top:4px}
+/* ROADMAP */
+.rm-card{border:1px solid #e8eaf0;border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.rm-card.tier1{border-left:4px solid #3b5bdb}
+.rm-card.expansion{border-left:4px solid #6741d9;background:#fdf4ff}
+.rm-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-right:6px;text-transform:uppercase}
+.rm-badge.shipped{background:#d3f9d8;color:#2b8a3e}
+.rm-badge.coming{background:#fff3bf;color:#e67700}
+.rm-badge.q{background:#dbe4ff;color:#3b5bdb}
+.rm-title{font-size:13px;font-weight:700;color:#1a1f2e;margin:6px 0 4px}
+.rm-desc{font-size:11px;color:#5a6178;line-height:1.5;margin-bottom:6px}
+.rm-pain{font-size:11px;color:#3b5bdb;font-style:italic}
+.rm-tier2{list-style:none;padding:0}
+.rm-tier2 li{font-size:11px;padding:6px 0;border-bottom:1px solid #f4f5f7;color:#5a6178;display:flex;align-items:center;gap:6px}
+.rm-tier2 li:last-child{border-bottom:none}
+/* USAGE BARS */
+.usage-bar-wrap{margin:8px 0}
+.usage-bar-label{display:flex;justify-content:space-between;font-size:11px;color:#5a6178;margin-bottom:3px}
+.usage-bar-bg{height:8px;background:#e8eaf0;border-radius:4px;overflow:hidden}
+.usage-bar-fill{height:100%;border-radius:4px;background:#3b5bdb;transition:width .3s}
+/* DIVIDER */
+.divider{height:1px;background:#e8eaf0;margin:14px 0}
+/* OPPORTUNITY CARDS */
+.opp-card{border:1px solid #e8eaf0;border-radius:10px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.opp-info{flex:1}
+.opp-name{font-size:13px;font-weight:700;color:#1a1f2e;margin-bottom:3px}
+.opp-meta{font-size:11px;color:#8b91a5}
+.opp-amount{font-size:18px;font-weight:700;color:#1a1f2e;text-align:right}
+/* INFO ROW */
+.info-row{display:flex;justify-content:space-between;font-size:12px;padding:7px 0;border-bottom:1px solid #f4f5f7}
+.info-row:last-child{border-bottom:none}
+.info-label{color:#8b91a5;font-weight:500}
+.info-val{color:#1a1f2e;font-weight:600;text-align:right;max-width:60%}
+/* TIMELINE */
+.timeline-item{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid #f4f5f7}
+.timeline-item:last-child{border-bottom:none}
+.tl-date{font-size:10px;color:#8b91a5;min-width:70px;padding-top:2px}
+.tl-content{flex:1;font-size:11px;color:#5a6178;line-height:1.5}
+.tl-title{font-size:12px;font-weight:600;color:#1a1f2e;margin-bottom:2px}
+@media(max-width:640px){.grid-2,.grid-3,.grid-4,.health-grid{grid-template-columns:1fr}.kpi-strip{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-logo">JMT</div>
+    <div>
+      <div class="header-title">Johnson, Mirmiran &amp; Thompson, Inc.</div>
+      <div class="header-sub">Architecture, Engineering &amp; Design &nbsp;&#8226;&nbsp; Hunt Valley, MD &nbsp;&#8226;&nbsp; Tier 3 &nbsp;&#8226;&nbsp; Enterprise</div>
+    </div>
+  </div>
+  <div class="header-meta">
+    <div class="hmeta">
+      <div class="hmeta-label">ARR</div>
+      <div class="hmeta-value">$84,545</div>
+    </div>
+    <div class="hmeta">
+      <div class="hmeta-label">Renewal</div>
+      <div class="hmeta-value">Nov 5, 2027</div>
+    </div>
+    <div class="hmeta">
+      <div class="hmeta-label">Days Out</div>
+      <div class="hmeta-value" style="color:#2b8a3e">520</div>
+    </div>
+    <div class="hmeta">
+      <div class="hmeta-label">Owner</div>
+      <div class="hmeta-value">Andrew Pollard</div>
+    </div>
+    <div class="hmeta">
+      <div class="hmeta-label">Refreshed</div>
+      <div class="hmeta-value">Jun 8, 2026</div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- KPI STRIP -->
+<div class="kpi-strip">
+  <div class="kpi-card">
+    <div class="kpi-label">Total ARR</div>
+    <div class="kpi-val">$84,545</div>
+    <div class="kpi-sub">Recruiting $40,561 &nbsp;+&nbsp; OB $43,985</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Engagement Score</div>
+    <div class="kpi-val" style="color:#2b8a3e">100%</div>
+    <div class="kpi-sub">Services &amp; Customer Engagement</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Active Products</div>
+    <div class="kpi-val">2</div>
+    <div class="kpi-sub">Recruiting &amp; Onboarding</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Events 12mo</div>
+    <div class="kpi-val">1,154</div>
+    <div class="kpi-sub">67 events last 30 days</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Support Cases</div>
+    <div class="kpi-val">90</div>
+    <div class="kpi-sub">12 months &nbsp;&#8226;&nbsp; All closed</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">At-Risk Alerts</div>
+    <div class="kpi-val" style="color:#2b8a3e">0</div>
+    <div class="kpi-sub">No active alerts</div>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-wrap">
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab(0)">&#9654; Actions</button>
+    <button class="tab-btn" onclick="switchTab(1)">Account Intel</button>
+    <button class="tab-btn" onclick="switchTab(2)">Use Case</button>
+    <button class="tab-btn" onclick="switchTab(3)">People</button>
+    <button class="tab-btn" onclick="switchTab(4)">Contracts</button>
+    <button class="tab-btn" onclick="switchTab(5)">Product</button>
+    <button class="tab-btn" onclick="switchTab(6)">Usage</button>
+    <button class="tab-btn" onclick="switchTab(7)">Cases</button>
+    <button class="tab-btn" onclick="switchTab(8)">Risk</button>
+  </div>
+</div>
+
+<!-- TAB 0: ACTIONS -->
+<div class="tab-panel active" id="tab-0">
+
+  <div class="section">
+    <div class="section-title">Priority Actions</div>
+
+    <div class="action-card amber">
+      <div class="action-title">&#9888; Establish yourself as Andrew&#8217;s strategic presence &#8212; relationship reset in progress</div>
+      <div class="action-why">The Chorus record shows you were recently introduced as the new account manager (replacing Bernard Jackson). The sseeley@jmt.com call included an explicit AI by Michael De Los Reyes to "send introduction email for Andrew Pollard as new account manager." Primary champion Jill Jameson (CHRO) has not yet been formally engaged by you. The 15-year tenure means strong institutional memory &#8212; but it belongs to former CSMs, not yet to you.</div>
+      <div class="action-step">&#8594; Next Step: Schedule a dedicated executive check-in with Jill Jameson within the next 2 weeks. Focus on strategic priorities for FY26/27, not product support. Anchor the conversation around IIJA infrastructure boom and JMT&#8217;s 2025 Clark Nexsen merger staffing needs.</div>
+    </div>
+
+    <div class="action-card amber">
+      <div class="action-title">&#9888; I-9 workflow errors need resolution before they become a support escalation</div>
+      <div class="action-why">Chorus calls reveal active I-9 form delivery errors being investigated. Kara Sheridan was actioned to "investigate I-9 form delivery error," "explore stopgap notification solution for I-9 task reopening," and "investigate I-9 integration trigger settings with Kelly Brennan." The June 2 call shows this is unresolved. I-9 errors carry legal compliance risk for JMT &#8212; a federally contracted engineering firm. This is a retention risk if unresolved at renewal.</div>
+      <div class="action-step">&#8594; Next Step: Follow up with Kara Sheridan by June 12 on I-9 error status. Confirm resolution before the July monthly meeting. If unresolved, escalate to product team for priority fix.</div>
+    </div>
+
+    <div class="action-card blue">
+      <div class="action-title">&#128204; Close the Rosie AI / Candidate Match enablement loop</div>
+      <div class="action-why">Alex Kuehl was actioned to "enable Candidate Match with Rosie feature for JMT" and also to "demo Rosie Candidate Match feature and email campaigns in a later session." Given JMT&#8217;s active hiring surge (ZoomInfo: IT and Finance roles at 12-month highs, multi-regional expansion), this feature directly addresses their pain. It&#8217;s a quick win that also demonstrates AI ROI ahead of renewal.</div>
+      <div class="action-step">&#8594; Next Step: Confirm with Alex Kuehl that Rosie / Candidate Match has been enabled. If not, block 15 minutes in the next monthly meeting to demo. Frame as &#8220;competitive edge for your infrastructure expansion hiring.&#8221;</div>
+    </div>
+
+    <div class="action-card blue">
+      <div class="action-title">&#128204; Address API / reporting export needs proactively</div>
+      <div class="action-why">Chorus action items show JMT evaluating "automated reporting export option as potential API alternative" and David Krabner + Jennifer Pickel were actioned to "evaluate scheduled reporting export functionality for data needs." This suggests they are trying to solve a data integration or analytics gap. Leaving this unaddressed could lead them to build workarounds or seek third-party tools &#8212; reducing platform stickiness.</div>
+      <div class="action-step">&#8594; Next Step: Bring scheduled reporting export feature to the July monthly meeting agenda. If API access is the real ask, engage the product team to understand timeline and whether JMT qualifies for early access.</div>
+    </div>
+
+    <div class="action-card blue">
+      <div class="action-title">&#128204; Confirm OrangeTree background check vendor transition is complete</div>
+      <div class="action-why">Multiple support cases in Apr-May 2026 are titled "OrangeTree Password Change" and "Updated Password for Background Checks." Jennifer Pickel was actioned to "update Robert Andrew on background check vendor transition." A vendor switch mid-cycle creates integration friction. If the Onboarding background check integration is broken or degraded, it affects new hire experience &#8212; JMT&#8217;s highest-volume use case.</div>
+      <div class="action-step">&#8594; Next Step: Confirm with Sara Seeley or Jennifer Pickel that the OrangeTree integration is live and functioning. Close any remaining cases. Flag to services if re-configuration is needed.</div>
+    </div>
+
+  </div>
+
+  <div class="section">
+    <div class="section-title">Engagement Health</div>
+    <div class="health-grid">
+      <div class="health-card">
+        <div class="health-score" style="color:#2b8a3e">100%</div>
+        <div class="health-label">Customer Engagement
+          <span class="metric-tip">?<span class="tip-box">Source: Customer_Engagement_Score__c = 100.0. Composite measure of platform activity, meeting cadence, and responsiveness. Scale: 0&#8211;100. Field: CustomerEngagementScoreNUMBER__c = 1.0 (normalized).</span></span>
+        </div>
+        <div class="health-sub">Top decile</div>
+      </div>
+      <div class="health-card">
+        <div class="health-score" style="color:#2b8a3e">100%</div>
+        <div class="health-label">Services Engagement
+          <span class="metric-tip">?<span class="tip-box">Source: Services_Engagement_Score_Percent__c = 100.0. Measures participation in services programs, site reviews, and implementation work. 100% = fully engaged with Rival services team.</span></span>
+        </div>
+        <div class="health-sub">Fully engaged</div>
+      </div>
+      <div class="health-card">
+        <div class="health-score" style="color:#3b5bdb">99</div>
+        <div class="health-label">Cross-Sell Score
+          <span class="metric-tip">?<span class="tip-box">Source: Cross_Sell_Score__c = 99.0. Predictive score (0&#8211;100) estimating likelihood of purchasing additional Rival products. 99 = highest intent tier. Based on usage depth, engagement patterns, and firmographic signals.</span></span>
+        </div>
+        <div class="health-sub">Highest intent tier</div>
+      </div>
+      <div class="health-card">
+        <div class="health-score" style="color:#e67700">0.0</div>
+        <div class="health-label">Avg NPS Score
+          <span class="metric-tip">?<span class="tip-box">Source: Average_NPS_Score_SFDC__c = 0.0. Calculated from NPS survey responses. Last NPS sent: 2026-04-17. Next send: 2026-10-14. Score of 0 = NPS response is blank/null in SFDC &#8212; not necessarily a detractor. Verify: no response received or score truly 0.</span></span>
+        </div>
+        <div class="health-sub">Verify: Apr 2026 NPS</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;font-size:11px;color:#8b91a5">
+      Overall Health Score, Product Health Score, and Relationship Health Score are null in SFDC &#8212; not yet populated for this account tier. &nbsp;&#8226;&nbsp; Last Site Review: Mar 2, 2026 (98 days ago, not overdue). &nbsp;&#8226;&nbsp; Last Onsite F2F: Mar 3, 2026 (97 days ago, not overdue).
+    </div>
+  </div>
+
+</div>
+
+<!-- TAB 1: ACCOUNT INTEL -->
+<div class="tab-panel" id="tab-1">
+
+  <div class="section">
+    <div class="section-title">Company Overview</div>
+    <div class="grid-2">
+      <div>
+        <div class="info-row"><span class="info-label">Full Name</span><span class="info-val">Johnson, Mirmiran &amp; Thompson, Inc.</span></div>
+        <div class="info-row"><span class="info-label">Founded</span><span class="info-val">1971 (55 years)</span></div>
+        <div class="info-row"><span class="info-label">HQ</span><span class="info-val">Hunt Valley, Maryland</span></div>
+        <div class="info-row"><span class="info-label">Employees</span><span class="info-val">~2,700 (post-Clark Nexsen merger)</span></div>
+        <div class="info-row"><span class="info-label">Revenue</span><span class="info-val">~$514M (ZoomInfo)</span></div>
+        <div class="info-row"><span class="info-label">Ownership</span><span class="info-val">100% ESOP (employee-owned since 1999)</span></div>
+        <div class="info-row"><span class="info-label">Website</span><span class="info-val"><a href="https://www.jmt.com" target="_blank" style="color:#3b5bdb">jmt.com</a></span></div>
+        <div class="info-row"><span class="info-label">SFDC Industry</span><span class="info-val">Architecture, Engineering &amp; Design</span></div>
+      </div>
+      <div>
+        <div class="info-row"><span class="info-label">ENR Ranking</span><span class="info-val">#50 Top 500 Design Firms</span></div>
+        <div class="info-row"><span class="info-label">ESOP Ranking</span><span class="info-val">#41 NCEO Top 100 Employee-Owned Cos. (2025)</span></div>
+        <div class="info-row"><span class="info-label">Office Locations</span><span class="info-val">109 locations (ZoomInfo)</span></div>
+        <div class="info-row"><span class="info-label">HR Dept Size</span><span class="info-val">32 HR employees (ZoomInfo)</span></div>
+        <div class="info-row"><span class="info-label">Engineering Staff</span><span class="info-val">902 (ZoomInfo)</span></div>
+        <div class="info-row"><span class="info-label">Phone</span><span class="info-val">(410) 329-3100</span></div>
+        <div class="info-row"><span class="info-label">AMAccountSegment</span><span class="info-val">B</span></div>
+        <div class="info-row"><span class="info-label">SDA Client</span><span class="info-val">No</span></div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div style="font-size:12px;color:#5a6178;line-height:1.7">
+      JMT is a 100% employee-owned multi-disciplinary AEC (architecture, engineering &amp; construction) firm founded in 1971. The firm serves transportation, water, environmental, energy, federal, and building markets. With 109 offices nationwide and ~2,700 employees post-merger, JMT is one of the largest ESOP-structured firms in U.S. civil engineering. Their employee-ownership model drives strong retention culture and long-term investment thinking &#8212; a cultural fit with Rival&#8217;s platform philosophy.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Recent Market Dynamics</div>
+    <table class="data-table">
+      <thead><tr><th>When</th><th>What Happened</th><th>HR / Rival Implication</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>May 2025</td>
+          <td>JMT merges with Clark Nexsen (325 employees, Virginia Beach-based AEC firm). Creates combined 2,750+ employee firm with expanded Mid-Atlantic and Southeast presence.</td>
+          <td>Significant new-hire onboarding volume expected as 325 Clark Nexsen employees are integrated into JMT systems. Rival Onboarding is the platform handling this &#8212; direct usage driver. Also: new recruiters (karla.alvarado@clarknexsen.com already in SFDC contacts) need Recruiting platform access.</td>
+        </tr>
+        <tr>
+          <td>Nov 2025</td>
+          <td>JMT advances to #41 on NCEO&#8217;s Top 100 employee-owned companies list (up from #55 in 2024, #62 in 2023). Demonstrates consistent growth trajectory.</td>
+          <td>Growing employee base = growing platform usage. ESOP culture means HR is a strategic function, not a cost center. Decision-makers care about employee experience &#8212; Rival&#8217;s branded onboarding aligns with this.</td>
+        </tr>
+        <tr>
+          <td>Apr 2026</td>
+          <td>JMT wins Project of the Year and 6 total awards at 2026 MdQI Awards. Also 4 ACEC/MD Engineering Excellence Awards (Feb 2026). Strong project pipeline and award momentum.</td>
+          <td>Award-winning project pipeline = sustained infrastructure contracts = ongoing engineering hiring. Recruiting platform volume will remain elevated through 2027 renewal window.</td>
+        </tr>
+        <tr>
+          <td>Apr 2026</td>
+          <td>ZoomInfo signals: JMT has more IT and Finance open roles than any time in the past 12 months. Technologies in demand: Python, ArcGIS Pro. Finance skills: Project Controls, Risk Register.</td>
+          <td>Increased hiring velocity across IT and Finance on top of engineering base = higher Recruiting platform transaction volume. Rosie AI Candidate Match is a perfect feature for this volume surge.</td>
+        </tr>
+        <tr>
+          <td>Feb 2026</td>
+          <td>Pittsburgh office relocating in May 2026 (5313 Campbells Run Rd, Pittsburgh, PA).</td>
+          <td>Office relocation = new employee change-of-address onboarding events, potential I-9 re-verification triggers, and system re-configuration needs. Monitor for support case spike.</td>
+        </tr>
+        <tr>
+          <td>Ongoing</td>
+          <td>IIJA (Infrastructure Investment and Jobs Act) driving record federal infrastructure spending. JMT is explicitly positioned as a federal government partner in transportation, water, and environmental sectors.</td>
+          <td>Federal project awards translate directly to engineering headcount growth across multiple geographies. JMT is positioned to capture disproportionate IIJA-funded project share &#8212; this is a multi-year hiring tailwind for the Recruiting platform.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Competitive Peers</div>
+    <table class="data-table">
+      <thead><tr><th>Firm</th><th>Est. Revenue</th><th>ENR Rank</th><th>Ownership</th><th>Notable</th></tr></thead>
+      <tbody>
+        <tr><td>JMT (this account)</td><td>~$514M</td><td>#50</td><td>100% ESOP</td><td>Growing; Clark Nexsen merger 2025</td></tr>
+        <tr><td>Kimley-Horn</td><td>~$1B+</td><td>Top 30</td><td>ESOP</td><td>Dominant in Southeast/Sun Belt</td></tr>
+        <tr><td>Stantec</td><td>~$5B</td><td>Top 10</td><td>Public (TSX:STN)</td><td>Aggressive US acquisition strategy</td></tr>
+        <tr><td>Kleinfelder</td><td>~$500M</td><td>~50&#8211;75</td><td>ESOP</td><td>Similar ESOP peer; West/Southwest focus</td></tr>
+        <tr><td>Michael Baker Intl</td><td>~$700M</td><td>~40&#8211;50</td><td>Private (DC Capital)</td><td>Federal/DOT competitor in Mid-Atlantic</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:11px;color:#8b91a5;margin-top:8px">Revenue figures estimated from ZoomInfo / ENR public rankings. Verify before sharing externally.</div>
+  </div>
+
+</div>
+
+<!-- TAB 2: USE CASE -->
+<div class="tab-panel" id="tab-2">
+
+  <div class="section">
+    <div class="section-title">Use Case Summary</div>
+    <div style="font-size:12px;color:#5a6178;line-height:1.8">
+      JMT is a 15+ year Rival customer (Tenure_Earliest_product = 5,694 days &#8594; ~15.6 years). They use Recruiting and Onboarding to manage a high-volume, multi-office engineering hiring lifecycle. Their 109-location footprint, recent Clark Nexsen merger (adding ~325 employees), and IIJA-driven project pipeline create sustained demand for both products. The Onboarding platform handles new-hire, offboarding, and transfer/promotion lifecycle events &#8212; making it deeply embedded in JMT&#8217;s operational HR processes, particularly the compliance-critical I-9 workflow and background check integration (OrangeTree). Recruiting manages the full requisition-to-hire workflow for engineering roles across the U.S., with the Rosie AI candidate match feature recently enabled to address their IT and Finance hiring surge.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Per-Product Value Map</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Recruiting &nbsp;<span class="badge badge-green">ACTIVE</span> &nbsp; ARR: $40,561</div>
+        <div class="divider"></div>
+        <div class="info-row"><span class="info-label">Use Case</span><span class="info-val">Engineering requisition-to-hire across 109 offices</span></div>
+        <div class="info-row"><span class="info-label">Pain Solved</span><span class="info-val">Multi-geography, multi-discipline hiring coordination</span></div>
+        <div class="info-row"><span class="info-label">Value Delivered</span><span class="info-val">Centralized pipeline, branded career portal, Rosie AI match</span></div>
+        <div class="info-row"><span class="info-label">Risk to Value</span><span class="info-val">OrangeTree BGC integration in transition; monitor usage post-migration</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Onboarding (Workflow) &nbsp;<span class="badge badge-green">ACTIVE</span> &nbsp; ARR: $43,985</div>
+        <div class="divider"></div>
+        <div class="info-row"><span class="info-label">Use Case</span><span class="info-val">New hire, transfer/promo, offboarding lifecycle events</span></div>
+        <div class="info-row"><span class="info-label">Pain Solved</span><span class="info-val">I-9 compliance, BGC orchestration, multi-step conditional workflows</span></div>
+        <div class="info-row"><span class="info-val" style="max-width:100%">1,154 events in 12 months; Clark Nexsen integration driving new-hire surge</span></div>
+        <div class="info-row"><span class="info-label">Risk to Value</span><span class="info-val">Active I-9 delivery errors need resolution; BGC vendor transition active</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Expansion Vectors</div>
+    <table class="data-table">
+      <thead><tr><th>Product</th><th>Observed Pain Signal</th><th>Entry Point</th><th>Cross-Sell Score</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Performance (HeartBeat)</strong><br><span class="badge badge-gray">Not owned</span></td>
+          <td>ESOP culture requires transparent goal-setting and employee contribution tracking. Engineering firms manage project-based performance cycles that standard performance tools can&#8217;t handle well.</td>
+          <td>Frame around ESOP accountability: employee-owners need to see how their performance connects to company value. Cross-sell score = 99.</td>
+          <td><span style="color:#3b5bdb;font-weight:700">99 / 100</span></td>
+        </tr>
+        <tr>
+          <td><strong>Learning (WingSpan)</strong><br><span class="badge badge-gray">Not owned</span></td>
+          <td>Kristyn Newby (ZoomInfo) is "Associate VP, Learning &amp; Manager Development" &#8212; a dedicated L&amp;D leader exists. Clark Nexsen merger requires skills development harmonization across combined 2,750-employee firm.</td>
+          <td>Kristyn Newby is the warm contact. Frame around merger L&amp;D integration: unified learning catalog, skills gap analysis for post-merger team harmonization.</td>
+          <td><span style="color:#3b5bdb;font-weight:700">99 / 100</span></td>
+        </tr>
+        <tr>
+          <td><strong>Managed Services</strong><br><span class="badge badge-gray">Not owned</span></td>
+          <td>32 HR staff supporting 2,700 employees = 1:84 HR-to-employee ratio. High complexity (109 offices, I-9 compliance, BGC orchestration) with a lean HR team.</td>
+          <td>Position Managed Services as HR capacity extension. Particularly relevant given I-9 errors and BGC vendor transition complexity.</td>
+          <td><span style="color:#3b5bdb;font-weight:700">99 / 100</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Renewal Summary</div>
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-title">Switching Cost</div>
+        <div class="card-sub" style="font-size:12px;color:#5a6178;margin-top:6px;line-height:1.6">15.6 years of embedded configuration (workflows, eforms, BGC integrations, I-9 triggers). 109-office deployment. Deep IT (Robert Andrew, Deputy CIO) integration. Re-implementation risk is extremely high.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Whitespace</div>
+        <div class="card-sub" style="font-size:12px;color:#5a6178;margin-top:6px;line-height:1.6">3 expansion products (Performance, Learning, Managed Services) with cross-sell score 99. ZoomInfo L&amp;D leader identified (Kristyn Newby). ESOP culture = strong candidate for all 3.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Renewal Outlook</div>
+        <div class="card-sub" style="font-size:12px;color:#5a6178;margin-top:6px;line-height:1.6">Nov 5, 2027 (520 days). Two open renewal opps at Stage 5 ($80,409 + $4,132). No renewal strategy documented in SFDC (CSM_Renewal_Strategy__c = null). No active at-risk alerts. Strong engagement signals.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TAB 3: PEOPLE -->
+<div class="tab-panel" id="tab-3">
+
+  <div class="section">
+    <div class="section-title">Key Stakeholders &#8212; JMT</div>
+    <div class="people-grid">
+
+      <div class="person-card">
+        <div class="person-avatar" style="background:#c92a2a">JJ</div>
+        <div class="person-name">Jill Jameson</div>
+        <div class="person-title">CHRO &nbsp;<span class="badge badge-red">Executive Sponsor</span></div>
+        <div class="person-intel">Primary executive contact. As CHRO of a 2,700-person ESOP firm, Jill owns HR strategy and vendor relationships. Key renewal authority. Andrew Pollard has not yet met with her directly post-introduction &#8212; highest-priority relationship to establish.</div>
+      </div>
+
+      <div class="person-card">
+        <div class="person-avatar" style="background:#3b5bdb">SS</div>
+        <div class="person-name">Sara Seeley</div>
+        <div class="person-title">Manager, Human Resources &nbsp;<span class="badge badge-blue">Champion</span></div>
+        <div class="person-intel">Day-to-day Onboarding platform owner. Active on Chorus calls (I-9 issues, I-9 reopening, BGC vendor transition). Strong platform user and point of contact for operational issues. Key champion for renewal conversation.</div>
+      </div>
+
+      <div class="person-card">
+        <div class="person-avatar" style="background:#2b8a3e">JP</div>
+        <div class="person-name">Jennifer Pickel</div>
+        <div class="person-title">Recruiting Team Lead &nbsp;<span class="badge badge-blue">Champion</span></div>
+        <div class="person-intel">Leads the Recruiting platform usage. Active on Chorus calls &#8212; actioned on sprint functionality, BGC vendor update to Robert Andrew, and monthly meeting agenda. High engagement. Confirmed Recruiting power user.</div>
+      </div>
+
+      <div class="person-card">
+        <div class="person-avatar" style="background:#6741d9">RA</div>
+        <div class="person-name">Robert Andrew</div>
+        <div class="person-title">Deputy CIO &nbsp;<span class="badge badge-purple">IT Stakeholder</span></div>
+        <div class="person-title" style="color:#8b91a5">rsandrew@jmt.com</div>
+        <div class="person-intel">Deputy CIO &#8212; technical decision-maker for integrations (I-9, BGC, reporting/API). Actioned to "provide calendar availability for business improvement discussions" on Chorus call. Important for any technical escalation or API discussion.</div>
+      </div>
+
+      <div class="person-card">
+        <div class="person-avatar" style="background:#e67700">KN</div>
+        <div class="person-name">Kristyn Newby</div>
+        <div class="person-title">Associate VP, Learning &amp; Manager Development &nbsp;<span class="badge badge-amber">Expansion Target</span></div>
+        <div class="person-intel">ZoomInfo confirmed. Learning &amp; Development leader &#8212; the exact buyer persona for WingSpan (Rival Learn). Given Clark Nexsen merger, she has a pressing use case: harmonize L&amp;D programs across combined 2,750-person firm. Not yet contacted by Rival.</div>
+      </div>
+
+      <div class="person-card">
+        <div class="person-avatar" style="background:#495057">JW</div>
+        <div class="person-name">Jennifer Wolery</div>
+        <div class="person-title">Associate Vice President &nbsp;<span class="badge badge-gray">Stakeholder</span></div>
+        <div class="person-intel">Senior HR stakeholder. Role specifics unconfirmed &#8212; verify area of responsibility. May have oversight of Recruiting or HR operations.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Rival Team</div>
+    <div class="people-grid">
+      <div class="person-card">
+        <div class="person-avatar" style="background:#1a1f2e">AP</div>
+        <div class="person-name">Andrew Pollard</div>
+        <div class="person-title">Customer Success Manager &nbsp;<span class="badge badge-blue">New to Account</span></div>
+        <div class="person-intel">Recently introduced as account manager. Introduction sent by Michael De Los Reyes. Priority: executive engagement with Jill Jameson (CHRO) and establish direct rapport with key champions.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar" style="background:#3b5bdb">KS</div>
+        <div class="person-name">Kara Sheridan</div>
+        <div class="person-title">Services / Implementation &nbsp;<span class="badge badge-gray">Services</span></div>
+        <div class="person-intel">Primary services contact for JMT. Owns I-9 delivery error investigation, BGC vendor reconfiguration, I-9 integration trigger settings. Active resolver on current support issues.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar" style="background:#2b8a3e">BJ</div>
+        <div class="person-name">Bernard Jackson</div>
+        <div class="person-title">Previous CSM / AE &nbsp;<span class="badge badge-gray">Transitioning</span></div>
+        <div class="person-intel">Managed JMT renewal in 2025 (Closed Won $160K). Recent emails re JMT/Rival meeting scheduling (May 24-26, 2026). Now transitioning account to Andrew Pollard. Strong institutional knowledge holder.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar" style="background:#6741d9">AK</div>
+        <div class="person-name">Alex Kuehl</div>
+        <div class="person-title">Product Specialist / CSM &nbsp;<span class="badge badge-gray">Support</span></div>
+        <div class="person-intel">Actioned to demo and enable Rosie Candidate Match for JMT. Presented tips/tricks in working sessions. Technical product expert on the account.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar" style="background:#e67700">KB</div>
+        <div class="person-name">Kelly Brennan</div>
+        <div class="person-title">CSM / AE &nbsp;<span class="badge badge-gray">Active</span></div>
+        <div class="person-intel">Recent email threads (Jun 8, 2026): "Re: Match with Rosie" &#8212; active on Rosie enablement for JMT. Also handling report requests (May 21). Active presence on account alongside Andrew.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">ZoomInfo Expansion Targets (HR Leadership)</div>
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Title</th><th>Signal</th><th>Relevance</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Kristyn Newby</strong></td>
+          <td>Associate VP, Learning &amp; Manager Development</td>
+          <td>ZoomInfo verified. Acc score: 98. Active since Feb 2026.</td>
+          <td>WingSpan (Learn) primary buyer. Post-merger L&amp;D harmonization use case.</td>
+        </tr>
+        <tr>
+          <td><strong>Jill Jameson</strong></td>
+          <td>CHRO</td>
+          <td>SFDC contact. Not yet engaged by Andrew Pollard.</td>
+          <td>Executive sponsor. Renewal authority. Strategic priority.</td>
+        </tr>
+        <tr>
+          <td><strong>Sara Seeley</strong></td>
+          <td>Manager, Human Resources</td>
+          <td>Active on Chorus. Platform champion.</td>
+          <td>Renewal voice. Day-to-day operational authority.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- TAB 4: CONTRACTS -->
+<div class="tab-panel" id="tab-4">
+
+  <div class="section">
+    <div class="section-title">Active Renewal Opportunities</div>
+
+    <div class="opp-card">
+      <div class="opp-info">
+        <div class="opp-name">JMT &#8212; Renewal Opportunity (Primary)</div>
+        <div class="opp-meta">Stage: <span class="badge badge-amber">5. Renewal Solutioning</span> &nbsp;&#8226;&nbsp; Type: Renewal &nbsp;&#8226;&nbsp; Probability: 40% &nbsp;&#8226;&nbsp; Owner: Andrew Pollard</div>
+        <div class="opp-meta" style="margin-top:4px">Created: Nov 18, 2025 &nbsp;&#8226;&nbsp; Last Modified: Jun 4, 2026 &nbsp;&#8226;&nbsp; Close Date: Nov 4, 2027 &nbsp;&#8226;&nbsp; Potential ARR: $80,409</div>
+      </div>
+      <div class="opp-amount">$80,409</div>
+    </div>
+
+    <div class="opp-card">
+      <div class="opp-info">
+        <div class="opp-name">JMT &#8212; Renewal Opportunity (Secondary)</div>
+        <div class="opp-meta">Stage: <span class="badge badge-amber">5. Renewal Solutioning</span> &nbsp;&#8226;&nbsp; Type: Renewal &nbsp;&#8226;&nbsp; Probability: 40% &nbsp;&#8226;&nbsp; Owner: Andrew Pollard</div>
+        <div class="opp-meta" style="margin-top:4px">Created: Nov 18, 2025 &nbsp;&#8226;&nbsp; Last Modified: Jun 4, 2026 &nbsp;&#8226;&nbsp; Close Date: Nov 4, 2027</div>
+      </div>
+      <div class="opp-amount">$4,132</div>
+    </div>
+
+    <div style="font-size:11px;color:#8b91a5;margin-top:8px">Combined renewal value: $84,541 &#8226; 520 days to renewal &#8226; Both opps at Stage 5 (Renewal Solutioning) &#8226; No next step documented on either opportunity.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Contract History</div>
+    <table class="data-table">
+      <thead><tr><th>Contract #</th><th>Status</th><th>Start</th><th>End</th><th>Renewal Term</th></tr></thead>
+      <tbody>
+        <tr><td>00016094</td><td><span class="badge badge-gray">Expired</span></td><td>2022-11-05</td><td>2024-11-04</td><td>12 months</td></tr>
+        <tr><td>00016723</td><td><span class="badge badge-gray">Expired</span></td><td>2022-08-22</td><td>2024-11-04</td><td>12 months</td></tr>
+        <tr><td>00017491</td><td><span class="badge badge-gray">Expired</span></td><td>2023-04-01</td><td>2024-11-04</td><td>12 months</td></tr>
+        <tr><td>00012225</td><td><span class="badge badge-gray">Expired</span></td><td>2018-11-05</td><td>2020-11-04</td><td>12 months</td></tr>
+        <tr><td>00007212</td><td><span class="badge badge-gray">Expired</span></td><td>2015-11-05</td><td>2018-11-04</td><td>&#8212;</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:11px;color:#8b91a5;margin-top:8px">Note: All contracts shown are expired. Current active subscription period Nov 2025&#8211;Nov 2027 is managed under the 2025 renewal opp. SFDC shows 2 active contracts field = 2 (likely representing Recruiting and Onboarding subscriptions).</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Opportunity History (Key Milestones)</div>
+    <table class="data-table">
+      <thead><tr><th>Date</th><th>Opp Name</th><th>Result</th><th>Amount</th><th>Owner</th></tr></thead>
+      <tbody>
+        <tr><td>Nov 2025</td><td>Renewal Opportunity</td><td><span class="badge badge-green">Won</span></td><td>$160,826</td><td>Bernard Jackson</td></tr>
+        <tr><td>Nov 2025</td><td>Recruit Expansion</td><td><span class="badge badge-green">Won</span></td><td>$8,264</td><td>Kara Sheridan</td></tr>
+        <tr><td>Nov 2024</td><td>Additional Onboarding Events &#8212; Compliance</td><td><span class="badge badge-green">Won</span></td><td>$15,152</td><td>Kara Sheridan</td></tr>
+        <tr><td>Nov 2024</td><td>Recruiting + Onboarding Renewal</td><td><span class="badge badge-green">Won</span></td><td>$61,432</td><td>Kara Sheridan</td></tr>
+        <tr><td>Sep 2023</td><td>OTC XSell</td><td><span class="badge badge-red">Lost</span></td><td>$0</td><td>Adam Kuchyt</td></tr>
+        <tr><td>Mar 2023</td><td>JMT &#8212; Recruiting Add-On</td><td><span class="badge badge-green">Won</span></td><td>$4,357</td><td>John Sauter</td></tr>
+        <tr><td>Dec 2013</td><td>GreenLight</td><td><span class="badge badge-red">Lost</span></td><td>$30,000</td><td>Danny Kirkman</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:11px;color:#8b91a5;margin-top:8px">Renewal strategy (CSM_Renewal_Strategy__c): <em>null &#8212; not documented in SFDC. Recommend Andrew Pollard document strategy before Q1 2027.</em></div>
+  </div>
+
+</div>
+
+<!-- TAB 5: PRODUCT -->
+<div class="tab-panel" id="tab-5">
+
+  <div class="section">
+    <div class="section-title">Active Projects &amp; In-Flight Items</div>
+    <div class="action-card amber">
+      <div class="action-title">I-9 Workflow Delivery Errors &#8212; Under Investigation</div>
+      <div class="action-why">Source: Chorus Jun 2, 2026 call. Sara Seeley reported I-9 form delivery errors. Kara Sheridan investigating delivery error, I-9 task reopening notification, and integration trigger settings with Kelly Brennan. Active open item.</div>
+      <div class="action-step">Owner: Kara Sheridan + Kelly Brennan &nbsp;&#8226;&nbsp; Target: Resolve before Jul monthly meeting</div>
+    </div>
+    <div class="action-card blue">
+      <div class="action-title">OrangeTree Background Check Vendor Transition &#8212; In Progress</div>
+      <div class="action-why">Source: SFDC cases (Apr-May 2026) + Chorus. Multiple password-reset support cases for OrangeTree BGC integration. Jennifer Pickel actioned to update Robert Andrew (Deputy CIO) on BGC vendor transition. Secondary employment section removal also in scope.</div>
+      <div class="action-step">Owner: Kara Sheridan &nbsp;&#8226;&nbsp; Key contacts: Jennifer Pickel, Robert Andrew</div>
+    </div>
+    <div class="action-card blue">
+      <div class="action-title">Rosie AI / Candidate Match &#8212; Feature Enablement</div>
+      <div class="action-why">Source: Chorus. Alex Kuehl actioned to enable Candidate Match with Rosie for JMT. Kelly Brennan actively emailing on "Match with Rosie" (Jun 4 and 8, 2026). Feature aligned to JMT&#8217;s multi-discipline engineering hiring surge.</div>
+      <div class="action-step">Owner: Alex Kuehl + Kelly Brennan &nbsp;&#8226;&nbsp; Status: Likely in progress (Jun 8 email activity)</div>
+    </div>
+    <div class="action-card blue">
+      <div class="action-title">API / Reporting Export Evaluation</div>
+      <div class="action-why">Source: Chorus. JMT reviewing "automated reporting export option as potential API alternative." David Krabner and Jennifer Pickel to evaluate scheduled reporting export for data needs. Possible integration or BI analytics use case.</div>
+      <div class="action-step">Owner: Andrew Pollard to follow up &nbsp;&#8226;&nbsp; Bring to Jul monthly meeting agenda</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Product Roadmap &#8212; Tier 1 (Direct Pain Match)</div>
+    <div style="font-size:11px;color:#8b91a5;margin-bottom:10px">Features mapped directly to known JMT pain signals from Chorus calls, SFDC cases, and market context. Source: Product team intelligence + rival-hr.com.</div>
+
+    <div class="rm-card tier1">
+      <div><span class="rm-badge shipped">Shipped</span><span style="font-size:11px;color:#8b91a5">2026</span></div>
+      <div class="rm-title">Rosie AI Candidate Match &amp; Email Campaigns</div>
+      <div class="rm-desc">AI-powered candidate matching that surfaces best-fit applicants from the existing pipeline and enables automated outreach email campaigns to passive candidates.</div>
+      <div class="rm-pain">JMT Pain: Engineering hiring surge (IT and Finance roles at 12-month highs per ZoomInfo). Multi-discipline search across 109 offices. Rosie is being actively enabled for JMT right now &#8212; ensure adoption sticks.</div>
+    </div>
+
+    <div class="rm-card tier1">
+      <div><span class="rm-badge shipped">Shipped</span><span style="font-size:11px;color:#8b91a5">2025&#8211;2026</span></div>
+      <div class="rm-title">Scheduled Reporting Export</div>
+      <div class="rm-desc">Automated export of platform reports on a scheduled cadence, delivered to configured email or SFTP destinations. Reduces manual data extraction work.</div>
+      <div class="rm-pain">JMT Pain: Chorus action items show JMT evaluating "automated reporting export option as potential API alternative." David Krabner is specifically tasked with evaluating this. Direct feature-to-request match.</div>
+    </div>
+
+    <div class="rm-card tier1">
+      <div><span class="rm-badge shipped">Shipped</span><span style="font-size:11px;color:#8b91a5">2025&#8211;2026</span></div>
+      <div class="rm-title">I-9 Workflow Enhancements &amp; Compliance Triggers</div>
+      <div class="rm-desc">Enhanced I-9 form delivery logic, re-open notification triggers, and improved integration event handling for third-party I-9 verification systems.</div>
+      <div class="rm-pain">JMT Pain: Active I-9 delivery errors being investigated. Sara Seeley reported I-9 task reopening issues. This is JMT&#8217;s most operationally critical compliance use case &#8212; any platform improvement here directly addresses their pain.</div>
+    </div>
+
+    <div class="rm-card tier1">
+      <div><span class="rm-badge coming">Coming</span><span style="font-size:11px;color:#8b91a5">2026</span></div>
+      <div class="rm-title">Early Access Feature Program</div>
+      <div class="rm-desc">Customers in the early access program receive pre-release feature access for testing and feedback before general availability.</div>
+      <div class="rm-pain">JMT Pain: Bernard Jackson actioned to "work with JMT on early access program for upcoming feature releases." JMT has been nominated for this program. High-engagement customer &#8212; confirm enrollment status with Andrew Pollard.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Product Roadmap &#8212; Tier 2 (In-Product, No Direct Signal)</div>
+    <ul class="rm-tier2">
+      <li><span class="rm-badge shipped">Shipped</span> Background Check Integration Enhancements &#8212; vendor credential management improvements</li>
+      <li><span class="rm-badge shipped">Shipped</span> Onboarding Community Access Controls &#8212; admin role configuration for team members</li>
+      <li><span class="rm-badge shipped">Shipped</span> Multi-Step Conditional Workflow Builder &#8212; advanced logic for complex lifecycle events</li>
+      <li><span class="rm-badge coming">Coming</span> Enhanced Offboarding Event Tracking &#8212; improved exit workflow analytics</li>
+      <li><span class="rm-badge coming">Coming</span> Transfer &amp; Promotion Workflow Automation &#8212; streamlined lateral move processing</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Expansion &#8212; Products JMT Does Not Own</div>
+    <div style="font-size:11px;color:#8b91a5;margin-bottom:10px">Expired products per SFDC: Talent Center (Onboarding), Recruiting. All relevant expansion is in products never owned.</div>
+
+    <div class="rm-card expansion">
+      <div><span class="rm-badge" style="background:#f3d9fa;color:#6741d9">EXPANSION</span> <strong>Performance (HeartBeat)</strong></div>
+      <div class="rm-desc" style="margin-top:8px">Goal-setting, continuous feedback, and performance review cycles designed for project-based workforce structures.</div>
+      <div class="rm-pain">Observed pain: ESOP ownership culture requires accountability and contribution visibility. 2,700-person engineering firm managing project-based performance without a dedicated tool. Cross-sell score: 99. Entry: position around ESOP employee value creation narrative.</div>
+    </div>
+
+    <div class="rm-card expansion">
+      <div><span class="rm-badge" style="background:#f3d9fa;color:#6741d9">EXPANSION</span> <strong>Learning (WingSpan)</strong></div>
+      <div class="rm-desc" style="margin-top:8px">LMS for technical skills development, compliance training, and onboarding curriculum management.</div>
+      <div class="rm-pain">Observed pain: Dedicated L&amp;D leader (Kristyn Newby, AVP) confirmed by ZoomInfo. Clark Nexsen merger requires training harmonization across 2,750 combined employees. Cross-sell score: 99. Entry: contact Kristyn Newby directly.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TAB 6: USAGE -->
+<div class="tab-panel" id="tab-6">
+
+  <div class="section">
+    <div class="section-title">LifeSuite Usage Telemetry &nbsp;<span style="font-size:10px;color:#8b91a5;font-weight:400">(Source: LifeSuite_Product_Usage__c, as of Jun 8, 2026)</span></div>
+    <div class="grid-4">
+      <div class="card">
+        <div class="card-title">Events 12 Months</div>
+        <div class="card-val">1,154</div>
+        <div class="card-sub">0.43 events/employee/yr</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Events Last 30 Days</div>
+        <div class="card-val">67</div>
+        <div class="card-sub">Moderate monthly pace</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Events YTD 2026</div>
+        <div class="card-val">498</div>
+        <div class="card-sub">Through Jun 8, 2026</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Unique Logins L30D</div>
+        <div class="card-val" style="color:#e67700">0</div>
+        <div class="card-sub">Field null in LifeSuite &#8212; verify</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Usage Trend Analysis</div>
+    <div style="margin-bottom:12px">
+      <div style="font-size:12px;font-weight:600;color:#1a1f2e;margin-bottom:8px">Events Last 30 Days &#8212; Recent Daily Trend (Onboarding events)</div>
+      <div class="usage-bar-wrap"><div class="usage-bar-label"><span>Jun 8</span><span>67</span></div><div class="usage-bar-bg"><div class="usage-bar-fill" style="width:56%"></div></div></div>
+      <div class="usage-bar-wrap"><div class="usage-bar-label"><span>Jun 5</span><span>77</span></div><div class="usage-bar-bg"><div class="usage-bar-fill" style="width:64%"></div></div></div>
+      <div class="usage-bar-wrap"><div class="usage-bar-label"><span>Jun 3</span><span>86</span></div><div class="usage-bar-bg"><div class="usage-bar-fill" style="width:72%"></div></div></div>
+      <div class="usage-bar-wrap"><div class="usage-bar-label"><span>Jun 1</span><span>77</span></div><div class="usage-bar-bg"><div class="usage-bar-fill" style="width:64%"></div></div></div>
+      <div class="usage-bar-wrap"><div class="usage-bar-label"><span>May 30</span><span>82</span></div><div class="usage-bar-bg"><div class="usage-bar-fill" style="width:68%"></div></div></div>
+      <div class="usage-bar-wrap"><div class="usage-bar-label"><span>May 27</span><span>~85 est.</span></div><div class="usage-bar-bg"><div class="usage-bar-fill" style="width:71%"></div></div></div>
+    </div>
+    <div class="divider"></div>
+    <div class="grid-2" style="margin-top:10px">
+      <div>
+        <div style="font-size:12px;font-weight:600;margin-bottom:8px">Utilization Assessment</div>
+        <div class="info-row"><span class="info-label">Events / Employee / Year</span><span class="info-val">0.43 (1,154 &#247; 2,700)</span></div>
+        <div class="info-row"><span class="info-label">Tier Assessment</span><span class="info-val">Moderate (0.1&#8211;0.5 range)</span></div>
+        <div class="info-row"><span class="info-label">Trend Direction</span><span class="info-val">Stable &#8212; slight June dip vs May</span></div>
+        <div class="info-row"><span class="info-label">Clark Nexsen Impact</span><span class="info-val">Expected to boost H2 2026 events</span></div>
+        <div class="info-row"><span class="info-label">YTD Run Rate</span><span class="info-val">~996 on pace (498 &#215; 2)</span></div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:600;margin-bottom:8px">Open Questions</div>
+        <div class="card" style="font-size:11px;color:#5a6178;line-height:1.7">
+          &#8226; Unique_User_Logins_L30D_Onboard__c = 0 in LifeSuite data. This may be a data sync issue rather than true zero logins. Verify with Kara Sheridan or services team.<br>
+          &#8226; Active_Users_Onboard__c = null. No active user count available in LifeSuite. Cannot confirm % of workforce on platform.<br>
+          &#8226; Usage_Region_A__c = null. Geographic usage breakdown unavailable &#8212; unknown if all 109 offices are active or just a subset.<br>
+          &#8226; New Hire vs Transfer/Promo vs Offboarding breakdown: event type fields not populated in latest LifeSuite records. Historical split unknown.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Services &amp; Site Review</div>
+    <div class="grid-2">
+      <div>
+        <div class="info-row"><span class="info-label">Last Site Review</span><span class="info-val">Mar 2, 2026 (98 days ago)</span></div>
+        <div class="info-row"><span class="info-label">Site Review Overdue</span><span class="info-val" style="color:#2b8a3e">No</span></div>
+        <div class="info-row"><span class="info-label">Last Onsite F2F</span><span class="info-val">Mar 3, 2026 (97 days ago)</span></div>
+        <div class="info-row"><span class="info-label">Onsite F2F Overdue</span><span class="info-val" style="color:#2b8a3e">No</span></div>
+      </div>
+      <div>
+        <div class="info-row"><span class="info-label">NPS Last Sent</span><span class="info-val">Apr 17, 2026</span></div>
+        <div class="info-row"><span class="info-label">NPS Next Send</span><span class="info-val">Oct 14, 2026</span></div>
+        <div class="info-row"><span class="info-label">Global Onboarding Score</span><span class="info-val" style="color:#2b8a3e">100</span></div>
+        <div class="info-row"><span class="info-label">LSCode</span><span class="info-val">Verify: null in latest records</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TAB 7: CASES -->
+<div class="tab-panel" id="tab-7">
+
+  <div class="section">
+    <div class="section-title">Support Summary (Last 12 Months)</div>
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-title">Total Cases</div>
+        <div class="card-val">90</div>
+        <div class="card-sub">All closed</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Dominant Theme</div>
+        <div class="card-val" style="font-size:14px">BGC / I-9</div>
+        <div class="card-sub">Background check password updates &amp; I-9 workflow</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Priority Distribution</div>
+        <div class="card-val" style="font-size:14px">3-Moderate</div>
+        <div class="card-sub">Majority at Moderate priority</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Recent Cases (Last 60 Days)</div>
+    <table class="data-table">
+      <thead><tr><th>Case #</th><th>Subject</th><th>Status</th><th>Priority</th><th>Created</th></tr></thead>
+      <tbody>
+        <tr><td>00997452</td><td>OH &#8212; Jane Lee Updated Password</td><td><span class="badge badge-gray">Closed</span></td><td>3-Moderate</td><td>2026-05-15</td></tr>
+        <tr><td>00997260</td><td>RE: Jane Lee Updated Password</td><td><span class="badge badge-gray">Closed</span></td><td>3-Moderate</td><td>2026-05-13</td></tr>
+        <tr><td>00997258</td><td>OH &#8212; Jane Lee Updated Password</td><td><span class="badge badge-gray">Closed</span></td><td>3-Moderate</td><td>2026-05-13</td></tr>
+        <tr><td>00997153</td><td>RE: Updated Password</td><td><span class="badge badge-gray">Closed</span></td><td>3-Moderate</td><td>2026-05-11</td></tr>
+        <tr><td>00997152</td><td>OH &#8212; Updated Password</td><td><span class="badge badge-gray">Closed</span></td><td>3-Moderate</td><td>2026-05-11</td></tr>
+        <tr><td>00997135</td><td>RE: Password Updated for Background Checks</td><td><span class="badge badge-gray">Closed</span></td><td>3-Moderate</td><td>2026-05-08</td></tr>
+        <tr><td>00997134</td><td>Password Updated for Background Checks</td><td><span class="badge badge-gray">Closed</span></td><td>3-Moderate</td><td>2026-05-08</td></tr>
+        <tr><td>00997054</td><td>OH &#8212; Updated Password with Background Check Vendor</td><td><span class="badge badge-gray">Closed</span></td><td>3-Moderate</td><td>2026-05-06</td></tr>
+        <tr><td>00997015</td><td>Workflow Errors</td><td><span class="badge badge-gray">Closed</span></td><td>4-Low</td><td>2026-05-05</td></tr>
+        <tr><td>00996664</td><td>OrangeTree Password Change &#8212; Please Update</td><td><span class="badge badge-gray">Closed</span></td><td>3-Moderate</td><td>2026-04-23</td></tr>
+        <tr><td>00996663</td><td>OrangeTree Password Change &#8212; Please Update</td><td><span class="badge badge-gray">Closed</span></td><td>3-Moderate</td><td>2026-04-23</td></tr>
+        <tr><td>00996629</td><td>JMT Question</td><td><span class="badge badge-gray">Closed</span></td><td>3-Moderate</td><td>2026-04-22</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Case Pattern Analysis</div>
+    <div class="grid-2">
+      <div>
+        <div style="font-size:12px;font-weight:600;margin-bottom:8px">Top Case Themes (12 Months)</div>
+        <div class="usage-bar-wrap">
+          <div class="usage-bar-label"><span>Background Check BGC Password Updates</span><span>~60%</span></div>
+          <div class="usage-bar-bg"><div class="usage-bar-fill" style="width:60%;background:#e67700"></div></div>
+        </div>
+        <div class="usage-bar-wrap">
+          <div class="usage-bar-label"><span>I-9 / Workflow Issues</span><span>~20%</span></div>
+          <div class="usage-bar-bg"><div class="usage-bar-fill" style="width:20%;background:#c92a2a"></div></div>
+        </div>
+        <div class="usage-bar-wrap">
+          <div class="usage-bar-label"><span>General Questions / Config</span><span>~15%</span></div>
+          <div class="usage-bar-bg"><div class="usage-bar-fill" style="width:15%;background:#3b5bdb"></div></div>
+        </div>
+        <div class="usage-bar-wrap">
+          <div class="usage-bar-label"><span>Other</span><span>~5%</span></div>
+          <div class="usage-bar-bg"><div class="usage-bar-fill" style="width:5%;background:#8b91a5"></div></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:600;margin-bottom:8px">Key Observations</div>
+        <div class="card" style="font-size:11px;color:#5a6178;line-height:1.7">
+          &#8226; <strong>BGC password volume is a systemic friction point</strong>: OrangeTree password rotation is generating repeated support tickets. Each rotation creates ~2&#8211;4 duplicate cases (email chain copies). Root fix = automate credential sync or provide self-service re-configuration workflow.<br>
+          &#8226; <strong>All 90 cases are closed</strong>: No open cases. Healthy resolution rate. Good support experience baseline.<br>
+          &#8226; <strong>Workflow Errors case (May 5)</strong>: Low-priority but may be related to I-9 delivery errors raised in Chorus. Monitor if pattern continues.<br>
+          &#8226; <strong>Jane Lee</strong> is named in multiple cases &#8212; she appears to be the primary Onboarding admin handling BGC integration. Likely a key user to track for adoption health.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TAB 8: RISK -->
+<div class="tab-panel" id="tab-8">
+
+  <div class="section">
+    <div class="section-title">Risk Assessment &nbsp;<span style="font-size:10px;color:#8b91a5;font-weight:400">(Monday Full Refresh &#8212; Jun 8, 2026)</span></div>
+
+    <div class="risk-card">
+      <div class="risk-header"><span class="risk-icon">&#127881;</span><div><div class="risk-title">Commercial Risk &#8212; Renewal at Stage 5, 520 Days Out</div><span class="badge badge-green">Green &#8212; On Track</span></div></div>
+      <div class="risk-body">Two renewal opps open at Stage 5 (Renewal Solutioning), both owned by Andrew Pollard. Combined value: $84,541. Close date: Nov 4, 2027. 520 days out &#8212; well within safe window. Both opps modified Jun 4, 2026. No at-risk alerts (Count_of_Active_At_Risk_Alerts__c = 0).</div>
+      <div class="risk-change">What would change this: If opps regress below Stage 4 without documented reason, or if renewal conversation stalls past Jun 2027 &#8212; escalate to Stage 7 (Negotiation) by Aug 2027 at latest.</div>
+    </div>
+
+    <div class="risk-card">
+      <div class="risk-header"><span class="risk-icon">&#128994;</span><div><div class="risk-title">Engagement Health &#8212; 100% Scores, Active Monthly Cadence</div><span class="badge badge-green">Green &#8212; Healthy</span></div></div>
+      <div class="risk-body">Customer Engagement Score = 100%. Services Engagement Score = 100%. Monthly cadence meetings confirmed (Jun 2, 2026 most recent per SFDC task). Active Chorus calls across multiple JMT stakeholders. Cross-sell score = 99. Global Onboarding Score = 100.</div>
+      <div class="risk-change">What would change this: If monthly meetings lapse beyond 45 days, or if Jill Jameson (CHRO) disengages following account manager transition. Monitor: Andrew Pollard&#8217;s first direct touchpoint with CHRO.</div>
+    </div>
+
+    <div class="risk-card">
+      <div class="risk-header"><span class="risk-icon">&#128993;</span><div><div class="risk-title">I-9 Compliance Risk &#8212; Active Delivery Errors</div><span class="badge badge-amber">Amber &#8212; Monitor</span></div></div>
+      <div class="risk-body">Evidence: Chorus Jun 2, 2026 call. Active I-9 form delivery errors and reopening notification gaps. Kara Sheridan assigned to investigate. I-9 is a federally mandated compliance workflow &#8212; JMT as a federal contractor has elevated compliance exposure. If delivery errors cause missed I-9 completions, JMT faces legal risk. Platform trust erodes if the compliance product fails.</div>
+      <div class="risk-change">What would change this: Resolution confirmation from Kara Sheridan + Closed confirmation from Sara Seeley by Jun 12. If unresolved by July monthly meeting, escalate to product team for priority fix.</div>
+    </div>
+
+    <div class="risk-card">
+      <div class="risk-header"><span class="risk-icon">&#128993;</span><div><div class="risk-title">Account Manager Transition Risk &#8212; Relationship Reset in Progress</div><span class="badge badge-amber">Amber &#8212; Monitor</span></div></div>
+      <div class="risk-body">Evidence: Chorus call action items. Andrew Pollard was just introduced as new account manager, replacing Bernard Jackson. The CHRO (Jill Jameson) has not been formally engaged by Andrew yet. 15.6-year tenure means deeply embedded relationships &#8212; but those relationships were with previous CSMs. Transition periods are when competitors re-enter conversations.</div>
+      <div class="risk-change">What would change this: Andrew schedules and completes an executive check-in with Jill Jameson by Jun 30, 2026. Document CHRO engagement in SFDC.</div>
+    </div>
+
+    <div class="risk-card">
+      <div class="risk-header"><span class="risk-icon">&#128993;</span><div><div class="risk-title">NPS Response Gap &#8212; Score Shows 0.0</div><span class="badge badge-amber">Amber &#8212; Verify</span></div></div>
+      <div class="risk-body">Evidence: Average_NPS_Score_SFDC__c = 0.0. Last NPS sent: Apr 17, 2026. A score of 0.0 may mean no response was received (null defaults to 0 in SFDC) rather than a true detractor score. However, it cannot be confirmed as positive. If the NPS was truly responded to at 0, that is a detractor signal requiring immediate action.</div>
+      <div class="risk-change">What would change this: Confirm with Kara Sheridan or SFDC admin whether April NPS was completed. If no response &#8212; follow up with Sara Seeley or Jill Jameson to collect. If true 0 &#8212; treat as priority recovery.</div>
+    </div>
+
+    <div class="risk-card">
+      <div class="risk-header"><span class="risk-icon">&#128994;</span><div><div class="risk-title">Competitive / Displacement Risk &#8212; No Active Threat Signals</div><span class="badge badge-green">Green &#8212; No Signals</span></div></div>
+      <div class="risk-body">SFDC Renewal_Risks_Competitive_Threats__c = null. No Workday consolidation signals detected in Chorus calls or SFDC cases. No HCM vendor replacement signals in ZoomInfo scoops. The 2013 GreenLight lost deal is the only competitive loss on record &#8212; and that was 13 years ago. 15.6 years of continuous renewal with two active products represents extremely high switching cost.</div>
+      <div class="risk-change">What would change this: Any mention of Workday HCM expansion, new HRIS vendor evaluation, or parent-level cost consolidation mandates in Chorus calls. Monitor monthly meeting transcripts for vendor consolidation language.</div>
+    </div>
+
+    <div class="risk-card">
+      <div class="risk-header"><span class="risk-icon">&#128994;</span><div><div class="risk-title">Market / Sector Risk &#8212; Tailwinds Outweigh Headwinds</div><span class="badge badge-green">Green &#8212; Favorable</span></div></div>
+      <div class="risk-body">JMT is a beneficiary of IIJA federal infrastructure spending (transportation, water, environment) &#8212; their core markets. 2025 Clark Nexsen merger adds 325 employees and expands geographies. Pittsburgh office expansion signals continued growth. IT and Finance hiring at 12-month highs (ZoomInfo). No evidence of cost-cutting, layoffs, or revenue pressure. ESOP firm #41 on NCEO list &#8212; growing, not contracting.</div>
+      <div class="risk-change">What would change this: Federal infrastructure funding rollback or IIJA rescission (political risk, monitor). Or: if JMT experiences project wins slowdown. Currently no signals of either.</div>
+    </div>
+
+    <div class="risk-card">
+      <div class="risk-header"><span class="risk-icon">&#128993;</span><div><div class="risk-title">No Renewal Strategy Documented in SFDC</div><span class="badge badge-amber">Amber &#8212; Admin Gap</span></div></div>
+      <div class="risk-body">CSM_Renewal_Strategy__c = null. With 520 days to renewal, the lack of a documented strategy is not yet critical &#8212; but this field should be populated before Q1 2027 to ensure continuity across any future CSM transitions and to support forecasting. The 2025 renewal was closed by Bernard Jackson without a documented strategy handoff.</div>
+      <div class="risk-change">What would change this: Andrew Pollard documents renewal strategy in SFDC before Dec 2026. Strategy should include: current CHRO relationship status, expansion plan (Performance/Learning), commercial targets, and known risk factors.</div>
+    </div>
+
+  </div>
+
+</div><!-- end tab-8 -->
+
+</div><!-- end container -->
+
+<script>
+function switchTab(n) {
+  var panels = document.querySelectorAll('.tab-panel');
+  var btns = document.querySelectorAll('.tab-btn');
+  for (var i = 0; i < panels.length; i++) { panels[i].classList.remove('active'); }
+  for (var i = 0; i < btns.length; i++) { btns[i].classList.remove('active'); }
+  document.getElementById('tab-' + n).classList.add('active');
+  for (var i = 0; i < btns.length; i++) {
+    if (btns[i].getAttribute('onclick') === 'switchTab(' + n + ')') {
+      btns[i].classList.add('active');
+      break;
+    }
+  }
+}
+</script>
+</body>
+</html>

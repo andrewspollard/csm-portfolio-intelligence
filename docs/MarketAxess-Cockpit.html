@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light only">
+<title>MarketAxess Corporation — CSM Account Cockpit</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;background:#f8f9fb;color:#1a1f2e;overflow-x:hidden}
+.container{max-width:100%;padding:16px}
+/* HEADER */
+.header{background:#ffffff;border-radius:12px;padding:18px 24px;margin-bottom:14px;border:1px solid #e8eaf0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.header-left{display:flex;align-items:center;gap:14px}
+.account-logo{width:48px;height:48px;background:#1e3a5f;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#ffffff;font-weight:800;font-size:18px;letter-spacing:-1px}
+.account-name{font-size:20px;font-weight:800;color:#1a1f2e}
+.account-sub{font-size:12px;color:#6b7280;margin-top:2px}
+.header-badges{display:flex;gap:8px;flex-wrap:wrap}
+.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-blue{background:#dbeafe;color:#1e40af}
+.badge-green{background:#d1fae5;color:#065f46}
+.badge-amber{background:#fef3c7;color:#92400e}
+.badge-red{background:#fee2e2;color:#991b1b}
+.badge-purple{background:#ede9fe;color:#5b21b6}
+.badge-gray{background:#f3f4f6;color:#374151}
+/* KPI STRIP */
+.kpi-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:14px}
+.kpi-card{background:#ffffff;border-radius:10px;padding:14px 16px;border:1px solid #e8eaf0}
+.kpi-label{font-size:10px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.kpi-value{font-size:20px;font-weight:800;color:#1a1f2e}
+.kpi-sub{font-size:10px;color:#6b7280;margin-top:2px}
+.kpi-green{border-top:3px solid #10b981}
+.kpi-amber{border-top:3px solid #f59e0b}
+.kpi-red{border-top:3px solid #ef4444}
+.kpi-blue{border-top:3px solid #3b82f6}
+/* TABS */
+.tab-bar{display:flex;gap:2px;background:#e8eaf0;border-radius:10px;padding:4px;overflow-x:auto;white-space:nowrap;position:sticky;top:0;z-index:100;margin-bottom:14px}
+.tab-btn{padding:9px 16px;border:none;background:transparent;color:#5a6178;font-size:12px;font-weight:600;border-radius:8px;cursor:pointer;white-space:nowrap;transition:all .15s}
+.tab-btn:hover{background:#f0f1f5;color:#1a1f2e}
+.tab-btn.active{background:#ffffff;color:#1a1f2e;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+/* PANELS */
+.tab-panel{display:none;overflow:visible}
+.tab-panel.active{display:block}
+/* SECTIONS */
+.section{background:#ffffff;border-radius:10px;padding:18px 20px;margin-bottom:12px;border:1px solid #e8eaf0;overflow:visible}
+.section-title{font-size:13px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #f3f4f6}
+/* GRID LAYOUTS */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+/* CARDS */
+.card{background:#f8f9fb;border-radius:8px;padding:14px;border:1px solid #e8eaf0}
+.card-title{font-size:12px;font-weight:700;color:#374151;margin-bottom:6px}
+.card-body{font-size:12px;color:#6b7280;line-height:1.5}
+/* TABLES */
+.data-table{width:100%;border-collapse:collapse;font-size:12px}
+.data-table th{text-align:left;padding:8px 10px;background:#f8f9fb;color:#6b7280;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.3px;border-bottom:2px solid #e8eaf0}
+.data-table td{padding:9px 10px;border-bottom:1px solid #f3f4f6;color:#374151;vertical-align:top}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:#fafafa}
+/* PEOPLE */
+.people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.person-card{background:#f8f9fb;border-radius:8px;padding:14px;border:1px solid #e8eaf0}
+.person-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#ffffff;font-weight:700;font-size:15px;margin-bottom:8px}
+.person-name{font-size:13px;font-weight:700;color:#1a1f2e}
+.person-title{font-size:11px;color:#6b7280;margin-top:2px;line-height:1.3}
+.person-intel{font-size:11px;color:#374151;margin-top:8px;padding-top:8px;border-top:1px solid #e8eaf0;line-height:1.4}
+/* RISK CARDS */
+.risk-card{border-radius:8px;padding:16px;margin-bottom:10px;border:1px solid #e8eaf0}
+.risk-red{background:#fff5f5;border-left:4px solid #ef4444}
+.risk-amber{background:#fffbeb;border-left:4px solid #f59e0b}
+.risk-green{background:#f0fdf4;border-left:4px solid #10b981}
+.risk-title{font-size:13px;font-weight:700;color:#1a1f2e;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.risk-body{font-size:12px;color:#4b5563;line-height:1.5;margin-bottom:8px}
+.risk-resolution{font-size:11px;color:#6b7280;font-style:italic;padding-top:6px;border-top:1px solid #e8eaf0}
+/* ACTION ITEMS */
+.action-card{background:#ffffff;border-radius:8px;padding:16px;margin-bottom:10px;border:1px solid #e8eaf0;border-left:4px solid #3b82f6;display:flex;gap:12px}
+.action-num{font-size:20px;font-weight:800;color:#3b82f6;min-width:28px}
+.action-title{font-size:13px;font-weight:700;color:#1a1f2e;margin-bottom:4px}
+.action-why{font-size:12px;color:#6b7280;margin-bottom:6px;line-height:1.4}
+.action-next{font-size:11px;color:#3b82f6;font-weight:600}
+/* HEALTH GRID */
+.health-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;overflow:visible}
+.health-card{background:#f8f9fb;border-radius:8px;padding:14px;border:1px solid #e8eaf0;position:relative;overflow:visible}
+.health-score{font-size:28px;font-weight:800}
+.health-label{font-size:11px;color:#6b7280;margin-top:4px}
+/* TOOLTIP */
+.metric-tip{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:#e5e7eb;color:#6b7280;font-size:9px;font-weight:700;cursor:help;position:relative;margin-left:5px;vertical-align:middle}
+.metric-tip .tip-box{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);width:240px;padding:9px 11px;background:#1a1f2e;color:#fff;font-size:11px;font-weight:400;line-height:1.5;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:9999;white-space:normal}
+.metric-tip:hover .tip-box{display:block}
+/* ROADMAP */
+.roadmap-card{background:#f0fdf4;border-radius:8px;padding:14px;margin-bottom:8px;border:1px solid #bbf7d0}
+.roadmap-card-expansion{background:#faf5ff;border-radius:8px;padding:14px;margin-bottom:8px;border:1px solid #ddd6fe}
+.roadmap-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;margin-bottom:6px}
+.rb-shipped{background:#d1fae5;color:#065f46}
+.rb-coming{background:#dbeafe;color:#1e40af}
+.rb-expansion{background:#ede9fe;color:#5b21b6}
+/* STAT BOXES */
+.stat-box{background:#f8f9fb;border-radius:8px;padding:12px 16px;border:1px solid #e8eaf0;text-align:center}
+.stat-num{font-size:22px;font-weight:800;color:#1a1f2e}
+.stat-label{font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+/* CASE BADGE */
+.case-status{padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600}
+.cs-closed{background:#d1fae5;color:#065f46}
+.cs-open{background:#fef3c7;color:#92400e}
+/* RENEWAL BAR */
+.renewal-bar-wrap{background:#e5e7eb;border-radius:4px;height:8px;margin-top:6px}
+.renewal-bar-fill{height:8px;border-radius:4px;background:linear-gradient(90deg,#3b82f6,#1d4ed8)}
+/* UTILITY */
+.text-sm{font-size:12px}.text-xs{font-size:11px}.text-muted{color:#6b7280}.fw-700{font-weight:700}
+.mt-8{margin-top:8px}.mt-12{margin-top:12px}.mb-8{margin-bottom:8px}
+.sfdc-link{color:#3b82f6;text-decoration:none;font-weight:600}
+.sfdc-link:hover{text-decoration:underline}
+a{color:#3b82f6}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.source-note{font-size:10px;color:#9ca3af;margin-top:8px;padding-top:6px;border-top:1px dashed #e5e7eb}
+.unverified{background:#fef9c3;border-radius:3px;padding:1px 5px;font-size:10px;color:#92400e}
+@media(max-width:900px){.kpi-strip{grid-template-columns:repeat(3,1fr)}.people-grid{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:1fr 1fr}.health-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.kpi-strip{grid-template-columns:repeat(2,1fr)}.people-grid{grid-template-columns:1fr}.grid-2{grid-template-columns:1fr}.health-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="account-logo">MX</div>
+    <div>
+      <div class="account-name">MarketAxess Corporation</div>
+      <div class="account-sub">NASDAQ: MKTX &nbsp;|&nbsp; New York, NY &nbsp;|&nbsp; 859 employees &nbsp;|&nbsp; Finance / Electronic Trading &nbsp;|&nbsp; Tier 3 Enterprise</div>
+    </div>
+  </div>
+  <div class="header-badges">
+    <span class="badge badge-blue">Performance + Other</span>
+    <span class="badge badge-green">Active Customer</span>
+    <span class="badge badge-amber">Renewal May 24, 2027</span>
+    <span class="badge badge-gray">14+ Year Tenure</span>
+    <span class="badge badge-gray">Refreshed: Mon Jun 8, 2026</span>
+  </div>
+</div>
+
+<!-- KPI STRIP -->
+<div class="kpi-strip">
+  <div class="kpi-card kpi-blue">
+    <div class="kpi-label">ARR</div>
+    <div class="kpi-value">$78,462</div>
+    <div class="kpi-sub">Perf: $76,840 &bull; Other: $1,622</div>
+  </div>
+  <div class="kpi-card kpi-amber">
+    <div class="kpi-label">Days to Renewal</div>
+    <div class="kpi-value">350</div>
+    <div class="kpi-sub">May 24, 2027</div>
+  </div>
+  <div class="kpi-card kpi-green">
+    <div class="kpi-label">Engagement</div>
+    <div class="kpi-value">100%</div>
+    <div class="kpi-sub">Customer Engagement Score</div>
+  </div>
+  <div class="kpi-card kpi-amber">
+    <div class="kpi-label">Services Score</div>
+    <div class="kpi-value">50%</div>
+    <div class="kpi-sub">Services Engagement</div>
+  </div>
+  <div class="kpi-card kpi-amber">
+    <div class="kpi-label">NPS</div>
+    <div class="kpi-value">0</div>
+    <div class="kpi-sub">Last sent May 28, 2026</div>
+  </div>
+  <div class="kpi-card kpi-blue">
+    <div class="kpi-label">At-Risk Alerts</div>
+    <div class="kpi-value">0</div>
+    <div class="kpi-sub">No active alerts</div>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab(0)">Actions</button>
+  <button class="tab-btn" onclick="switchTab(1)">Account Intel</button>
+  <button class="tab-btn" onclick="switchTab(2)">Use Case</button>
+  <button class="tab-btn" onclick="switchTab(3)">People</button>
+  <button class="tab-btn" onclick="switchTab(4)">Contracts</button>
+  <button class="tab-btn" onclick="switchTab(5)">Product</button>
+  <button class="tab-btn" onclick="switchTab(6)">Usage</button>
+  <button class="tab-btn" onclick="switchTab(7)">Cases</button>
+  <button class="tab-btn" onclick="switchTab(8)">Risk</button>
+</div>
+
+<!-- TAB 0: ACTIONS -->
+<div class="tab-panel active" id="tab-0">
+  <div class="section">
+    <div class="section-title">Priority Actions — Week of Jun 8, 2026</div>
+    <div class="action-card">
+      <div class="action-num">1</div>
+      <div>
+        <div class="action-title">Close Renewal Opp — Stage 5, $78,464, Due May 23, 2027</div>
+        <div class="action-why">The active renewal (Andrew Pollard, owner) is at Stage 5 "Renewal Solutioning" at 40% probability. Prior renewal (Bernard Jackson) closed at $78,462 on May 27, 2026 after extended pricing negotiation thread (May 14–21 activity). Cross-sell of Learning ($55K) was lost Jan 2026 — pricing sensitivity confirmed. Strategy note: not populated in SFDC — proceed cautiously on discounting without guidance from prior CSM.</div>
+        <div class="action-next">&#8594; Confirm agreement execution status with Poonam / Julie; log NextStep in SFDC opp. AE: Michael de los Reyes.</div>
+      </div>
+    </div>
+    <div class="action-card">
+      <div class="action-num">2</div>
+      <div>
+        <div class="action-title">Schedule Q2 Site Review — Last Review was Dec 5, 2025 (185 days ago)</div>
+        <div class="action-why">Site review cadence requires scheduling — last review was tied to a Sep 2025 case (00986103). 185 days elapsed but Site_Review_Overdue is still false. MarketAxess actively running performance cycles (Oct 2025 cases: self-review notifications, admin access, process assignment). A Q2 site review is the right vehicle to demonstrate value and set renewal context.</div>
+        <div class="action-next">&#8594; Reach out to Emily Yurachek (Head of Org Dev) or Poonam Katarki (Head of HR Tech & Ops) to schedule June/July site review.</div>
+      </div>
+    </div>
+    <div class="action-card">
+      <div class="action-num">3</div>
+      <div>
+        <div class="action-title">Pursue Performance Review Process Workflow Demo — NPS Sends May 28</div>
+        <div class="action-why">NPS sent May 28, 2026 — response window open. Cases in Oct 2025 cluster around performance review cycle (self-review notifications, employee visibility, process assignment). This is a high-activity, high-pain period. Rival Workflow features in the roadmap directly address admin overhead in review configuration. This is a Tier 1 expansion opportunity.</div>
+        <div class="action-next">&#8594; Follow up with Kara Sheridan (AE) on Rival Workflow email thread (May 29). Demo to Poonam or Emily on Workflow capabilities in Performance.</div>
+      </div>
+    </div>
+    <div class="action-card">
+      <div class="action-num">4</div>
+      <div>
+        <div class="action-title">Investigate HRIS Feed Error — Case 00983516 Closed Jul 2025, Risk of Recurrence</div>
+        <div class="action-why">SFDC Case "Error in Feed from HRIS" (Jun 19, 2025) took 35 days to close. HRIS integration issues are the leading predictor of data quality complaints and renewal friction. ZoomInfo shows MarketAxess actively hiring Finance roles with Adaptive Planning, Domo, and Power BI expertise — tech stack is evolving. Confirm current HRIS and integration health before renewal.</div>
+        <div class="action-next">&#8594; Confirm current HRIS vendor (UKG integration was sold 2022). Ask Poonam about integration health; log any findings in SFDC.</div>
+      </div>
+    </div>
+    <div class="action-card">
+      <div class="action-num">5</div>
+      <div>
+        <div class="action-title">Respond to NPS — Score is 0.0, Survey Sent May 28</div>
+        <div class="action-why">NPS score shows 0.0 — this either means no responses yet or a neutral/passives outcome. MarketAxess had a learning opp closed-lost ($55K, Jan 2026), active pricing negotiation, and HRIS integration issues in the last 12 months. Unresponsive NPS with pending renewal is a risk signal that requires proactive follow-up to understand sentiment before it surfaces as a churn indicator.</div>
+        <div class="action-next">&#8594; Follow up with Julie Sheffet (CHRO) or Emily Yurachek for direct feedback. Document any qualitative feedback in SFDC account notes.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Engagement Health <span class="metric-tip">?<span class="tip-box">Composite of 4 SFDC engagement signals updated weekly. Source: Customer_Engagement_Score__c, Services_Engagement_Score_Percent__c, Average_NPS_Score_SFDC__c, Days_since_last_Site_Review__c</span></span></div>
+    <div class="health-grid">
+      <div class="health-card">
+        <div class="health-score" style="color:#10b981">100%</div>
+        <div class="health-label">Customer Engagement <span class="metric-tip">?<span class="tip-box">Source: Customer_Engagement_Score__c = 100. Reflects overall product engagement — logins, active use, platform touchpoints. Score of 100 indicates top-tier engagement tier.</span></span></div>
+        <div class="mt-8"><span class="badge badge-green">Healthy</span></div>
+      </div>
+      <div class="health-card">
+        <div class="health-score" style="color:#f59e0b">50%</div>
+        <div class="health-label">Services Engagement <span class="metric-tip">?<span class="tip-box">Source: Services_Engagement_Score_Percent__c = 50. Measures how actively MarketAxess engages with Rival services: site reviews, F2F, QBRs. 50% suggests moderate engagement — room to increase cadence.</span></span></div>
+        <div class="mt-8"><span class="badge badge-amber">Monitor</span></div>
+      </div>
+      <div class="health-card">
+        <div class="health-score" style="color:#f59e0b">0.0</div>
+        <div class="health-label">Avg NPS <span class="metric-tip">?<span class="tip-box">Source: Average_NPS_Score_SFDC__c = 0. NPS sent May 28, 2026; next send Nov 24, 2026. Score of 0 indicates no responses received yet or passive/neutral score.</span></span></div>
+        <div class="mt-8"><span class="badge badge-amber">Awaiting Response</span></div>
+      </div>
+      <div class="health-card">
+        <div class="health-score" style="color:#3b82f6">185</div>
+        <div class="health-label">Days Since Site Review <span class="metric-tip">?<span class="tip-box">Source: Days_since_last_Site_Review__c = 185. Last review: Dec 5, 2025. Not flagged overdue per SFDC (Site_Review_Overdue__c = false), but scheduling Q2 review is recommended given renewal context.</span></span></div>
+        <div class="mt-8"><span class="badge badge-blue">Schedule Q2</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 1: ACCOUNT INTEL -->
+<div class="tab-panel" id="tab-1">
+  <div class="section">
+    <div class="section-title">Company Overview</div>
+    <div class="grid-2">
+      <div>
+        <div class="card">
+          <div class="card-title">Who They Are</div>
+          <div class="card-body">MarketAxess Holdings Inc. (NASDAQ: MKTX) is the leading operator of an electronic fixed-income trading platform serving institutional investors and broker-dealers worldwide. Founded in 2000 and headquartered in New York, MarketAxess enables trading in U.S. corporate bonds, emerging market bonds, high-yield, Eurobonds, munis, CDS, and ETFs via proprietary protocols including Open Trading, Portfolio Trading (PT), and Mid-X.<br><br>
+          The company is publicly traded, has 859 employees across 7 global locations, and generated $871M in revenue in FY2025. Q1 2026 delivered record revenue of $233.4M (+12% YoY). Key differentiators include its CP+ AI pricing engine, Adaptive Algo automation platform, and Trax post-trade services division.</div>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="card-title">Key Facts</div>
+          <div class="card-body">
+            <table class="data-table">
+              <tr><td class="fw-700">Founded</td><td>2000 (14+ year Rival customer since ~2012)</td></tr>
+              <tr><td class="fw-700">HQ</td><td>New York City, NY</td></tr>
+              <tr><td class="fw-700">Employees</td><td>859 (Q1 2026; down 1% YoY, headcount stable)</td></tr>
+              <tr><td class="fw-700">Revenue</td><td>$871M FY2025 / $233M Q1 2026 (record)</td></tr>
+              <tr><td class="fw-700">Ticker</td><td>NASDAQ: MKTX</td></tr>
+              <tr><td class="fw-700">Industry</td><td>Finance / Lending &amp; Brokerage / FinTech</td></tr>
+              <tr><td class="fw-700">Type</td><td>Public, B2B</td></tr>
+              <tr><td class="fw-700">Locations</td><td>7 (US, UK, EU, APAC)</td></tr>
+              <tr><td class="fw-700">Parent</td><td>None — standalone public company</td></tr>
+              <tr><td class="fw-700">Usage Region</td><td>United States</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Market Dynamics — HR Implications</div>
+    <table class="data-table">
+      <thead><tr><th>When</th><th>What Happened</th><th>HR / People Implication</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>May 2026</td>
+          <td>Q1 2026 record revenue $233M (+12%), EPS beat consensus; 44% operating margin (+200bps)</td>
+          <td>Financial health is strong — no cost pressure headwinds. HR team can focus on performance enablement, not cost reduction. Stable renewal environment.</td>
+        </tr>
+        <tr>
+          <td>May 2025</td>
+          <td>Dean Berry appointed Group COO &amp; CEO of EMEA/APAC</td>
+          <td>New senior leader in EMEA/APAC = organizational change management need, potentially new performance/development cycles for international teams.</td>
+        </tr>
+        <tr>
+          <td>May 2025</td>
+          <td>Spencer Lee joins as Head of Client Products, Americas; reports to Concannon</td>
+          <td>New hires at Head level trigger onboarding workflows. If managed manually today, this is an opportunity to demonstrate Rival's value in structured exec onboarding.</td>
+        </tr>
+        <tr>
+          <td>Feb 2026</td>
+          <td>Headcount 869 in Q4 2025, declining to 859 in Q1 2026 (down 2% YoY, 3% QoQ)</td>
+          <td>Controlled headcount reduction — likely performance-driven exits rather than restructuring. Performance management platform usage may increase. Not an expansion signal for seat count.</td>
+        </tr>
+        <tr>
+          <td>Jun 2026</td>
+          <td>ZoomInfo: MarketAxess hiring more Finance roles than any prior 12-month period; focus on Adaptive Planning, Domo, Power BI, Alteryx</td>
+          <td>Finance team growing — possible org restructuring around data/analytics. New hires in Finance dept create onboarding demand and performance review need for new employees.</td>
+        </tr>
+        <tr>
+          <td>2026</td>
+          <td>AI initiatives: Adaptive Algo, CP+ pricing, codebase modernization, new CTO (Will Quan) hired</td>
+          <td>Tech talent hiring intensifying. AI-native employees require modern performance frameworks with skills-tracking and continuous feedback — not annual review cycles.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="source-note">Sources: Q1 2026 Earnings Call (May 7, 2026) &bull; BusinessWire press release &bull; MarketAxess investor site &bull; ZoomInfo Scoops (May 23, 2026)</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Competitive Position — FinTech / Electronic Trading</div>
+    <table class="data-table">
+      <thead><tr><th>Company</th><th>Positioning</th><th>2025/26 Move</th><th>MarketAxess Status</th></tr></thead>
+      <tbody>
+        <tr><td class="fw-700">Tradeweb</td><td>Primary MKTX competitor in rates &amp; credit</td><td>Expanding portfolio trading, repo market</td><td>MKTX gaining share in PT (+51% ADV Q1 2026)</td></tr>
+        <tr><td class="fw-700">Bloomberg BVAL/TSOX</td><td>Incumbent via terminal penetration</td><td>Expanding fixed income execution</td><td>MKTX differentiated via Open Trading liquidity</td></tr>
+        <tr><td class="fw-700">ICE BondPoint</td><td>Retail bond market focus</td><td>Stable, niche</td><td>Different ICP — minimal overlap</td></tr>
+        <tr><td class="fw-700">DirectBooks</td><td>New issue syndication platform</td><td>MKTX announced partnership Q1 2026</td><td>Partner, not competitor</td></tr>
+      </tbody>
+    </table>
+    <div class="source-note">Source: Q1 2026 earnings transcript, market intelligence</div>
+  </div>
+</div>
+
+<!-- TAB 2: USE CASE -->
+<div class="tab-panel" id="tab-2">
+  <div class="section">
+    <div class="section-title">Executive Summary</div>
+    <div class="card">
+      <div class="card-body">MarketAxess is a 14+ year Rival customer using <strong>Agile Performance (ex-HeartBeat/Perform)</strong> and an <strong>Other</strong> module at $78,462 ARR. The platform supports their annual and continuous performance review cycles for ~859 employees across US operations. The account has a high engagement score (100%) and a stable, long-tenured relationship — but is not maximizing Rival's lifecycle capabilities beyond performance reviews.<br><br>
+      Key use cases center on: structured performance reviews (annual + mid-year cycles), goal cascading, and manager calibration. Evidence from cases (Oct 2025 cluster) shows active configuration of review processes, employee visibility settings, and self-review notifications — all indicating a mature but narrow use of the platform.<br><br>
+      Expansion opportunities exist in <strong>Onboarding</strong> (closed lost Oct 2024), <strong>Learning/WingSpan</strong> (closed lost Jan 2026 at $55K), and Rival Workflow for performance automation. The closed-lost Learning deal indicates pricing sensitivity. The right expansion play now is demonstrating workflow value within the existing Performance contract.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Active Products</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">&#10003; Agile Performance (ex-HeartBeat / Perform)</div>
+        <div class="card-body"><strong>ARR:</strong> $76,840<br>
+        <strong>Use Case:</strong> Annual performance reviews, continuous feedback, goal management, manager calibration, 360-degree reviews<br>
+        <strong>Pain It Solves:</strong> Fragmented review process — without Rival, HR manages reviews via email/spreadsheet with no visibility. Rival provides structured workflows, employee/manager portals, and HR admin tooling.<br>
+        <strong>Value Delivered:</strong> 14+ years of review cycle data, embedded HR admin workflows, integration with UKG HRIS<br>
+        <strong>Risk to Value:</strong> If MarketAxess expands to new HRIS with built-in performance module, they may evaluate consolidation</div>
+      </div>
+      <div class="card">
+        <div class="card-title">&#10003; Other Module</div>
+        <div class="card-body"><strong>ARR:</strong> $1,622<br>
+        <strong>Use Case:</strong> Unspecified — likely an integration, SDA project, or add-on service (see historical: OnDemand SDA Project $2,500 in 2017; UKG Integration $8,160 in 2022)<br>
+        <strong>Value Delivered:</strong> Connectivity / integration layer<br>
+        <span class="unverified">Verify: Confirm current scope of "Other" with client — field not granular in SFDC</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Expansion Vectors</div>
+    <table class="data-table">
+      <thead><tr><th>Product</th><th>Observed Pain Signal</th><th>Entry Point</th><th>History</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="fw-700">Rival Workflow</td>
+          <td>Oct 2025 cases show manual admin overhead in review process configuration; email threads on self-review notifications</td>
+          <td>Demonstrate automated workflow triggers for review cycle launch, manager reminders, and completion tracking</td>
+          <td>No prior opp — new territory. AE Kara Sheridan emailed "Rival Workflow" May 29, 2026</td>
+        </tr>
+        <tr>
+          <td class="fw-700">Learning (WingSpan)</td>
+          <td>Tech-native employee population; AI literacy programs; new Finance hire wave requiring onboarding enablement</td>
+          <td>Re-engage after Jan 2026 closed-lost — identify what killed the deal. Pricing was cited (RFP in Dec 2025). Consider package pricing with renewal.</td>
+          <td>$55K opp closed-lost Jan 2026; $27,540 WingSpan deal won in 2012 — they know the product</td>
+        </tr>
+        <tr>
+          <td class="fw-700">Onboarding</td>
+          <td>New senior hires (Dean Berry, Spencer Lee, Will Quan), Finance hiring wave — structured onboarding currently untracked</td>
+          <td>Quantify onboarding friction cost; connect to time-to-productivity for new Finance and Tech hires</td>
+          <td>$0 opp closed-lost Oct 2024 — dropped early. Re-engage with quantified business case.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Summary Signals</div>
+    <div class="grid-3">
+      <div class="stat-box">
+        <div class="stat-num" style="color:#10b981">High</div>
+        <div class="stat-label">Switching Cost</div>
+        <div class="text-xs text-muted mt-8">14 years of performance data, embedded HR workflows, UKG integration — replacing Rival requires significant migration effort</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" style="color:#3b82f6">$80K+</div>
+        <div class="stat-label">Whitespace ARR</div>
+        <div class="text-xs text-muted mt-8">Learning ($55K), Onboarding (~$25K est.), Workflow — all observed pain signals, no current contract</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" style="color:#f59e0b">350 days</div>
+        <div class="stat-label">To Renewal</div>
+        <div class="text-xs text-muted mt-8">Opp at Stage 5, Andrew Pollard owner. Renewal potential: $78,464. Prior year closed at $78,462.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 3: PEOPLE -->
+<div class="tab-panel" id="tab-3">
+  <div class="section">
+    <div class="section-title">Key Stakeholders — MarketAxess</div>
+    <div class="people-grid">
+      <div class="person-card">
+        <div class="person-avatar" style="background:#1e3a5f">JS</div>
+        <div class="person-name">Julie Sheffet</div>
+        <div class="person-title">Chief Human Resources Officer</div>
+        <span class="badge badge-blue" style="font-size:10px;margin-top:4px">Executive Sponsor</span>
+        <div class="person-intel">CHRO and ultimate decision-maker for all HR tech investments. ZoomInfo accuracy score: 93 (verified Mar 2026). Key renewal signatory. Mobile: (973) 903-5099.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar" style="background:#065f46">PK</div>
+        <div class="person-name">Poonam Katarki</div>
+        <div class="person-title">Head of HR Technology &amp; Operations</div>
+        <span class="badge badge-green" style="font-size:10px;margin-top:4px">Primary Champion</span>
+        <div class="person-intel">Day-to-day owner of the Rival platform. Manages integrations, admin workflows, and support cases. Most recently modified contact (Jun 4, 2026). Mobile: (201) 563-2310. SFDC contact.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar" style="background:#7c3aed">EY</div>
+        <div class="person-name">Emily Yurachek</div>
+        <div class="person-title">Head of Organizational Development</div>
+        <span class="badge badge-purple" style="font-size:10px;margin-top:4px">Power User</span>
+        <div class="person-intel">Drives performance review design and org development strategy. Key contact for site review scheduling and Workflow expansion conversations. Phone: (917) 267-1294.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar" style="background:#b45309">LY</div>
+        <div class="person-name">Laura Yacko</div>
+        <div class="person-title">HR Operations Manager</div>
+        <span class="badge badge-amber" style="font-size:10px;margin-top:4px">Admin User</span>
+        <div class="person-intel">HR Ops — likely involved in day-to-day configuration (review processes, HRIS feed). ZoomInfo: Benefits &amp; Immigration Head (US), accuracy 84. SFDC contact.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar" style="background:#0369a1">FT</div>
+        <div class="person-name">Frank Tassiello</div>
+        <div class="person-title">Global Head, Compensation</div>
+        <span class="badge badge-gray" style="font-size:10px;margin-top:4px">Influencer</span>
+        <div class="person-intel">Compensation leader — likely involved in goal-pay alignment features and calibration workflows. ZoomInfo accuracy 91. Title confirmed via ZoomInfo. SFDC contact.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar" style="background:#be185d">CK</div>
+        <div class="person-name">Christina L. Kane</div>
+        <div class="person-title">Head of Talent Acquisition</div>
+        <span class="badge badge-gray" style="font-size:10px;margin-top:4px">Expansion Target</span>
+        <div class="person-intel">Talent Acquisition Head — key contact for any Recruiting or Onboarding expansion. ZoomInfo accuracy 94 (verified Mar 2026). Not currently in SFDC. Source: ZoomInfo.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar" style="background:#374151">KD</div>
+        <div class="person-name">Kelly Dispoto</div>
+        <div class="person-title">Head of HR, Business Partners (US)</div>
+        <span class="badge badge-gray" style="font-size:10px;margin-top:4px">HRBP Lead</span>
+        <div class="person-intel">US HRBP leader — influences performance review process design. ZoomInfo accuracy 92 (verified Mar 2026). Not in SFDC — expansion target. Source: ZoomInfo.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar" style="background:#1e3a5f">CB</div>
+        <div class="person-name">Cordelia Boise</div>
+        <div class="person-title">Head of Human Resources</div>
+        <span class="badge badge-gray" style="font-size:10px;margin-top:4px">HR Leader</span>
+        <div class="person-intel">HR leadership — possible regional or divisional head. Phone: (212) 813-6000. SFDC contact. Relationship status unclear — verify role scope vs Julie Sheffet.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Rival Team</div>
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-title">Andrew Pollard — CSM (Owner)</div>
+        <div class="card-body">Account owner. Renewal opp Stage 5 active. Responsible for coordinating Q2 site review and NPS follow-up. Handoff from Bernard Jackson on renewal.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Kara Sheridan — AE</div>
+        <div class="card-body">Handling expansion conversations (Workflow email May 29; Learning opp owner — closed lost Jan 2026). Active in recent activity log. Key commercial partner.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Bernard Jackson — Prior Owner</div>
+        <div class="card-body">Led prior renewal (closed $78,462, May 27, 2026). Ran strategy meeting May 28, 2026 ("MarketAxess/Rival 2026 Strategy Meeting" via Chorus). Action items sent. Handoff required.</div>
+      </div>
+    </div>
+    <div class="source-note">Sources: SFDC Contacts, ZoomInfo HR contacts search, SFDC Task Activity Log &bull; Unverified contacts noted with source</div>
+  </div>
+</div>
+
+<!-- TAB 4: CONTRACTS -->
+<div class="tab-panel" id="tab-4">
+  <div class="section">
+    <div class="section-title">Active Contracts</div>
+    <table class="data-table">
+      <thead><tr><th>Contract #</th><th>Status</th><th>Start Date</th><th>End Date</th><th>Renewal Term</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="fw-700">00019110</td>
+          <td><span class="case-status cs-closed">Activated</span></td>
+          <td>May 21, 2026</td>
+          <td>May 23, 2027</td>
+          <td>12 months</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="source-note">Source: SFDC Contract — 1 active contract. 12-month term. Renewal date: May 24, 2027 (350 days).</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Active Opportunities</div>
+    <div class="card" style="margin-bottom:10px;border-left:4px solid #f59e0b">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
+        <div>
+          <div class="fw-700" style="font-size:13px">MarketAxess Corporation - Renewal Opportunity</div>
+          <div class="text-xs text-muted mt-8">Type: Renewal &nbsp;|&nbsp; Owner: Andrew Pollard &nbsp;|&nbsp; Created: May 21, 2026</div>
+        </div>
+        <div style="text-align:right">
+          <span class="badge badge-amber">Stage 5 — Renewal Solutioning</span>
+          <div class="text-xs text-muted mt-8">40% probability &nbsp;|&nbsp; Close: May 23, 2027</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+        <div class="stat-box"><div class="stat-num">$78,464</div><div class="stat-label">ARR</div></div>
+        <div class="stat-box"><div class="stat-num">$78,464</div><div class="stat-label">Potential Renewal</div></div>
+        <div class="stat-box"><div class="stat-num">18 days</div><div class="stat-label">Stage Age</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Recent Closed Opportunities — History</div>
+    <table class="data-table">
+      <thead><tr><th>Opportunity</th><th>Type</th><th>Amount</th><th>Close Date</th><th>Result</th><th>Owner</th></tr></thead>
+      <tbody>
+        <tr><td>MarketAxess - Renewal Opportunity</td><td>Renewal</td><td>$78,462</td><td>May 27, 2026</td><td><span class="badge badge-green">Won</span></td><td>Bernard Jackson</td></tr>
+        <tr><td>MarketAxess - Learning</td><td>Cross-sell</td><td>$55,000</td><td>Jan 5, 2026</td><td><span class="badge badge-red">Lost</span></td><td>Kara Sheridan</td></tr>
+        <tr><td>MarketAxcess - Performance Integration Renewal</td><td>Renewal</td><td>$83,794</td><td>May 30, 2025</td><td><span class="badge badge-green">Won</span></td><td>Shelly Price</td></tr>
+        <tr><td>MarketAxcess - Onboarding</td><td>Cross-sell</td><td>—</td><td>Oct 1, 2024</td><td><span class="badge badge-red">Lost</span></td><td>Kara Sheridan</td></tr>
+        <tr><td>MarketAxcess - Agile Integration Renewal</td><td>Renewal</td><td>$67,887</td><td>May 7, 2024</td><td><span class="badge badge-green">Won</span></td><td>Courtney Oiler</td></tr>
+        <tr><td>MarketAxcess - Perf 100 License Add-on</td><td>Add-on</td><td>$8,289</td><td>May 7, 2024</td><td><span class="badge badge-green">Won</span></td><td>Courtney Oiler</td></tr>
+        <tr><td>MarketAxess - UKG Integration with Agile</td><td>Cross-sell</td><td>$8,160</td><td>Jan 6, 2022</td><td><span class="badge badge-green">Won</span></td><td>Sarah Gregory</td></tr>
+        <tr><td>MarketAxess - WS-Agile conversion</td><td>Cross-sell</td><td>$80,373</td><td>Dec 23, 2021</td><td><span class="badge badge-green">Won</span></td><td>Sarah Gregory</td></tr>
+      </tbody>
+    </table>
+    <div class="source-note">Source: SFDC Opportunities &bull; ARR trend: $67,887 (2024) → $83,794 (2025) → $78,462 (2026). Slight ARR compression from 2025 to 2026 renewal — monitor for further erosion.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Renewal Progress</div>
+    <div class="grid-2">
+      <div>
+        <div class="text-sm fw-700 mb-8">Days to Renewal: 350 of 365</div>
+        <div class="renewal-bar-wrap"><div class="renewal-bar-fill" style="width:4%"></div></div>
+        <div class="text-xs text-muted mt-8">Contract start: May 21, 2026 &nbsp;|&nbsp; Expiry: May 23, 2027</div>
+      </div>
+      <div>
+        <div class="text-sm fw-700 mb-8">CSM Renewal Strategy</div>
+        <div class="card" style="background:#fef3c7;border:1px solid #fcd34d">
+          <div class="card-body" style="color:#92400e"><span class="unverified">NOT POPULATED</span> — CSM_Renewal_Strategy__c field is null in SFDC. Prior CSM (Bernard Jackson) ran strategy meeting May 28, 2026 and sent action items. Review Chorus recording of that meeting to extract strategy context.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 5: PRODUCT -->
+<div class="tab-panel" id="tab-5">
+  <div class="section">
+    <div class="section-title">Active Projects &amp; In-Flight Work</div>
+    <div class="card" style="border-left:4px solid #3b82f6;margin-bottom:10px">
+      <div class="card-title">Rival Workflow Exploration (AE-Led)</div>
+      <div class="card-body">Kara Sheridan (AE) emailed MarketAxess on "Rival Workflow" May 29, 2026. This appears to be an early-stage expansion conversation. No formal opp created yet. Oct 2025 cases reveal manual overhead in performance review process configuration — direct Workflow pain point.</div>
+    </div>
+    <div class="card" style="border-left:4px solid #10b981;margin-bottom:10px">
+      <div class="card-title">2026 Strategy Meeting Follow-Up (May 28, 2026)</div>
+      <div class="card-body">Bernard Jackson held a "MarketAxess / Rival 2026 Strategy Meeting" on May 28, 2026 (Chorus-recorded). Action items were sent via email (May 28). Renewal signed same day. Outstanding: Andrew Pollard to review action items and own execution going forward. <span class="unverified">Verify: Pull Chorus transcript for this meeting for full context</span></div>
+    </div>
+    <div class="card" style="border-left:4px solid #f59e0b">
+      <div class="card-title">DKIM / AWS SES Migration (May 2026)</div>
+      <div class="card-body">Rival actioned DKIM updates for AWS SES migration affecting MarketAxess (case reference in activity log, May 15, 2026 — Bernard Jackson). This was an infrastructure change, now resolved. Confirm with Poonam that email deliverability for performance notifications is stable post-migration.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Product Roadmap — Performance (Active Product)</div>
+    <div class="text-xs text-muted mb-8">MarketAxess owns Agile Performance. Features shown are scoped to their active product line. Tier 1 = direct pain match; Tier 2 = relevant product features.</div>
+
+    <div class="roadmap-card">
+      <span class="roadmap-badge rb-shipped">SHIPPED</span>
+      <div class="fw-700 text-sm">Performance Review Workflow Automation</div>
+      <div class="text-xs text-muted mt-8">Automated launch triggers for review cycles — eliminates manual HR admin steps for launching self-reviews, manager reviews, and skip-level reviews.</div>
+      <div style="margin-top:8px;background:#dcfce7;border-radius:6px;padding:8px">
+        <div class="text-xs fw-700" style="color:#065f46">Pain / Use Case for MarketAxess</div>
+        <div class="text-xs" style="color:#065f46;margin-top:4px">Oct 2025 cases directly document: "FW: Time to write your self-review," "Cannot assign employee to a Review Process," admin access issues — all manual workflow pain. This feature eliminates exactly these support cases.</div>
+      </div>
+    </div>
+
+    <div class="roadmap-card">
+      <span class="roadmap-badge rb-shipped">SHIPPED</span>
+      <div class="fw-700 text-sm">Review Sharing &amp; Visibility Controls</div>
+      <div class="text-xs text-muted mt-8">Granular controls for which review content is shared with employees, when, and by whom. Supports read-only sharing and co-author workflows.</div>
+      <div style="margin-top:8px;background:#dcfce7;border-radius:6px;padding:8px">
+        <div class="text-xs fw-700" style="color:#065f46">Pain / Use Case for MarketAxess</div>
+        <div class="text-xs" style="color:#065f46;margin-top:4px">Case 00990519: "Reports Request: Reviews shared with Employee" (High priority, Oct 2025) — admin needed granular control over review sharing. This feature directly resolves this class of ticket.</div>
+      </div>
+    </div>
+
+    <div class="roadmap-card">
+      <span class="roadmap-badge rb-coming">COMING</span>
+      <div class="fw-700 text-sm">Rival Workflow — Lifecycle Event Orchestration</div>
+      <div class="text-xs text-muted mt-8">Multi-step, conditional workflow builder for HR lifecycle events: performance review launches, completion reminders, escalation paths, and cross-system triggers.</div>
+      <div style="margin-top:8px;background:#dcfce7;border-radius:6px;padding:8px">
+        <div class="text-xs fw-700" style="color:#065f46">Pain / Use Case for MarketAxess</div>
+        <div class="text-xs" style="color:#065f46;margin-top:4px">AE is actively exploring "Rival Workflow" (May 29 email). Oct 2025 case cluster is exactly the pain this product addresses. This is the #1 expansion demo priority for Q2 2026.</div>
+      </div>
+    </div>
+
+    <div style="margin-top:14px">
+      <div class="text-xs fw-700 text-muted mb-8">TIER 2 — Relevant Performance Features (General)</div>
+      <div style="background:#f8f9fb;border-radius:8px;padding:12px;border:1px solid #e8eaf0">
+        <div class="text-xs" style="line-height:2">
+          &#9679; Continuous feedback &amp; check-in tools — supports always-on performance model for tech talent<br>
+          &#9679; Calibration matrix &amp; forced ranking — relevant for MarketAxess's comp-linked performance cycles<br>
+          &#9679; Goal cascading (OKR / KPI) — aligns individual goals to company-level bond market strategy<br>
+          &#9679; 360 peer feedback — suitable for HRBP and cross-functional finance/tech teams<br>
+          &#9679; People analytics dashboards — performance trend data for CHRO reporting to board
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Expansion Products (Not Currently Owned)</div>
+    <div class="roadmap-card-expansion">
+      <span class="roadmap-badge rb-expansion">EXPANSION</span>
+      <div class="fw-700 text-sm">Learning / WingSpan (ex-legacy name)</div>
+      <div class="text-xs text-muted mt-8">Digital learning platform for structured L&amp;D programs, compliance training, and skills development. $55K opp lost Jan 2026.</div>
+      <div class="text-xs mt-8"><strong>Observed Pain:</strong> New Finance hires (Adaptive Planning, Domo) need product-specific onboarding and skills training. AI/tech talent requires continuous learning programs. Re-engage post-renewal with bundled pricing.</div>
+    </div>
+    <div class="roadmap-card-expansion">
+      <span class="roadmap-badge rb-expansion">EXPANSION</span>
+      <div class="fw-700 text-sm">Onboarding</div>
+      <div class="text-xs text-muted mt-8">Structured new-hire and lifecycle event onboarding. $0 opp lost Oct 2024 — dropped early in process.</div>
+      <div class="text-xs mt-8"><strong>Observed Pain:</strong> Senior hires (Dean Berry as COO, Spencer Lee, Will Quan as CTO) in 2025–2026 have no structured digital onboarding. New Finance hiring wave = more onboarding demand. Quantify manual onboarding cost and re-engage.</div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 6: USAGE -->
+<div class="tab-panel" id="tab-6">
+  <div class="section">
+    <div class="section-title">LifeSuite Telemetry — Performance Module</div>
+    <div class="grid-4">
+      <div class="stat-box">
+        <div class="stat-num" style="color:#6b7280">0</div>
+        <div class="stat-label">Unique Logins L30D</div>
+        <div class="text-xs text-muted mt-8">Jun 8, 2026 snapshot</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" style="color:#6b7280">0</div>
+        <div class="stat-label">Events YTD</div>
+        <div class="text-xs text-muted mt-8">Onboard events (not Performance)</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" style="color:#6b7280">0</div>
+        <div class="stat-label">Events Last 12Mo</div>
+        <div class="text-xs text-muted mt-8">All Onboard metrics = 0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" style="color:#f59e0b">1</div>
+        <div class="stat-label">Login Spike May 28</div>
+        <div class="text-xs text-muted mt-8">Single login day correlated with strategy meeting</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Usage Analysis — Important Context</div>
+    <div class="card" style="border-left:4px solid #f59e0b">
+      <div class="card-title">⚠ LifeSuite Telemetry Shows Onboarding Fields — Performance Not Captured Here</div>
+      <div class="card-body">The LifeSuite_Product_Usage__c object tracks Onboarding module metrics (events, logins for Onboard). MarketAxess's active product is <strong>Agile Performance</strong>, not Onboarding. All Onboard fields are null or zero across 30 days of records — this is expected, as MarketAxess does not have the Onboarding product.<br><br>
+      <strong>What this means:</strong> Performance module usage data lives in a separate system and is not captured in these LifeSuite records. The Customer Engagement Score of 100% suggests strong platform usage, but Onboard telemetry cannot confirm or deny Performance utilization.<br><br>
+      <strong>Action:</strong> Request a Performance utilization report from Rival's internal analytics team, or review the Chorus recording from the May 28 strategy meeting where usage context may have been discussed.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Instance Details</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Platform Configuration</div>
+        <div class="card-body">
+          <table class="data-table">
+            <tr><td class="fw-700">LS Code</td><td>MarketAxess</td></tr>
+            <tr><td class="fw-700">Customer Name</td><td>MarketAxess</td></tr>
+            <tr><td class="fw-700">Usage Region</td><td>United States</td></tr>
+            <tr><td class="fw-700">Countries</td><td>United States</td></tr>
+            <tr><td class="fw-700">HRIS Integration</td><td>UKG (via 2022 integration opp — verify current status)</td></tr>
+            <tr><td class="fw-700">SDA Client</td><td>No</td></tr>
+            <tr><td class="fw-700">Global Onboarding Score</td><td>100 <span class="unverified">Verify: may reflect Admin setup completeness, not platform usage</span></td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Utilization Open Questions</div>
+        <div class="card-body text-xs" style="line-height:2">
+          &#9679; How many employees completed performance reviews in the most recent cycle?<br>
+          &#9679; Is the HRIS feed from UKG currently healthy? (Last error: Jun 2025, 35-day resolution)<br>
+          &#9679; Are goals being set at the individual level or only at manager level?<br>
+          &#9679; Is 360 feedback currently enabled?<br>
+          &#9679; What % of the 859 headcount is active on the platform?
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Site Review Status</div>
+    <div class="grid-3">
+      <div class="stat-box">
+        <div class="stat-num">185</div>
+        <div class="stat-label">Days Since Site Review</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">Dec 5</div>
+        <div class="stat-label">Last Review Date (2025)</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">Not Overdue</div>
+        <div class="stat-label">SFDC Overdue Flag</div>
+      </div>
+    </div>
+    <div class="text-xs text-muted mt-8">No onsite F2F on record (Last_Onsite_F2F_Date__c = null). Site review case 00986103 closed Dec 5, 2025 by Randy Havel.</div>
+  </div>
+</div>
+
+<!-- TAB 7: CASES -->
+<div class="tab-panel" id="tab-7">
+  <div class="section">
+    <div class="section-title">Cases — Last 12 Months (All Closed)</div>
+    <table class="data-table">
+      <thead><tr><th>Case #</th><th>Subject</th><th>Priority</th><th>Status</th><th>Opened</th><th>Closed</th><th>Days Open</th><th>Owner</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="fw-700">00990519</td>
+          <td>PL- Reports Request: Reviews shared with Employee</td>
+          <td><span class="badge badge-red" style="font-size:10px">High</span></td>
+          <td><span class="case-status cs-closed">Closed</span></td>
+          <td>Oct 30, 2025</td>
+          <td>Dec 5, 2025</td>
+          <td><span style="color:#ef4444;font-weight:700">36</span></td>
+          <td>Rica Lopez</td>
+        </tr>
+        <tr>
+          <td class="fw-700">00990201</td>
+          <td>PL- Review Shared information</td>
+          <td><span class="badge badge-amber" style="font-size:10px">Moderate</span></td>
+          <td><span class="case-status cs-closed">Closed</span></td>
+          <td>Oct 22, 2025</td>
+          <td>Oct 27, 2025</td>
+          <td style="color:#10b981;font-weight:700">5</td>
+          <td>Rica Lopez</td>
+        </tr>
+        <tr>
+          <td class="fw-700">00990055</td>
+          <td>PL - AWS outage</td>
+          <td><span class="badge badge-amber" style="font-size:10px">Moderate</span></td>
+          <td><span class="case-status cs-closed">Closed</span></td>
+          <td>Oct 20, 2025</td>
+          <td>Oct 21, 2025</td>
+          <td style="color:#10b981;font-weight:700">1</td>
+          <td>Rica Lopez</td>
+        </tr>
+        <tr>
+          <td class="fw-700">00987142</td>
+          <td>PL Access issue - Administrators</td>
+          <td><span class="badge badge-amber" style="font-size:10px">Moderate</span></td>
+          <td><span class="case-status cs-closed">Closed</span></td>
+          <td>Oct 3, 2025</td>
+          <td>Oct 16, 2025</td>
+          <td><span style="color:#f59e0b;font-weight:700">13</span></td>
+          <td>Rica Lopez</td>
+        </tr>
+        <tr>
+          <td class="fw-700">00987097</td>
+          <td>PL - Re: Self-review email notification</td>
+          <td><span class="badge badge-amber" style="font-size:10px">Moderate</span></td>
+          <td><span class="case-status cs-closed">Closed</span></td>
+          <td>Oct 3, 2025</td>
+          <td>Oct 6, 2025</td>
+          <td style="color:#10b981;font-weight:700">3</td>
+          <td>Kristian Monge</td>
+        </tr>
+        <tr>
+          <td class="fw-700">00987057</td>
+          <td>PL - FW: Time to write your self-review</td>
+          <td><span class="badge badge-amber" style="font-size:10px">Moderate</span></td>
+          <td><span class="case-status cs-closed">Closed</span></td>
+          <td>Oct 2, 2025</td>
+          <td>Oct 17, 2025</td>
+          <td><span style="color:#f59e0b;font-weight:700">15</span></td>
+          <td>Kristian Monge</td>
+        </tr>
+        <tr>
+          <td class="fw-700">00987011</td>
+          <td>PL- Cannot assign employee to a Review Process</td>
+          <td><span class="badge badge-amber" style="font-size:10px">Moderate</span></td>
+          <td><span class="case-status cs-closed">Closed</span></td>
+          <td>Oct 1, 2025</td>
+          <td>Oct 7, 2025</td>
+          <td style="color:#10b981;font-weight:700">6</td>
+          <td>Rica Lopez</td>
+        </tr>
+        <tr>
+          <td class="fw-700">00986103</td>
+          <td>Market Axess Site Review</td>
+          <td><span class="badge badge-gray" style="font-size:10px">Low</span></td>
+          <td><span class="case-status cs-closed">Closed</span></td>
+          <td>Sep 4, 2025</td>
+          <td>Dec 5, 2025</td>
+          <td><span style="color:#ef4444;font-weight:700">92</span></td>
+          <td>Randy Havel</td>
+        </tr>
+        <tr>
+          <td class="fw-700">00984707</td>
+          <td>PL - My team Total</td>
+          <td><span class="badge badge-amber" style="font-size:10px">Moderate</span></td>
+          <td><span class="case-status cs-closed">Closed</span></td>
+          <td>Jul 22, 2025</td>
+          <td>Jul 23, 2025</td>
+          <td style="color:#10b981;font-weight:700">1</td>
+          <td>Kristian Monge</td>
+        </tr>
+        <tr>
+          <td class="fw-700">00983516</td>
+          <td>Error in Feed from HRIS</td>
+          <td><span class="badge badge-amber" style="font-size:10px">Moderate</span></td>
+          <td><span class="case-status cs-closed">Closed</span></td>
+          <td>Jun 19, 2025</td>
+          <td>Jul 24, 2025</td>
+          <td><span style="color:#ef4444;font-weight:700">35</span></td>
+          <td>Kristian Monge</td>
+        </tr>
+        <tr>
+          <td class="fw-700">00983235</td>
+          <td>AP - No Goals in previous Manager review</td>
+          <td><span class="badge badge-amber" style="font-size:10px">Moderate</span></td>
+          <td><span class="case-status cs-closed">Closed</span></td>
+          <td>Jun 11, 2025</td>
+          <td>Jul 18, 2025</td>
+          <td><span style="color:#f59e0b;font-weight:700">37</span></td>
+          <td>Randy Havel</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Case Analytics</div>
+    <div class="grid-4">
+      <div class="stat-box">
+        <div class="stat-num">11</div>
+        <div class="stat-label">Cases L12M</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">21 days</div>
+        <div class="stat-label">Avg Resolution</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" style="color:#10b981">1 day</div>
+        <div class="stat-label">Fastest Close</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" style="color:#ef4444">92 days</div>
+        <div class="stat-label">Longest (Site Review)</div>
+      </div>
+    </div>
+    <div class="card mt-12">
+      <div class="card-title">Case Patterns</div>
+      <div class="card-body text-xs" style="line-height:1.8">
+        &#9679; <strong>October 2025 cluster (7 cases):</strong> All tied to annual performance review cycle launch — self-review notifications, process assignments, admin access, and visibility. Strongly suggests this account relies on manual configuration for each review cycle. This is Workflow automation pain.<br>
+        &#9679; <strong>HRIS Feed Error (Jun 2025, 35 days):</strong> Integration health concern. Resolution took 5 weeks — risk of data quality issues during review periods.<br>
+        &#9679; <strong>High-priority case (00990519, 36 days):</strong> Review sharing visibility — required custom investigation. Indicates product configuration complexity for this account.<br>
+        &#9679; <strong>Site Review case (92 days):</strong> Not a support issue — just a long engagement task. Completed Dec 5, 2025.
+      </div>
+    </div>
+    <div class="source-note">Source: SFDC Cases — 11 cases in last 365 days. All closed. 0 open cases as of Jun 8, 2026.</div>
+  </div>
+</div>
+
+<!-- TAB 8: RISK -->
+<div class="tab-panel" id="tab-8">
+  <div class="section">
+    <div class="section-title">Risk Assessment — Jun 8, 2026</div>
+
+    <div class="risk-card risk-green">
+      <div class="risk-title">&#128994; Commercial Health — Renewal On Track</div>
+      <div class="risk-body">Renewal contract signed May 27, 2026 ($78,462). Active 2027 renewal opp at Stage 5 with 350 days remaining. ARR slightly compressed vs 2025 renewal ($83,794 → $78,462) — 6% decline, attributed to license count normalization. No at-risk alerts in SFDC. Headcount stable at 859.</div>
+      <div class="risk-resolution">&#10003; Green: Renewal process is active and on track. Monitor: Prevent further ARR erosion at next renewal — build expansion story with Learning or Workflow before pricing conversation starts.</div>
+    </div>
+
+    <div class="risk-card risk-amber">
+      <div class="risk-title">&#127993; ARR Compression Pattern</div>
+      <div class="risk-body">ARR trend: $67,887 (2024) → $83,794 (2025) → $78,462 (2026). Three-year comparison shows growth but 2025→2026 dip of ~6.4%. Learning opp ($55K) was lost in Jan 2026, which would have expanded ARR. Pricing negotiation was active and extended (May 14–21, 2026 — 8-day thread involving AE and multiple CSM touches).</div>
+      <div class="risk-resolution">Would move to Green: Close Learning or Workflow expansion to grow total ARR above $83K baseline. Bundle pricing if possible at next renewal.</div>
+    </div>
+
+    <div class="risk-card risk-amber">
+      <div class="risk-title">&#127993; NPS Unresponsive — Sentiment Unknown</div>
+      <div class="risk-body">NPS score shows 0.0 in SFDC. Survey was sent May 28, 2026 — 11 days ago with no response captured. No CSAT data available (Average_Support_CSAT_Score__c = null). With an active renewal in progress and two closed-lost expansion opps in the last 12 months, understanding customer sentiment is critical before Stage 5 pricing begins.</div>
+      <div class="risk-resolution">Would move to Green: Receive NPS response. Proactive outreach to Julie Sheffet or Emily Yurachek for direct qualitative feedback within 30 days.</div>
+    </div>
+
+    <div class="risk-card risk-amber">
+      <div class="risk-title">&#127993; HRIS Integration Health — History of Feed Errors</div>
+      <div class="risk-body">Case 00983516 (Jun 2025): "Error in Feed from HRIS" — took 35 days to resolve. The UKG integration was sold in 2022 ($8,160). ZoomInfo scoops show MarketAxess actively hiring Finance roles with Domo, Power BI, Alteryx, and Adaptive Planning skills — Finance tech stack is evolving. HRIS health is foundational to Performance platform data integrity.</div>
+      <div class="risk-resolution">Would move to Green: Confirm with Poonam that UKG feed is stable post-Q3 2025 fix. Establish proactive monitoring protocol and integration health check in site review agenda.</div>
+    </div>
+
+    <div class="risk-card risk-green">
+      <div class="risk-title">&#128994; No Workday Consolidation Risk Detected</div>
+      <div class="risk-body">No evidence of Workday presence, new HRIS procurement, or consolidation discussion in SFDC cases, activity log, or market intelligence. MarketAxess has a long-established UKG integration (2022). Headcount is declining slightly (869 → 859) but not via restructuring — controlled. No ZoomInfo scoops indicate HCM vendor change.</div>
+      <div class="risk-resolution">&#10003; Green: Coexistence with UKG is established. Workday is not a factor. Monitor if Finance/tech headcount growth accelerates and triggers HRIS reassessment.</div>
+    </div>
+
+    <div class="risk-card risk-green">
+      <div class="risk-title">&#128994; Market Position — Financially Healthy, Growing</div>
+      <div class="risk-body">Q1 2026: Record revenue $233.4M (+12% YoY). EPS $2.25 (+20% YoY). $537M cash on hand. $316M trailing free cash flow. Operating margin 44% (+200bps). Share repurchase of $300M completed. MarketAxess is in a strong, expanding financial position — no cost-cutting mandates or risk of vendor rationalization due to financial stress.</div>
+      <div class="risk-resolution">&#10003; Green: Financial strength supports stable renewal. Growth initiatives (AI, DirectBooks, EMEA/APAC expansion under Dean Berry) increase HR complexity and create legitimate expansion surface area.</div>
+    </div>
+
+    <div class="risk-card risk-amber">
+      <div class="risk-title">&#127993; Closed-Lost Expansion Signals — Two Opps Lost in 12 Months</div>
+      <div class="risk-body">Learning ($55K, Jan 2026) and Onboarding ($0, Oct 2024) were both closed-lost within 12–24 months. The Learning opp had an RFP kickoff in Dec 2025 and was lost — indicates competitive evaluation or budget rejection. No notes in SFDC on why these were lost beyond NextStep: "RFP will kickoff in December."</div>
+      <div class="risk-resolution">Would move to Green: Understand loss reasons for both opps. Re-engage on Learning post-renewal with a bundled or discounted offer. Build Onboarding business case tied to Finance and tech executive hiring pipeline.</div>
+    </div>
+
+    <div class="risk-card risk-green">
+      <div class="risk-title">&#128994; Relationship Engagement — Active &amp; Recent</div>
+      <div class="risk-body">Strategy meeting May 28, 2026. Renewal signed May 27, 2026. Active email thread on pricing (May 14–21). AE email on Workflow (May 29). Engagement score 100%. Contact record updated Jun 3–5, 2026. Relationship is recently active and multi-threaded.</div>
+      <div class="risk-resolution">&#10003; Green: Relationship is healthy and engaged. Transition from Bernard Jackson (prior owner) to Andrew Pollard is in progress — introduce formally to Julie and Poonam before end of June.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Risk Summary</div>
+    <div class="grid-3">
+      <div class="stat-box">
+        <div class="stat-num" style="color:#ef4444">0</div>
+        <div class="stat-label">Red Risks</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" style="color:#f59e0b">4</div>
+        <div class="stat-label">Amber Risks</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" style="color:#10b981">4</div>
+        <div class="stat-label">Green</div>
+      </div>
+    </div>
+    <div class="text-xs text-muted mt-8">Overall assessment: Moderate health. No immediate churn risk. Primary vulnerabilities: ARR compression, NPS gap, and HRIS integration history. Renewal is on track. Biggest opportunity: expand to Learning or Workflow before next pricing conversation.</div>
+    <div class="source-note">Sources: SFDC Account, Opportunity, Case, Contract &bull; ZoomInfo Scoops (May 2026) &bull; Q1 2026 Earnings Call &bull; MarketAxess Investor Site &bull; Activity Log</div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+function switchTab(n) {
+  var panels = document.querySelectorAll('.tab-panel');
+  var btns = document.querySelectorAll('.tab-btn');
+  var i;
+  for (i = 0; i < panels.length; i++) { panels[i].classList.remove('active'); }
+  for (i = 0; i < btns.length; i++) { btns[i].classList.remove('active'); }
+  document.getElementById('tab-' + n).classList.add('active');
+  for (i = 0; i < btns.length; i++) {
+    if (btns[i].getAttribute('onclick') === 'switchTab(' + n + ')') {
+      btns[i].classList.add('active');
+      break;
+    }
+  }
+}
+</script>
+</body>
+</html>
