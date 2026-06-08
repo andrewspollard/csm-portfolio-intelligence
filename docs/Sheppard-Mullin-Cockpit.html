@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light only">
+<title>Sheppard, Mullin, Richter &amp; Hampton LLP &mdash; CSM Account Cockpit</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f9fb; color: #1a1f2e; overflow-x: hidden; }
+.container { max-width: 100%; padding: 16px; }
+
+/* Header */
+.header { background: #ffffff; border-radius: 12px; padding: 18px 22px; margin-bottom: 14px; border: 1px solid #e4e7ef; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.header-left h1 { font-size: 20px; font-weight: 700; color: #1a1f2e; line-height: 1.2; }
+.header-left .sub { font-size: 13px; color: #5a6178; margin-top: 3px; }
+.header-right { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.badge-enterprise { background: #e8edf8; color: #2c5282; }
+.badge-tier { background: #fef3c7; color: #92400e; }
+.badge-sda { background: #d1fae5; color: #065f46; }
+.refresh-note { font-size: 11px; color: #9ba3b8; margin-top: 4px; }
+
+/* KPI Strip */
+.kpi-strip { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 14px; }
+.kpi-card { background: #ffffff; border-radius: 10px; padding: 14px 16px; border: 1px solid #e4e7ef; }
+.kpi-label { font-size: 11px; color: #8b91a5; font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; }
+.kpi-value { font-size: 22px; font-weight: 700; color: #1a1f2e; line-height: 1; }
+.kpi-sub { font-size: 11px; color: #8b91a5; margin-top: 4px; }
+.kpi-green { color: #059669; }
+.kpi-amber { color: #d97706; }
+.kpi-red { color: #dc2626; }
+.kpi-blue { color: #2563eb; }
+
+/* Tab Bar */
+.tab-bar-wrap { position: sticky; top: 0; z-index: 100; background: #f8f9fb; padding-bottom: 10px; }
+.tab-bar { display: flex; gap: 2px; background: #e8eaf0; border-radius: 10px; padding: 4px; overflow-x: auto; white-space: nowrap; }
+.tab-btn { padding: 9px 16px; border: none; background: transparent; color: #5a6178; font-size: 12px; font-weight: 600; border-radius: 7px; cursor: pointer; white-space: nowrap; font-family: inherit; }
+.tab-btn.active { background: #ffffff; color: #1a1f2e; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+.tab-btn:hover:not(.active) { background: rgba(255,255,255,0.5); }
+
+/* Tab Panels */
+.tab-panel { display: none; padding: 0; overflow: visible; }
+.tab-panel.active { display: block; }
+
+/* Section */
+.section { background: #ffffff; border-radius: 12px; padding: 20px; margin-bottom: 14px; border: 1px solid #e4e7ef; overflow: visible; }
+.section-title { font-size: 14px; font-weight: 700; color: #1a1f2e; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.section-title span.cnt { background: #f0f2f7; color: #5a6178; font-size: 11px; padding: 2px 8px; border-radius: 10px; }
+
+/* Action Cards */
+.action-card { border-left: 4px solid #2563eb; background: #f8fbff; border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; }
+.action-card.amber { border-left-color: #d97706; background: #fffbf0; }
+.action-card.green { border-left-color: #059669; background: #f0fdf4; }
+.action-number { font-size: 11px; color: #8b91a5; font-weight: 600; margin-bottom: 5px; }
+.action-title { font-size: 14px; font-weight: 700; color: #1a1f2e; margin-bottom: 5px; }
+.action-why { font-size: 12px; color: #5a6178; margin-bottom: 8px; line-height: 1.5; }
+.action-next { font-size: 12px; font-weight: 600; color: #2563eb; }
+.action-card.amber .action-next { color: #d97706; }
+
+/* Engagement Health */
+.health-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; overflow: visible; }
+.health-card { background: #f8f9fb; border-radius: 10px; padding: 14px; border: 1px solid #e4e7ef; position: relative; overflow: visible; }
+.health-title { font-size: 11px; color: #8b91a5; font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px; display: flex; align-items: center; gap: 4px; }
+.health-value { font-size: 24px; font-weight: 700; margin: 8px 0 4px; }
+.health-desc { font-size: 11px; color: #8b91a5; }
+.metric-tip { display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; border-radius: 50%; background: #e4e7ef; color: #8b91a5; font-size: 9px; font-weight: 700; cursor: help; position: relative; }
+.metric-tip .tip-box { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); width: 240px; padding: 10px 12px; background: #1a1f2e; color: #f0f2f7; font-size: 11px; font-weight: 400; line-height: 1.5; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,.2); z-index: 9999; white-space: normal; }
+.metric-tip:hover .tip-box { display: block; }
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; padding: 8px 10px; font-size: 11px; font-weight: 600; color: #8b91a5; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid #e4e7ef; }
+td { padding: 9px 10px; border-bottom: 1px solid #f0f2f7; color: #1a1f2e; vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #f8f9fb; }
+
+/* Status badges */
+.status-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+.s-open { background: #fee2e2; color: #991b1b; }
+.s-closed { background: #d1fae5; color: #065f46; }
+.s-waiting { background: #fef3c7; color: #92400e; }
+.s-pending { background: #e0e7ff; color: #3730a3; }
+.s-onhold { background: #f3f4f6; color: #374151; }
+.s-sow { background: #fce7f3; color: #9d174d; }
+.s-won { background: #d1fae5; color: #065f46; }
+.s-lost { background: #fee2e2; color: #991b1b; }
+.s-discovery { background: #e0e7ff; color: #3730a3; }
+.s-renewal { background: #ede9fe; color: #5b21b6; }
+.s-5 { background: #d1fae5; color: #065f46; }
+
+/* Priority badges */
+.p-high { background: #fee2e2; color: #991b1b; font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
+.p-mod { background: #fef3c7; color: #92400e; font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
+.p-low { background: #f3f4f6; color: #6b7280; font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
+
+/* People Cards */
+.people-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.person-card { background: #f8f9fb; border-radius: 10px; padding: 14px; border: 1px solid #e4e7ef; }
+.person-name { font-size: 14px; font-weight: 700; color: #1a1f2e; }
+.person-title { font-size: 12px; color: #5a6178; margin: 3px 0; }
+.person-email { font-size: 11px; color: #2563eb; }
+.person-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-top: 6px; }
+.pb-champion { background: #d1fae5; color: #065f46; }
+.pb-technical { background: #e0e7ff; color: #3730a3; }
+.pb-hr { background: #ede9fe; color: #5b21b6; }
+.pb-exec { background: #fef3c7; color: #92400e; }
+.pb-rival { background: #f0f9ff; color: #0369a1; }
+.person-note { font-size: 11px; color: #8b91a5; margin-top: 7px; line-height: 1.4; }
+
+/* Risk Cards */
+.risk-card { border-radius: 10px; padding: 16px; margin-bottom: 12px; border: 1px solid #e4e7ef; }
+.risk-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.risk-icon { font-size: 18px; }
+.risk-title { font-size: 14px; font-weight: 700; color: #1a1f2e; }
+.risk-body { font-size: 13px; color: #5a6178; line-height: 1.6; }
+.risk-card.red { background: #fff5f5; border-left: 4px solid #ef4444; }
+.risk-card.amber { background: #fffbf0; border-left: 4px solid #f59e0b; }
+.risk-card.green { background: #f0fdf4; border-left: 4px solid #22c55e; }
+.risk-change { font-size: 12px; font-weight: 600; color: #5a6178; margin-top: 8px; padding-top: 8px; border-top: 1px solid #e4e7ef; }
+
+/* Roadmap */
+.roadmap-card { background: #f8f9fb; border-radius: 10px; padding: 16px; margin-bottom: 10px; border: 1px solid #e4e7ef; }
+.roadmap-badge { display: inline-block; padding: 3px 9px; border-radius: 4px; font-size: 11px; font-weight: 700; margin-bottom: 8px; }
+.rb-shipped { background: #d1fae5; color: #065f46; }
+.rb-coming { background: #e0e7ff; color: #3730a3; }
+.rb-expansion { background: #ede9fe; color: #5b21b6; }
+.roadmap-feature { font-size: 14px; font-weight: 700; color: #1a1f2e; margin-bottom: 5px; }
+.roadmap-date { font-size: 11px; color: #8b91a5; margin-bottom: 6px; }
+.roadmap-desc { font-size: 13px; color: #5a6178; line-height: 1.5; }
+.roadmap-pain { font-size: 12px; font-weight: 600; color: #7c3aed; margin-top: 8px; padding: 6px 10px; background: #f5f3ff; border-radius: 6px; }
+.tier2-list { list-style: none; }
+.tier2-list li { padding: 7px 0; border-bottom: 1px solid #f0f2f7; font-size: 13px; color: #5a6178; display: flex; gap: 8px; align-items: flex-start; }
+.tier2-list li:last-child { border-bottom: none; }
+
+/* Usage */
+.usage-kpi { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+.usage-card { background: #f8f9fb; border-radius: 10px; padding: 14px; border: 1px solid #e4e7ef; text-align: center; }
+.usage-val { font-size: 28px; font-weight: 700; color: #1a1f2e; }
+.usage-label { font-size: 11px; color: #8b91a5; font-weight: 500; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
+.usage-trend { font-size: 12px; font-weight: 600; margin-top: 4px; }
+.trend-up { color: #059669; }
+.trend-flat { color: #d97706; }
+.trend-down { color: #dc2626; }
+
+/* Login chart bars */
+.login-chart { display: flex; align-items: flex-end; gap: 3px; height: 60px; margin: 8px 0; }
+.login-bar { flex: 1; background: #3b82f6; border-radius: 2px 2px 0 0; opacity: 0.7; transition: opacity 0.2s; min-width: 2px; }
+.login-bar:hover { opacity: 1; }
+
+/* Info grid */
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f2f7; font-size: 13px; }
+.info-row:last-child { border-bottom: none; }
+.info-label { color: #8b91a5; font-weight: 500; }
+.info-value { color: #1a1f2e; font-weight: 600; text-align: right; max-width: 60%; }
+
+/* Opp card */
+.opp-card { background: #f8f9fb; border-radius: 10px; padding: 14px; margin-bottom: 10px; border: 1px solid #e4e7ef; }
+.opp-name { font-size: 14px; font-weight: 700; color: #1a1f2e; margin-bottom: 5px; }
+.opp-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 6px; }
+.opp-amount { font-size: 16px; font-weight: 700; color: #059669; }
+.opp-note { font-size: 12px; color: #5a6178; }
+
+/* Divider */
+.divider { height: 1px; background: #e4e7ef; margin: 16px 0; }
+
+/* Source note */
+.source-note { font-size: 11px; color: #b0b7c8; margin-top: 12px; padding-top: 10px; border-top: 1px solid #f0f2f7; }
+
+/* Market dynamics table */
+.mkt-table td { vertical-align: top; }
+.mkt-date { font-size: 12px; color: #8b91a5; white-space: nowrap; }
+.mkt-event { font-size: 13px; color: #1a1f2e; font-weight: 600; }
+.mkt-impl { font-size: 12px; color: #5a6178; line-height: 1.4; }
+
+/* Summary cards row */
+.summary-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+.sum-card { background: #f8f9fb; border-radius: 10px; padding: 14px; border: 1px solid #e4e7ef; }
+.sum-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #8b91a5; margin-bottom: 8px; }
+.sum-body { font-size: 13px; color: #5a6178; line-height: 1.5; }
+
+/* Use Case cards */
+.uc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.uc-card { background: #f8f9fb; border-radius: 10px; padding: 16px; border: 1px solid #e4e7ef; }
+.uc-product { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #8b91a5; margin-bottom: 6px; }
+.uc-row { font-size: 13px; margin-bottom: 6px; color: #5a6178; }
+.uc-row strong { color: #1a1f2e; }
+
+/* Expansion table */
+.exp-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: #ede9fe; color: #5b21b6; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <h1>Sheppard, Mullin, Richter &amp; Hampton LLP</h1>
+    <div class="sub">Law Firm &mdash; Los Angeles, CA &nbsp;|&nbsp; 16 offices worldwide &nbsp;|&nbsp; 1,000+ attorneys &nbsp;|&nbsp; Founded 1927</div>
+    <div class="refresh-note">Monday Full Refresh &mdash; Jun 8, 2026 &nbsp;|&nbsp; Sources: SFDC &bull; Chorus &bull; ZoomInfo &bull; Market Intel &bull; Roadmap</div>
+  </div>
+  <div class="header-right">
+    <span class="badge badge-enterprise">Enterprise</span>
+    <span class="badge badge-tier">Tier 3</span>
+    <span class="badge badge-sda">SDA Client</span>
+  </div>
+</div>
+
+<!-- KPI STRIP -->
+<div class="kpi-strip">
+  <div class="kpi-card">
+    <div class="kpi-label">ARR</div>
+    <div class="kpi-value">$97K</div>
+    <div class="kpi-sub">Onboarding $77K &middot; MS $20K</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Engagement</div>
+    <div class="kpi-value kpi-amber">50%</div>
+    <div class="kpi-sub">SFDC: Customer_Engagement_Score__c</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Services Eng.</div>
+    <div class="kpi-value kpi-green">100%</div>
+    <div class="kpi-sub">Full MS utilization</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Renewal</div>
+    <div class="kpi-value">Oct 1, 2027</div>
+    <div class="kpi-sub">485 days &middot; Stage 5 Solutioning</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Events L12Mo</div>
+    <div class="kpi-value kpi-green">162</div>
+    <div class="kpi-sub">+29 vs 30d ago &nbsp; &#8593; trending</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">NPS</div>
+    <div class="kpi-value kpi-amber">0.0</div>
+    <div class="kpi-sub">Last sent Apr 23, 2026</div>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar-wrap">
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab(0)">Actions</button>
+    <button class="tab-btn" onclick="switchTab(1)">Account Intel</button>
+    <button class="tab-btn" onclick="switchTab(2)">Use Case</button>
+    <button class="tab-btn" onclick="switchTab(3)">People</button>
+    <button class="tab-btn" onclick="switchTab(4)">Contracts</button>
+    <button class="tab-btn" onclick="switchTab(5)">Product</button>
+    <button class="tab-btn" onclick="switchTab(6)">Usage</button>
+    <button class="tab-btn" onclick="switchTab(7)">Cases</button>
+    <button class="tab-btn" onclick="switchTab(8)">Risk</button>
+  </div>
+</div>
+
+<!-- TAB 0: ACTIONS -->
+<div class="tab-panel active" id="tab-0">
+  <div class="section">
+    <div class="section-title">Priority Actions <span class="cnt">5</span></div>
+    <div class="action-card">
+      <div class="action-number">ACTION 1 &mdash; HIGHEST IMPACT</div>
+      <div class="action-title">Close the FloRecruit ATS Integration SOW</div>
+      <div class="action-why">A scoping case (00995783) is in SOW Pricing stage with Jennifer Madrigal leading. Sheppard is actively hiring &mdash; attorney headcount up 3.5% YoY, $1.3B revenue milestone, and ZoomInfo confirms legal roles at highest volume in 12 months. They already use SmartHire; closing this ATS integration deepens platform stickiness, adds services ARR, and prevents a competitor from owning the ATS-to-onboarding handoff. The linked add-on opp (Flow Recruit Integration, $5K) is in Stage 1 with no clear next step since May 20.</div>
+      <div class="action-next">&#8594; Follow up with Kara Sheridan + Jennifer Madrigal on SOW status. Get a clear yes/no by Jun 20.</div>
+    </div>
+    <div class="action-card amber">
+      <div class="action-number">ACTION 2 &mdash; REVENUE PROTECTION</div>
+      <div class="action-title">Re-engage on Closed Lost Deals &mdash; Learn &amp; Analytics</div>
+      <div class="action-why">Two expansions lost in 90 days: Learn ($0, closed lost Apr 14) and Analytics Licenses ($25K, closed lost Mar 9). Both closed without a documented next step, suggesting stalled conversations rather than hard declines. With 100% Cross Sell Score in SFDC, the platform signals they are an expansion candidate. Re-opening either conversation adds to ARR before Oct 2027 renewal.</div>
+      <div class="action-next">&#8594; Ask Thomas Adrian (Sr. Director HR) what objection killed Analytics. Was it budget timing or product fit?</div>
+    </div>
+    <div class="action-card">
+      <div class="action-number">ACTION 3 &mdash; RELATIONSHIP</div>
+      <div class="action-title">Schedule Site Review &mdash; 185 Days Since Last (Dec 5, 2025)</div>
+      <div class="action-why">Last site review was Dec 5, 2025. At 185 days, the account is approaching overdue threshold. Sheppard&rsquo;s active integration work (UKG HRIS, NetDocs, CPD, background checks) gives you substantive content for a QBR-style session. CHRO Bess Sully is the right audience; this is also an opportunity to surface the roadmap (Analytics, Learn, FloRecruit).</div>
+      <div class="action-next">&#8594; Book with Bess Sully for a June or July site review. Use the roadmap and usage trends as the agenda framework.</div>
+    </div>
+    <div class="action-card">
+      <div class="action-number">ACTION 4 &mdash; INTELLIGENCE GAP</div>
+      <div class="action-title">Confirm NPS Score &mdash; Received 0.0</div>
+      <div class="action-why">SFDC shows Average_NPS_Score_SFDC__c = 0.0. This is likely a non-response (survey sent Apr 23, no reply) rather than a true Net Promoter Score of 0. Next NPS send is Oct 20, 2026. A score of 0 from an unreturned survey is a data gap, not a health signal. Confirm with Kelly Brennan whether the client engaged with the Apr survey.</div>
+      <div class="action-next">&#8594; Check with Kelly Brennan on NPS response status. Consider direct outreach to Bess Sully if no response received.</div>
+    </div>
+    <div class="action-card green">
+      <div class="action-number">ACTION 5 &mdash; RENEWAL PREP</div>
+      <div class="action-title">Validate Renewal Opp Scope &mdash; $97K ARR, Oct 2027</div>
+      <div class="action-why">Renewal opp (Stage 5, $96,999.80, Close Sep 30, 2027) is active under Andrew Pollard. Contract runs to Jan 23, 2032 but Next_Renewal_Date__c = Oct 1, 2027. Confirm whether this is a subscription renewal or a contract amendment event. At Stage 5 (Renewal Solutioning), next step is quote delivery &mdash; confirm timeline with Kara Sheridan (AE).</div>
+      <div class="action-next">&#8594; Align with Kara Sheridan on renewal timeline. Confirm quote delivery target date (recommend 6&ndash;9 months out = Q1 2027).</div>
+    </div>
+  </div>
+
+  <div class="section" style="overflow:visible;">
+    <div class="section-title">Engagement Health</div>
+    <div class="health-grid">
+      <div class="health-card">
+        <div class="health-title">Customer Engagement
+          <span class="metric-tip">?<span class="tip-box">Source: Customer_Engagement_Score__c (SFDC). Rival&rsquo;s composite score blending usage telemetry, support interactions, and relationship touchpoints. Scale 0&ndash;100. 50 = moderate risk.</span></span>
+        </div>
+        <div class="health-value kpi-amber">50%</div>
+        <div class="health-desc">Amber &mdash; Room to improve</div>
+      </div>
+      <div class="health-card">
+        <div class="health-title">Services Engagement
+          <span class="metric-tip">?<span class="tip-box">Source: Services_Engagement_Score_Percent__c (SFDC). Measures utilization of Managed Services hours purchased. 100% = fully consuming their MS allotment.</span></span>
+        </div>
+        <div class="health-value kpi-green">100%</div>
+        <div class="health-desc">Green &mdash; Full MS utilization</div>
+      </div>
+      <div class="health-card">
+        <div class="health-title">Global Onboarding Score
+          <span class="metric-tip">?<span class="tip-box">Source: Global_Onboarding_Score__c (SFDC). Platform configuration completeness score for Onboarding product. 100 = fully configured and deployed.</span></span>
+        </div>
+        <div class="health-value kpi-green">100</div>
+        <div class="health-desc">Green &mdash; Fully deployed</div>
+      </div>
+      <div class="health-card">
+        <div class="health-title">Cross-Sell Score
+          <span class="metric-tip">?<span class="tip-box">Source: Cross_Sell_Score__c (SFDC). Rival&rsquo;s propensity model for expansion. 100 = highest probability of buying an additional product based on usage patterns and firmographics.</span></span>
+        </div>
+        <div class="health-value kpi-green">100</div>
+        <div class="health-desc">Green &mdash; Prime expansion candidate</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 1: ACCOUNT INTEL -->
+<div class="tab-panel" id="tab-1">
+  <div class="section">
+    <div class="section-title">Company Overview</div>
+    <p style="font-size:14px;color:#5a6178;line-height:1.7;margin-bottom:14px;">
+      Sheppard, Mullin, Richter &amp; Hampton LLP is a full-service AmLaw 50 law firm founded in 1927 and headquartered in Los Angeles, CA. With 1,200+ lawyers across 16 offices in the US, Europe, and Asia, the firm crossed <strong>$1.3 billion in revenue in 2025</strong> &mdash; a 13%+ year-over-year increase. Revenue per lawyer grew 6.5% to ~$1.34 million. The firm is private (partnership structure), with chair Luca Salvi reporting profits &ldquo;surged into double-digits.&rdquo; Sheppard Mullin ranks AmLaw 48th by gross revenue and is considered one of the fastest-growing large law firms in the country.
+    </p>
+    <div class="info-grid">
+      <div>
+        <div class="info-row"><span class="info-label">HQ</span><span class="info-value">350 S Grand Ave, Los Angeles, CA</span></div>
+        <div class="info-row"><span class="info-label">Offices</span><span class="info-value">16 (US, Europe, Asia)</span></div>
+        <div class="info-row"><span class="info-label">Employees (SFDC)</span><span class="info-value">1,000</span></div>
+        <div class="info-row"><span class="info-label">Employees (Revelio)</span><span class="info-value">2,059 total (5.9% YoY growth)</span></div>
+        <div class="info-row"><span class="info-label">Attorneys</span><span class="info-value">1,200+ (964 per 2025 count)</span></div>
+        <div class="info-row"><span class="info-label">Partners</span><span class="info-value">411</span></div>
+      </div>
+      <div>
+        <div class="info-row"><span class="info-label">Revenue (2025)</span><span class="info-value">$1.3B+ (13% YoY growth)</span></div>
+        <div class="info-row"><span class="info-label">AmLaw Rank</span><span class="info-value">48th by gross revenue</span></div>
+        <div class="info-row"><span class="info-label">Founded</span><span class="info-value">1927</span></div>
+        <div class="info-row"><span class="info-label">Structure</span><span class="info-value">Private partnership</span></div>
+        <div class="info-row"><span class="info-label">Industry</span><span class="info-value">Law Firms &amp; Legal Services</span></div>
+        <div class="info-row"><span class="info-label">Website</span><span class="info-value">sheppardmullin.com</span></div>
+      </div>
+    </div>
+    <div class="source-note">Sources: ZoomInfo enrichment (Jun 2026) &bull; SFDC account record &bull; Law.com/AmLawyer (Jan 26, 2026) &bull; Revelio Labs (Dec 2025)</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">ZoomInfo Department Breakdown</div>
+    <table>
+      <tr><th>Department</th><th>Headcount</th><th>Rival Relevance</th></tr>
+      <tr><td>Legal</td><td>2,026</td><td>End users of onboarding (new hires, laterals)</td></tr>
+      <tr><td>Operations</td><td>357</td><td>Process owners; often manage onboarding workflows</td></tr>
+      <tr><td>Finance</td><td>162</td><td>Budget authority for HR tech renewals</td></tr>
+      <tr><td>Human Resources</td><td>74</td><td>Primary buyers and administrators of Rival platform</td></tr>
+      <tr><td>Information Technology</td><td>149</td><td>Integration owners (UKG, NetDocs, SmartHire, CPD)</td></tr>
+      <tr><td>Marketing</td><td>68</td><td>Employer brand; onboarding portal branding</td></tr>
+    </table>
+    <div class="source-note">Source: ZoomInfo company enrichment (Jun 2026) &bull; ZoomInfo Company ID: 16240761</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Market Dynamics</div>
+    <table>
+      <tr><th>When</th><th>Event</th><th>HR Implication</th></tr>
+      <tr>
+        <td class="mkt-date">Jan 2026</td>
+        <td class="mkt-event">Revenue surpasses $1.3B (+13% YoY)</td>
+        <td class="mkt-impl">Firm is in aggressive growth mode. More lateral hires = higher onboarding volume. Rival&rsquo;s platform needs to scale with increased event load.</td>
+      </tr>
+      <tr>
+        <td class="mkt-date">Sep 2025</td>
+        <td class="mkt-event">21-attorney IP litigation group joins from Ropes &amp; Gray</td>
+        <td class="mkt-impl">Large-scale lateral integration event. Multi-office, multi-specialty onboarding creates workflow complexity &mdash; exactly the scenario Rival&rsquo;s branching logic and conditional tasks address.</td>
+      </tr>
+      <tr>
+        <td class="mkt-date">Sep 2025</td>
+        <td class="mkt-event">New LA office opened at 350 S Grand Ave</td>
+        <td class="mkt-impl">New location means new Assign Office Location workflows, new IT provisioning tasks, possible portal config updates. Cases confirm this work (EPP: Assign Office Location, Jun 2026).</td>
+      </tr>
+      <tr>
+        <td class="mkt-date">Dec 2025</td>
+        <td class="mkt-event">ZoomInfo: Legal roles at 12-month hiring high</td>
+        <td class="mkt-impl">Sustained hiring volume = sustained platform utilization. Events L30D grew from 20 to 29 over 30 days, corroborating this signal.</td>
+      </tr>
+      <tr>
+        <td class="mkt-date">2026</td>
+        <td class="mkt-event">AmLaw 200 firms record highest lateral hire volume since 2021&ndash;22</td>
+        <td class="mkt-impl">Sector-wide hiring surge. Rival is well-positioned as specialist onboarding for law firms. Risk: competitors (iCIMS, Workday) also pitching consolidation to law firm COOs.</td>
+      </tr>
+    </table>
+    <div class="source-note">Sources: Law.com (Jan 2026) &bull; ZoomInfo Scoops (Nov&ndash;Dec 2025) &bull; sheppardmullin.com press releases &bull; AmLaw 200 Hiring Stats report</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Competitive Position (Am Law Peer Context)</div>
+    <table>
+      <tr><th>Firm</th><th>Revenue (2024)</th><th>Attorneys</th><th>Trajectory</th></tr>
+      <tr><td>Sheppard Mullin</td><td>$1.21B &rarr; $1.3B+ (2025)</td><td>1,200+</td><td style="color:#059669;font-weight:600;">&#8593; Growing 13%+ YoY</td></tr>
+      <tr><td>Kirkland &amp; Ellis</td><td>$7.8B+</td><td>3,500+</td><td style="color:#059669;font-weight:600;">&#8593; AmLaw #1 by revenue</td></tr>
+      <tr><td>Latham &amp; Watkins</td><td>$6.3B</td><td>3,300+</td><td style="color:#059669;font-weight:600;">&#8593; Growing</td></tr>
+      <tr><td>Sidley Austin</td><td>$3.8B</td><td>2,200+</td><td style="color:#9ca3af;">&#8594; Stable</td></tr>
+      <tr><td>DLA Piper</td><td>$4.4B</td><td>4,000+</td><td style="color:#9ca3af;">&#8594; Stable</td></tr>
+    </table>
+    <div class="source-note">Source: AmLaw 2025 rankings &bull; Verify: exact 2025 peer figures pending final AmLaw 100 publication</div>
+  </div>
+</div>
+
+<!-- TAB 2: USE CASE -->
+<div class="tab-panel" id="tab-2">
+  <div class="section">
+    <div class="section-title">Executive Summary</div>
+    <p style="font-size:14px;color:#5a6178;line-height:1.7;">
+      Sheppard Mullin uses Rival Onboarding as its enterprise-wide platform for attorney and staff onboarding, with Managed Services providing dedicated configuration and integration support. The firm operates a complex multi-system HR stack: UKG (HRIS), CPD (custom/legacy), NetDocs (document management), SmartHire/FloRecruit (ATS), and a background check vendor &mdash; all integrated into Rival Onboarding. The platform handles lateral attorney onboarding at scale (21-person Ropes &amp; Gray lateral group, summer associates, business services staff) across 16 offices. Full Onboarding Score of 100 confirms complete deployment; the MS team (Jennifer Madrigal, Kelly Brennan) is operationally embedded. Key expansion signals: 100 Cross-Sell Score, two recently closed-lost expansions (Learn, Analytics), and an active FloRecruit ATS integration scoping case.
+    </p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Product Use Cases</div>
+    <div class="uc-grid">
+      <div class="uc-card">
+        <div class="uc-product">Rival Onboarding &mdash; $77K ARR</div>
+        <div class="uc-row"><strong>Use Case:</strong> Attorney lateral onboarding; summer associate programs; business services staff; contractors</div>
+        <div class="uc-row"><strong>Pain It Solves:</strong> Coordinating multi-system new hire setup across 16 offices with different job codes, office locations, supervisors, and compliance requirements</div>
+        <div class="uc-row"><strong>Value Delivered:</strong> Single workflow hub for I-9, background checks, EPP completion, NetDocs integration, UKG HRIS sync, and CPD provisioning</div>
+        <div class="uc-row" style="color:#059669;font-weight:600;">&#8593; Value growing: 162 events L12Mo, trending up from 133 in May</div>
+      </div>
+      <div class="uc-card">
+        <div class="uc-product">Rival Managed Services &mdash; $20K ARR</div>
+        <div class="uc-row"><strong>Use Case:</strong> Ongoing configuration, integration management, form builds, EPP updates, Looker analytics support</div>
+        <div class="uc-row"><strong>Pain It Solves:</strong> Client&rsquo;s lean HR Ops team (Jeff Johnson, Cuong Quach) lacks bandwidth to self-administer a complex multi-integration platform</div>
+        <div class="uc-row"><strong>Value Delivered:</strong> 100% services engagement score; Kelly Brennan resolves most cases within 1&ndash;3 business days; Jennifer Madrigal owns integration work</div>
+        <div class="uc-row" style="color:#059669;font-weight:600;">&#8593; Fully utilized &mdash; 91 cases in 12 months = high operational dependency</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Expansion Vectors</div>
+    <table>
+      <tr><th>Product</th><th>Observed Pain Signal</th><th>Entry Point</th></tr>
+      <tr>
+        <td><span class="exp-tag">FloRecruit / ATS Integration</span></td>
+        <td>Active scoping case (SOW Pricing stage). Currently using SmartHire; seeking to integrate FloRecruit as ATS.</td>
+        <td>Close existing scoping SOW. Frame as closing the ATS-to-onboarding gap they already have.</td>
+      </tr>
+      <tr>
+        <td><span class="exp-tag">Analytics / Looker</span></td>
+        <td>Closed lost Mar 9, $25K. Case: &ldquo;Looker &mdash; Event Category Fields Showing as Multiple Rows&rdquo; (Jun 2026) &mdash; they are using Looker in some form already.</td>
+        <td>Diagnose the lost deal objection. If it was budget timing, re-introduce for Q3 2026. If product gap, escalate to product.</td>
+      </tr>
+      <tr>
+        <td><span class="exp-tag">Rival Learn (HeartBeat)</span></td>
+        <td>Cross-sell opp closed lost Apr 14. No documented reason.</td>
+        <td>Understand the &ldquo;no.&rdquo; Summer associate programs often need structured learning tracks &mdash; use summer 2026 as a re-entry point.</td>
+      </tr>
+      <tr>
+        <td><span class="exp-tag">Rival Performance (HeartBeat)</span></td>
+        <td>100% Cross-Sell Score. No active opp. Rheanna Smith (Sr. Mgr, Diversity, Inclusion &amp; Talent Strategy) is a natural champion for performance and talent strategy tools.</td>
+        <td>Introduce in the site review. Frame around attorney development and lateral retention &mdash; a top law firm priority.</td>
+      </tr>
+    </table>
+    <div class="source-note">Source: SFDC opportunities &bull; Cases &bull; SFDC Cross_Sell_Score__c = 100</div>
+  </div>
+
+  <div class="summary-cards">
+    <div class="sum-card">
+      <div class="sum-title">Switching Cost</div>
+      <div class="sum-body">HIGH. Seven active integrations (UKG, CPD, NetDocs, SmartHire/FloRecruit, background check vendor, SSO, Intake Portal). Replacing Rival requires re-building all 7 connectors. Managed Services dependency adds further switching friction &mdash; the MS team IS their HR Ops capacity for platform config.</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-title">Whitespace</div>
+      <div class="sum-body">Learn, Performance, Analytics, FloRecruit integration. Cross-Sell Score = 100 (Rival&rsquo;s highest propensity rating). Two recent lost deals indicate the buying conversation has begun but stalled &mdash; timing or budget, not platform fit.</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-title">Renewal Confidence</div>
+      <div class="sum-body">AMBER. Strong operational dependency and full Onboarding Score are positive. Engagement score of 50% and NPS of 0.0 (non-response risk) introduce uncertainty. No competitive threat documented but no site review in 185 days. Strategic renewal conversation overdue.</div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 3: PEOPLE -->
+<div class="tab-panel" id="tab-3">
+  <div class="section">
+    <div class="section-title">Key Stakeholders &mdash; Sheppard Mullin <span class="cnt">8</span></div>
+    <div class="people-grid">
+      <div class="person-card">
+        <div class="person-name">Bess Sully</div>
+        <div class="person-title">Chief Human Resources Officer</div>
+        <div class="person-email">bsully@sheppardmullin.com &bull; (917) 836-8298</div>
+        <span class="person-badge pb-exec">Executive Sponsor</span>
+        <div class="person-note">Primary executive relationship. Owns vendor decisions for HR tech. Last meaningful touchpoint tied to Jun 3 opp update. Site review pitch should go to her. ZoomInfo contact accuracy: 91.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-name">Thomas Adrian</div>
+        <div class="person-title">Senior Director, Human Resources</div>
+        <div class="person-email">tadrian@sheppardmullin.com &bull; (213) 455-7689</div>
+        <span class="person-badge pb-hr">HR Lead</span>
+        <div class="person-note">Day-to-day HR counterpart. Likely champion for product renewals and expansions. ZoomInfo accuracy 76 (recently updated Jun 4). Analytics lost deal &mdash; start here to understand objection.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-name">Jeff Johnson</div>
+        <div class="person-title">Senior Manager, Human Resources Operations</div>
+        <div class="person-email">jdjohnson@sheppardmullin.com &bull; (650) 815-2600</div>
+        <span class="person-badge pb-hr">HR Ops</span>
+        <div class="person-note">Platform administrator and HR Ops lead. Most likely daily Rival user. ZoomInfo accuracy: 99 &mdash; highest confidence contact. Mobile: (818) 521-3710.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-name">Cuong Quach</div>
+        <div class="person-title">Senior HCM Analyst</div>
+        <div class="person-email">cquach@sheppardmullin.com &bull; 213-455-7701</div>
+        <span class="person-badge pb-technical">Technical</span>
+        <div class="person-note">HCM analyst &mdash; owns UKG and integration configurations. Key contact for the UKG Hire integration and CPD integration work ongoing in cases.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-name">Ekaterina Obsokova</div>
+        <div class="person-title">Manager, Human Resources</div>
+        <div class="person-email">eobsokova@sheppardmullin.com &bull; (213) 455-7704</div>
+        <span class="person-badge pb-hr">HR Manager</span>
+        <div class="person-note">HR manager, likely involved in day-to-day onboarding administration. ZoomInfo accuracy: 86.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-name">Rheanna Smith</div>
+        <div class="person-title">Sr. Manager, Diversity Inclusion &amp; Talent Strategy</div>
+        <div class="person-email">rsmith@sheppardmullin.com &bull; (858) 720-7449</div>
+        <span class="person-badge pb-hr">Talent Strategy</span>
+        <div class="person-note">DEI and talent strategy lead &mdash; potential champion for Performance and Learn products. Mobile: (760) 845-8463.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-name">Britton Choi</div>
+        <div class="person-title">Chief Information Officer</div>
+        <div class="person-email">bchoi@sheppardmullin.com &bull; (310) 740-0045</div>
+        <span class="person-badge pb-technical">IT Executive</span>
+        <div class="person-note">CIO &mdash; executive sponsor of IT infrastructure. Relevant for SSO, integration architecture, and NetDocs integration work. Not a day-to-day Rival user.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-name">Cecilia Dinh</div>
+        <div class="person-title">Manager, Recruiting &amp; Staff Professional</div>
+        <div class="person-email">cdinh@sheppardmullin.com &bull; (213) 455-7631</div>
+        <span class="person-badge pb-hr">Recruiting</span>
+        <div class="person-note">Recruiting lead &mdash; key contact for FloRecruit ATS integration conversation and understanding the sourcing-to-onboarding workflow gap. Mobile: (714) 653-5020.</div>
+      </div>
+    </div>
+    <div class="source-note">Sources: SFDC Contacts &bull; ZoomInfo contact search (Jun 2026)</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Rival Team</div>
+    <div class="people-grid">
+      <div class="person-card">
+        <div class="person-name">Andrew Pollard</div>
+        <div class="person-title">Customer Success Manager</div>
+        <span class="person-badge pb-rival">CSM (Owner)</span>
+        <div class="person-note">Account owner. Renewal opp owner. Responsible for site review cadence, executive relationship with Bess Sully, and expansion strategy.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-name">Kara Sheridan</div>
+        <div class="person-title">Account Executive</div>
+        <span class="person-badge pb-rival">AE</span>
+        <div class="person-note">Owns expansion opps (FloRecruit, Learn, Analytics). All three expansions ran through Kara. Coordinate on renewal timeline and closed-lost follow-up.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-name">Kelly Brennan</div>
+        <div class="person-title">Managed Services &mdash; Support Lead</div>
+        <span class="person-badge pb-rival">MS Support</span>
+        <div class="person-note">Primary case handler. Owns 80%+ of Sheppard cases. Deep operational knowledge of the client&rsquo;s configuration. Key source for renewal health intelligence.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-name">Jennifer Madrigal</div>
+        <div class="person-title">Managed Services &mdash; Integration Lead</div>
+        <span class="person-badge pb-rival">MS Integration</span>
+        <div class="person-note">Leads integration work: UKG HRIS, CPD, SmartHire/FloRecruit scoping. Owns &ldquo;Chorus &mdash; Sheppard/Rival Project&rdquo; call from Jun 2. Critical for the ATS SOW close.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Executive Targets (ZoomInfo) &mdash; Additional Outreach Candidates</div>
+    <table>
+      <tr><th>Name</th><th>Title</th><th>ZI Accuracy</th><th>Rationale</th></tr>
+      <tr><td>Aileen Jauffret</td><td>Director, Human Resources &amp; Administration</td><td>95</td><td>High-accuracy HR director contact; potentially another product champion. Verify if existing relationship.</td></tr>
+      <tr><td>Elizabeth Sully</td><td>Talent Management &amp; Human Resources</td><td>91</td><td>ZoomInfo contact; possible relation to or colleague of Bess Sully. Verify title and scope.</td></tr>
+    </table>
+    <div class="source-note">Source: ZoomInfo search_contacts (Jun 2026) &bull; Verify: confirm these contacts are not already in SFDC before outreach</div>
+  </div>
+</div>
+
+<!-- TAB 4: CONTRACTS -->
+<div class="tab-panel" id="tab-4">
+  <div class="section">
+    <div class="section-title">Active Contract</div>
+    <table>
+      <tr><th>Contract #</th><th>Status</th><th>Start</th><th>End</th><th>Renewal Term</th><th>ARR</th></tr>
+      <tr>
+        <td>00018453</td>
+        <td><span class="status-badge s-won">Activated</span></td>
+        <td>Aug 23, 2024</td>
+        <td>Jan 23, 2032</td>
+        <td>12 months</td>
+        <td>$97,000</td>
+      </tr>
+    </table>
+    <div style="margin-top:12px;padding:12px;background:#fef3c7;border-radius:8px;font-size:13px;color:#92400e;">
+      <strong>Note:</strong> Contract end date is Jan 23, 2032 but Next_Renewal_Date__c = Oct 1, 2027. Verify whether Oct 2027 is a contractual price review/renewal event or an annual subscription term boundary. This distinction affects renewal strategy.
+    </div>
+    <div class="source-note">Source: SFDC Contract object (Contract ID: 800Vs00000D70rwIAB)</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Active Opportunities</div>
+    <div class="opp-card">
+      <div class="opp-name">Renewal Opportunity</div>
+      <div class="opp-meta">
+        <span class="status-badge s-5">Stage 5 &mdash; Renewal Solutioning</span>
+        <span style="font-size:12px;color:#8b91a5;">Renewal &middot; Andrew Pollard &middot; Close Sep 30, 2027</span>
+      </div>
+      <div class="opp-amount">$96,999.80</div>
+      <div class="opp-note">Potential Renewal ARR: $96,999.80. Last modified Jun 3, 2026. No next step documented. <strong>Action: Add a next step and target quote delivery date.</strong></div>
+    </div>
+    <div class="opp-card" style="border-left: 4px solid #f59e0b;">
+      <div class="opp-name">Flow Recruit Integration</div>
+      <div class="opp-meta">
+        <span class="status-badge s-discovery">Stage 1 &mdash; Discovery</span>
+        <span style="font-size:12px;color:#8b91a5;">Add-On &middot; Kara Sheridan &middot; Close Jun 26, 2026</span>
+      </div>
+      <div class="opp-amount" style="color:#d97706;">$5,000</div>
+      <div class="opp-note">Next Step (May 20): &ldquo;Client not ready to move forward at this time.&rdquo; Related scoping case (00995783) in SOW Pricing. Discrepancy: opp says not ready; case says in SOW Pricing. <strong>Clarify status immediately &mdash; close date is Jun 26.</strong></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Historical Opportunities</div>
+    <table>
+      <tr><th>Opportunity</th><th>Stage</th><th>Amount</th><th>Close</th><th>Notes</th></tr>
+      <tr>
+        <td>Learn</td>
+        <td><span class="status-badge s-lost">Closed Lost</span></td>
+        <td>&mdash;</td>
+        <td>Apr 14, 2026</td>
+        <td>Cross-sell, no documented reason. Re-open conversation.</td>
+      </tr>
+      <tr>
+        <td>Analytics Licenses</td>
+        <td><span class="status-badge s-lost">Closed Lost</span></td>
+        <td>$25,000</td>
+        <td>Mar 9, 2026</td>
+        <td>Add-on. Budget or product fit? Active Looker case Jun 2026 suggests continued interest.</td>
+      </tr>
+      <tr>
+        <td>Intake Portal</td>
+        <td><span class="status-badge s-won">Closed Won</span></td>
+        <td>$0</td>
+        <td>Nov 5, 2025</td>
+        <td>Additional offering. Successfully deployed.</td>
+      </tr>
+      <tr>
+        <td>Sheppard Mullin Onboarding</td>
+        <td><span class="status-badge s-won">Closed Won</span></td>
+        <td>$296,000</td>
+        <td>Aug 21, 2024</td>
+        <td>Original platform sale by Sheila Musurlian. Multi-year deal.</td>
+      </tr>
+      <tr>
+        <td>Onboarding (2018)</td>
+        <td><span class="status-badge s-lost">Closed Lost</span></td>
+        <td>$143,003</td>
+        <td>Oct 2018</td>
+        <td>Initial lost deal. Closed Won in 2024 &mdash; 6-year sales cycle to close.</td>
+      </tr>
+    </table>
+    <div class="source-note">Source: SFDC Opportunities (Account ID: 0016000000ItvaFAAR)</div>
+  </div>
+</div>
+
+<!-- TAB 5: PRODUCT -->
+<div class="tab-panel" id="tab-5">
+  <div class="section">
+    <div class="section-title">Active Projects &amp; Implementations</div>
+    <table>
+      <tr><th>Project</th><th>Status</th><th>Owner</th><th>Details</th></tr>
+      <tr>
+        <td><strong>FloRecruit / ATS Integration</strong></td>
+        <td><span class="status-badge s-sow">SOW Pricing</span></td>
+        <td>Jennifer Madrigal</td>
+        <td>Case 00995783. Scoping complete; awaiting SOW approval. Critical path for Q2/Q3 close.</td>
+      </tr>
+      <tr>
+        <td><strong>UKG Hire Integration</strong></td>
+        <td><span class="status-badge s-waiting">In Progress</span></td>
+        <td>Jennifer Madrigal</td>
+        <td>Cases: change trigger &amp; timing (00997944), SupervisorId payload issue (00997804), Network ID update (00992412). Active multi-case integration.</td>
+      </tr>
+      <tr>
+        <td><strong>CPD Integration</strong></td>
+        <td><span class="status-badge s-waiting">In Progress</span></td>
+        <td>Jennifer Madrigal</td>
+        <td>Multiple cases: change queue time, employee processing errors, field additions. Long-running integration maintained by MS team.</td>
+      </tr>
+      <tr>
+        <td><strong>NetDocs Integration</strong></td>
+        <td><span class="status-badge s-pending">Pending Internal</span></td>
+        <td>Kelly Brennan</td>
+        <td>Case 00997871: Doc Type configuration pending internal partner work.</td>
+      </tr>
+      <tr>
+        <td><strong>Looker Analytics Config</strong></td>
+        <td><span class="status-badge s-pending">Pending Internal</span></td>
+        <td>Kelly Brennan</td>
+        <td>Case 00997879: Event Category Fields showing multiple rows. PIR-172 raised. Product engineering involvement needed.</td>
+      </tr>
+      <tr>
+        <td><strong>California State Tax Form</strong></td>
+        <td><span class="status-badge s-pending">Pending Internal</span></td>
+        <td>Kelly Brennan</td>
+        <td>Case 00997668: Compliance form update pending internal partner work.</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Tier 1 Roadmap &mdash; Direct Pain Match</div>
+    <div class="roadmap-card">
+      <span class="roadmap-badge rb-coming">COMING</span>
+      <div class="roadmap-feature">ATS / Recruiting System Integration Enhancements</div>
+      <div class="roadmap-date">Relevant to H2 2026 &mdash; FloRecruit integration in SOW</div>
+      <div class="roadmap-desc">Improved bidirectional data flow between ATS and Onboarding. Reduces manual re-entry of candidate data, automates offer letter &rarr; onboarding trigger.</div>
+      <div class="roadmap-pain">Pain Match: Active FloRecruit scoping case. Sheppard&rsquo;s current SmartHire/FloRecruit workflow requires manual handoffs. This directly addresses their SOW scope.</div>
+    </div>
+    <div class="roadmap-card">
+      <span class="roadmap-badge rb-coming">COMING</span>
+      <div class="roadmap-feature">Analytics &amp; Looker &mdash; Event Category Field Fixes</div>
+      <div class="roadmap-date">PIR-172 raised Jun 2026</div>
+      <div class="roadmap-desc">Fix for Event Category Fields showing as multiple rows in Looker dashboard. Currently a known issue affecting dashboard usability.</div>
+      <div class="roadmap-pain">Pain Match: Case 00997879 is open and pending internal work. Analytics Licenses lost deal (Mar 2026) may have been influenced by this data quality issue. Resolution could re-open the conversation.</div>
+    </div>
+    <div class="roadmap-card">
+      <span class="roadmap-badge rb-shipped">SHIPPED</span>
+      <div class="roadmap-feature">California Compliance &mdash; Emergency Contact Checkbox</div>
+      <div class="roadmap-date">Case 00996257 &mdash; On Hold</div>
+      <div class="roadmap-desc">New Emergency Contact checkbox for California new hire compliance. Required for California-based hires.</div>
+      <div class="roadmap-pain">Pain Match: Case 00996257 is on hold &mdash; confirm with Kelly Brennan whether this compliance feature is live or still pending client testing.</div>
+    </div>
+    <div class="roadmap-card">
+      <span class="roadmap-badge rb-coming">COMING</span>
+      <div class="roadmap-feature">Feature Request PIR-299</div>
+      <div class="roadmap-date">Raised May 12, 2026</div>
+      <div class="roadmap-desc">Client-submitted feature request (details in case 00997218, Pending Internal Partner Work). Verify with Kelly Brennan what this request covers to assess roadmap alignment.</div>
+      <div class="roadmap-pain">Pain Match: Client-originated PIR. Confirming the ask and roadmap status demonstrates responsiveness to product feedback.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Tier 2 Roadmap &mdash; General Platform (Onboarding line)</div>
+    <ul class="tier2-list">
+      <li><span class="roadmap-badge rb-shipped" style="flex-shrink:0;">SHIPPED</span> SSO Migration &mdash; Completed Jan 2026 (Case 00992721). Platform now on new SSO infrastructure.</li>
+      <li><span class="roadmap-badge rb-shipped" style="flex-shrink:0;">SHIPPED</span> Intake Portal enhancements &mdash; Contractor intake portal, rehire flows, and Business Services portal all updated (multiple cases 2025&ndash;2026).</li>
+      <li><span class="roadmap-badge rb-shipped" style="flex-shrink:0;">SHIPPED</span> Task management improvements &mdash; Task activation via signature rules, task expire button, task cancellation notification (cases Q1&ndash;Q2 2026).</li>
+      <li><span class="roadmap-badge rb-coming" style="flex-shrink:0;">COMING</span> Enhanced merge field library &mdash; Expanded merge field support for offer letters and notification templates.</li>
+      <li><span class="roadmap-badge rb-coming" style="flex-shrink:0;">COMING</span> Preferred name field standardization &mdash; Case 00996291 resolved; verify client is using updated preferred name field in portal.</li>
+    </ul>
+    <div class="source-note">Source: SFDC Cases (active &amp; recently closed) &bull; Roadmap: verify specific release notes at rival-hr.com/release-note/ for latest shipped features</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Expansion &mdash; Products Not Currently Owned</div>
+    <div class="roadmap-card" style="border-left: 4px solid #7c3aed; background: #faf5ff;">
+      <span class="roadmap-badge rb-expansion">EXPANSION</span>
+      <div class="roadmap-feature">Rival Learn (WingSpan)</div>
+      <div class="roadmap-desc">Structured learning tracks for attorney development, CLE compliance, summer associate programs, and DEI training.</div>
+      <div class="roadmap-pain">Observed Pain: Cross-sell opp closed lost Apr 2026. Rheanna Smith (Talent Strategy) is a natural champion. Summer associate season (now) is ideal timing for re-introduction.</div>
+    </div>
+    <div class="roadmap-card" style="border-left: 4px solid #7c3aed; background: #faf5ff;">
+      <span class="roadmap-badge rb-expansion">EXPANSION</span>
+      <div class="roadmap-feature">Rival Analytics (Looker Enhanced)</div>
+      <div class="roadmap-desc">Advanced onboarding analytics &mdash; event completion rates, time-to-productivity benchmarks, office-by-office utilization comparisons.</div>
+      <div class="roadmap-pain">Observed Pain: $25K opp lost Mar 2026. Active Looker case (Jun 2026) suggests they ARE using Looker in some capacity. PIR-172 fix may re-open this door.</div>
+    </div>
+    <div class="roadmap-card" style="border-left: 4px solid #7c3aed; background: #faf5ff;">
+      <span class="roadmap-badge rb-expansion">EXPANSION</span>
+      <div class="roadmap-feature">Rival Performance (HeartBeat)</div>
+      <div class="roadmap-desc">Goal setting, performance reviews, 360 feedback. Relevant for partner evaluations, associate development, and staff performance cycles.</div>
+      <div class="roadmap-pain">Observed Pain: No active opp but Cross-Sell Score = 100. Rheanna Smith and Thomas Adrian are the right entry points. No documented prior conversation.</div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 6: USAGE -->
+<div class="tab-panel" id="tab-6">
+  <div class="section">
+    <div class="section-title">LifeSuite Telemetry &mdash; as of Jun 8, 2026</div>
+    <div class="usage-kpi">
+      <div class="usage-card">
+        <div class="usage-val">162</div>
+        <div class="usage-label">Events L12Mo</div>
+        <div class="usage-trend trend-up">&#8593; +29 vs 30 days ago</div>
+      </div>
+      <div class="usage-card">
+        <div class="usage-val">29</div>
+        <div class="usage-label">Events L30D</div>
+        <div class="usage-trend trend-up">&#8593; +9 vs May 9</div>
+      </div>
+      <div class="usage-card">
+        <div class="usage-val">130</div>
+        <div class="usage-label">Events YTD</div>
+        <div class="usage-trend trend-up">&#8593; On pace for ~220/yr</div>
+      </div>
+      <div class="usage-card">
+        <div class="usage-val">0.162</div>
+        <div class="usage-label">Events/Employee/Yr</div>
+        <div class="usage-trend trend-flat">&#8594; Low-moderate ratio</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Daily Login Activity &mdash; Last 30 Days</div>
+    <div style="font-size:12px;color:#8b91a5;margin-bottom:8px;">Bar height = unique user logins that day (May 9 &rarr; Jun 8, 2026). Peak: 78 logins (May 19).</div>
+    <div class="login-chart" id="login-chart">
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:#8b91a5;margin-top:4px;">
+      <span>May 9</span><span>May 19</span><span>May 29</span><span>Jun 8</span>
+    </div>
+    <div class="source-note">Source: LifeSuite_Product_Usage__c &bull; Unique_User_Logins_Onboard__c &bull; Note: Unique_User_Logins_L30D_Onboard__c shows 0.0 across all records &mdash; this field may not be populated for this account. Daily login counts used above.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Utilization Analysis</div>
+    <div class="info-grid">
+      <div>
+        <div class="info-row"><span class="info-label">Events trend (30d)</span><span class="info-value kpi-green">Growing &#8593;</span></div>
+        <div class="info-row"><span class="info-label">May 9 L30D events</span><span class="info-value">20</span></div>
+        <div class="info-row"><span class="info-label">Jun 8 L30D events</span><span class="info-value">29 (+45%)</span></div>
+        <div class="info-row"><span class="info-label">Events/Employee ratio</span><span class="info-value">0.162/yr (vs 1,000 EE)</span></div>
+        <div class="info-row"><span class="info-label">Event type breakdown</span><span class="info-value">Not populated (null in SFDC)</span></div>
+      </div>
+      <div>
+        <div class="info-row"><span class="info-label">Peak daily logins</span><span class="info-value">78 (May 19)</span></div>
+        <div class="info-row"><span class="info-label">Avg logins (workdays)</span><span class="info-value">~35&ndash;45 typical</span></div>
+        <div class="info-row"><span class="info-label">Low login days</span><span class="info-value">6&ndash;12 (weekends/holidays)</span></div>
+        <div class="info-row"><span class="info-label">L30D login field</span><span class="info-value">0.0 &mdash; Verify: not populated</span></div>
+        <div class="info-row"><span class="info-label">Active Users field</span><span class="info-value">null &mdash; not populated</span></div>
+      </div>
+    </div>
+    <div style="margin-top:14px;padding:12px;background:#f0f9ff;border-radius:8px;font-size:13px;color:#0369a1;">
+      <strong>Interpretation:</strong> At 0.162 events/employee/year, Sheppard Mullin is onboarding roughly 1 employee per 6 employees on the platform per year. For a 1,000-person firm this implies ~130&ndash;160 new hire and lifecycle events annually &mdash; consistent with a firm of this size in growth mode. This is not alarming underutilization; it reflects the firm&rsquo;s actual headcount growth rate. The event trend is growing, which is the right direction. The key question is whether lifecycle events (offboarding, transfers, promotions) are being captured &mdash; the event type fields are null, so this cannot be confirmed without Kelly Brennan or Jeff Johnson input.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Open Questions &mdash; Verify with Kelly Brennan</div>
+    <table>
+      <tr><th>Question</th><th>Why It Matters</th></tr>
+      <tr><td>Are offboarding and transfer events being captured in the platform?</td><td>Event type breakdown fields are null. If only new hire events are running, significant platform capability is unused &mdash; expansion opportunity.</td></tr>
+      <tr><td>Is the 21-attorney Ropes &amp; Gray lateral group fully processed?</td><td>Large lateral intake (Sep 2025) &mdash; confirm all onboarding events completed and any residual cases resolved.</td></tr>
+      <tr><td>What drove the Jun 6 spike (34 logins) after two low days?</td><td>Could indicate a batch event (large lateral group, summer associates starting) &mdash; useful for anticipating future volume.</td></tr>
+      <tr><td>Unique_User_Logins_L30D = 0.0 across all records &mdash; is this a data pipeline issue?</td><td>If this field is intended to show 30-day unique users and it&rsquo;s always 0, the telemetry may be misconfigured for this account.</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Services Team &amp; Engagement Review Status</div>
+    <table>
+      <tr><th>Item</th><th>Status</th><th>Detail</th></tr>
+      <tr><td>Last Site Review</td><td><span class="status-badge s-waiting">185 Days Ago</span></td><td>Dec 5, 2025. Site_Review_Overdue__c = false (threshold not yet met but approaching). Action: Schedule now.</td></tr>
+      <tr><td>Last Onsite F2F</td><td><span class="status-badge s-open">Never Recorded</span></td><td>Last_Onsite_F2F_Date__c = null. No in-person meeting on record. Flag for executive relationship building.</td></tr>
+      <tr><td>Managed Services Hours</td><td><span class="status-badge s-won">Active</span></td><td>Hours report email from Jun 8 (Kelly Brennan). MS fully consumed &mdash; 100% services engagement.</td></tr>
+      <tr><td>Active At-Risk Alerts</td><td><span class="status-badge s-won">0</span></td><td>Count_of_Active_At_Risk_Alerts__c = 0. No active risk flags in platform.</td></tr>
+    </table>
+    <div class="source-note">Source: SFDC Account record &bull; Task activity log (Jun 2026)</div>
+  </div>
+</div>
+
+<!-- TAB 7: CASES -->
+<div class="tab-panel" id="tab-7">
+  <div class="section">
+    <div class="section-title">Open Cases <span class="cnt">14</span></div>
+    <table>
+      <tr><th>Case #</th><th>Subject</th><th>Status</th><th>Priority</th><th>Created</th><th>Owner</th><th>Days Open</th></tr>
+      <tr><td>00998055</td><td>Integration: CPD (Change Queue Time)</td><td><span class="status-badge s-waiting">Waiting Client</span></td><td><span class="p-low">Low</span></td><td>Jun 5</td><td>Kelly Brennan</td><td>3</td></tr>
+      <tr><td>00998011</td><td>FW: Guerrero Contero, Rocio &mdash; Background</td><td><span class="status-badge s-waiting">Waiting Client</span></td><td><span class="p-low">Low</span></td><td>Jun 4</td><td>Kelly Brennan</td><td>4</td></tr>
+      <tr><td>00997944</td><td>UKG Hire Integration: Change trigger &amp; timing</td><td><span class="status-badge s-waiting">Waiting Client</span></td><td><span class="p-low">Low</span></td><td>Jun 2</td><td>Kelly Brennan</td><td>6</td></tr>
+      <tr><td>00997943</td><td>Business Intake Form: Add Supervisor Billing ID</td><td><span class="status-badge s-waiting">Waiting Client</span></td><td><span class="p-low">Low</span></td><td>Jun 2</td><td>Kelly Brennan</td><td>6</td></tr>
+      <tr><td>00997922</td><td>New Start Date Form</td><td><span class="status-badge s-waiting">Waiting Client</span></td><td><span class="p-low">Low</span></td><td>Jun 2</td><td>Kelly Brennan</td><td>6</td></tr>
+      <tr><td>00997879</td><td>(PIR-172) Looker &mdash; Event Category Fields Multiple Rows</td><td><span class="status-badge s-pending">Pending Internal</span></td><td><span class="p-low">Low</span></td><td>Jun 1</td><td>Kelly Brennan</td><td>7</td></tr>
+      <tr><td>00997871</td><td>NetDocs Integration &mdash; Doc Type</td><td><span class="status-badge s-pending">Pending Internal</span></td><td><span class="p-low">Low</span></td><td>Jun 1</td><td>Kelly Brennan</td><td>7</td></tr>
+      <tr><td>00997851</td><td>EPP Changes &ldquo;Enter Offer Letter Details&rdquo;</td><td><span class="status-badge s-pending">Pending Internal</span></td><td><span class="p-low">Low</span></td><td>May 31</td><td>Kelly Brennan</td><td>8</td></tr>
+      <tr><td>00997804</td><td>SupervisorId not being passed in HIRE payload</td><td><span class="status-badge s-waiting">Waiting Client</span></td><td><span class="p-low">Low</span></td><td>May 28</td><td>Jennifer Madrigal</td><td>11</td></tr>
+      <tr><td>00997599</td><td>FW: Rival Task &mdash; New Hire Photo Review</td><td><span class="status-badge s-pending">Pending Internal</span></td><td><span class="p-low">Low</span></td><td>May 21</td><td>Kelly Brennan</td><td>18</td></tr>
+      <tr><td>00997470</td><td>Business Services missing in &ldquo;Event&rdquo; filter &mdash; Dashboard</td><td><span class="status-badge s-pending">Pending Internal</span></td><td><span class="p-low">Low</span></td><td>May 15</td><td>Kelly Brennan</td><td>24</td></tr>
+      <tr><td>00997431</td><td>Error: Business Services Intake Form</td><td><span class="status-badge s-waiting">Waiting Client</span></td><td><span class="p-low">Low</span></td><td>May 14</td><td>Kelly Brennan</td><td>25</td></tr>
+      <tr><td>00997262</td><td>Event Cancelled Notification</td><td><span class="status-badge s-waiting">Waiting Client</span></td><td><span class="p-low">Low</span></td><td>May 13</td><td>Kelly Brennan</td><td>26</td></tr>
+      <tr><td>00996257</td><td>RE: New Emergency Contact Checkbox for California</td><td><span class="status-badge s-onhold">On Hold</span></td><td><span class="p-low">Low</span></td><td>Apr 8</td><td>Kelly Brennan</td><td>61</td></tr>
+    </table>
+    <div style="margin-top:12px;padding:10px;background:#fef3c7;border-radius:8px;font-size:12px;color:#92400e;">
+      Also in SOW Pricing: <strong>Case 00995783</strong> &mdash; Scope ATS Integration FloRecruit (opened Mar 23, 77 days old). Owner: Jennifer Madrigal. Not counted above.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Case Volume Trend &mdash; L12 Months</div>
+    <table>
+      <tr><th>Period</th><th>Approx Cases</th><th>Key Themes</th></tr>
+      <tr><td>Jun 2026 (to date)</td><td>8</td><td>Integration (CPD, UKG), Looker PIR, EPP changes, background checks</td></tr>
+      <tr><td>May 2026</td><td>~25</td><td>High volume: UKG/SmartHire integration, Rival errors, EPP updates, I-9, permissions, dashboard</td></tr>
+      <tr><td>Apr 2026</td><td>~20</td><td>SmartHire integration failure (Urgent), portal branding, permissions, I-9 compliance</td></tr>
+      <tr><td>Mar 2026</td><td>~10</td><td>Welcome message, ATS scoping, CPD integration</td></tr>
+      <tr><td>Jan&ndash;Feb 2026</td><td>~15</td><td>SSO migration, CPD updates, contractor portal, NetDocs</td></tr>
+      <tr><td>Oct&ndash;Dec 2025</td><td>~13</td><td>EPP profile fields, error fixes, contractor portal changes, CPD field additions</td></tr>
+      <tr><td>Sep&ndash;Oct 2025</td><td>Verify</td><td>CPD error (Thane Moustakas, Sep 30)</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Case Resolution Analysis</div>
+    <div class="info-grid">
+      <div>
+        <div class="info-row"><span class="info-label">Total cases L12Mo</span><span class="info-value">91</span></div>
+        <div class="info-row"><span class="info-label">Open cases</span><span class="info-value kpi-amber">14</span></div>
+        <div class="info-row"><span class="info-label">Pending Internal Partner</span><span class="info-value">5</span></div>
+        <div class="info-row"><span class="info-label">Waiting Client Feedback</span><span class="info-value">7</span></div>
+        <div class="info-row"><span class="info-label">On Hold</span><span class="info-value">1 (61 days old)</span></div>
+        <div class="info-row"><span class="info-label">SOW Pricing</span><span class="info-value">1 (FloRecruit)</span></div>
+      </div>
+      <div>
+        <div class="info-row"><span class="info-label">Fastest close</span><span class="info-value kpi-green">Same day (several)</span></div>
+        <div class="info-row"><span class="info-label">Typical close</span><span class="info-value kpi-green">1&ndash;3 business days</span></div>
+        <div class="info-row"><span class="info-label">Longest open</span><span class="info-value kpi-amber">61 days (CA compliance)</span></div>
+        <div class="info-row"><span class="info-label">Priority distribution</span><span class="info-value">Mostly Low, some Moderate</span></div>
+        <div class="info-row"><span class="info-label">Primary owner</span><span class="info-value">Kelly Brennan (80%+)</span></div>
+        <div class="info-row"><span class="info-label">Integration owner</span><span class="info-value">Jennifer Madrigal</span></div>
+      </div>
+    </div>
+    <div class="source-note">Source: SFDC Cases &bull; AccountId: 0016000000ItvaFAAR &bull; Date range: Jun 8, 2025 &ndash; Jun 8, 2026</div>
+  </div>
+</div>
+
+<!-- TAB 8: RISK -->
+<div class="tab-panel" id="tab-8">
+  <div class="section">
+    <div class="section-title">Risk Assessment &mdash; Jun 8, 2026</div>
+
+    <div class="risk-card amber">
+      <div class="risk-header"><span class="risk-icon">&#127937;</span><span class="risk-title">Engagement Score at 50% &mdash; Moderate Risk</span></div>
+      <div class="risk-body">Customer_Engagement_Score__c = 50 (0.5 numeric). This is the midpoint, indicating moderate engagement rather than a deeply embedded, strategic relationship. Despite a 100% Services Engagement Score (MS fully utilized), the platform engagement signal is amber. Contributing factors: NPS non-response (0.0 score from unreturned survey), no recorded onsite F2F ever, last site review 185 days ago. The account is operationally healthy but strategically underserved.</div>
+      <div class="risk-change">What would move this to green: Schedule and complete a site review. Get NPS response (target Bess Sully directly). Document a strategic conversation about the firm&rsquo;s 3-year growth plan and Rival&rsquo;s role in it.</div>
+    </div>
+
+    <div class="risk-card amber">
+      <div class="risk-header"><span class="risk-icon">&#127937;</span><span class="risk-title">Two Closed-Lost Expansions in 90 Days &mdash; Revenue Risk</span></div>
+      <div class="risk-body">Analytics Licenses ($25K, Mar 2026) and Learn ($0 documented, Apr 2026) both closed lost without documented reasons. Two failed cross-sells in quick succession indicates either: (1) budget pressure from the firm, (2) product gaps (Looker issue PIR-172 may have killed the Analytics sale), or (3) the buying conversation was never properly qualified. With Cross-Sell Score = 100, the platform considers this a high-probability expansion account &mdash; the lost deals represent recovered opportunity.</div>
+      <div class="risk-change">What would move this to green: Diagnose each lost deal. If budget timing: re-introduce at renewal. If product fit: escalate PIR-172 resolution. If never qualified: build a proper business case with Thomas Adrian.</div>
+    </div>
+
+    <div class="risk-card amber">
+      <div class="risk-header"><span class="risk-icon">&#127937;</span><span class="risk-title">NPS Score = 0.0 &mdash; Data Gap (Not Confirmed Detractor)</span></div>
+      <div class="risk-body">Average_NPS_Score_SFDC__c = 0.0. Last NPS sent Apr 23, 2026. NPS of 0 most likely reflects a non-response (survey ignored or not received) rather than a true promoter score of 0. However, a non-response itself is a signal: engaged accounts tend to respond. Next NPS send is Oct 20, 2026. Unverified: whether the survey was actually opened/seen by the client.</div>
+      <div class="risk-change">What would move this to green: Confirm with Kelly Brennan whether the Apr 23 NPS survey was responded to. If no: direct executive touchpoint with Bess Sully to solicit informal feedback before Oct send.</div>
+    </div>
+
+    <div class="risk-card green">
+      <div class="risk-header"><span class="risk-icon">&#9989;</span><span class="risk-title">Workday Risk Assessment &mdash; No Evidence of Threat</span></div>
+      <div class="risk-body">No Workday mentions found in any SFDC case, opportunity, or task data reviewed. UKG is confirmed as the HRIS; CPD handles another integration layer; NetDocs for documents. There is no evidence of a Workday deployment (new or existing) at Sheppard Mullin. The firm is a private partnership &mdash; no parent entity making top-down vendor consolidation decisions. Coexistence risk is low.</div>
+      <div class="risk-change">What would change this: A case or call transcript mentioning Workday HCM, Workday Onboarding, or a new HRIS evaluation. Monitor quarterly.</div>
+    </div>
+
+    <div class="risk-card green">
+      <div class="risk-header"><span class="risk-icon">&#9989;</span><span class="risk-title">Usage Trend &mdash; Growing</span></div>
+      <div class="risk-body">Events L12Mo grew from 133 (May 9) to 162 (Jun 8) &mdash; a 22% increase over 30 days. Events L30D grew from 20 to 29 (+45%). This is consistent with the firm&rsquo;s active hiring surge (ZoomInfo: legal roles at 12-month high). The onboarding platform is processing real business volume. Events/employee ratio is 0.162 (low-moderate) but appropriate for the firm&rsquo;s growth rate. No declining usage signals.</div>
+      <div class="risk-change">This risk is green. To maintain: ensure platform scales with the firm&rsquo;s continued 13%+ revenue growth trajectory.</div>
+    </div>
+
+    <div class="risk-card green">
+      <div class="risk-header"><span class="risk-icon">&#9989;</span><span class="risk-title">Renewal Timeline &mdash; On Track</span></div>
+      <div class="risk-body">Renewal opp is at Stage 5 (Renewal Solutioning), 485 days from Oct 1, 2027 renewal. No competitive threat documented. Contract runs to Jan 2032. CSM_Renewal_Strategy__c field is null &mdash; no prior strategy note. Opp owned by Andrew Pollard. No active at-risk alerts (Count_of_Active_At_Risk_Alerts__c = 0).</div>
+      <div class="risk-change">To keep green: document renewal strategy in SFDC field. Add next step to opp. Target quote delivery Q1 2027. Schedule site review now to set the stage.</div>
+    </div>
+
+    <div class="risk-card amber">
+      <div class="risk-header"><span class="risk-icon">&#127937;</span><span class="risk-title">Site Review Cadence Gap &mdash; 185 Days Since Last Review</span></div>
+      <div class="risk-body">Last Site Review: Dec 5, 2025 (185 days ago). Site_Review_Overdue__c = false (not yet past threshold), but approaching. No onsite F2F ever recorded. The account has been operationally managed but not strategically reviewed. Given the firm&rsquo;s growth trajectory, two failed cross-sells, and NPS non-response, a substantive business review is overdue.</div>
+      <div class="risk-change">What would move this to green: Site review completed with Bess Sully (CHRO) and Thomas Adrian. Agenda should include: usage review, roadmap preview (Analytics PIR-172 fix, FloRecruit integration), expansion conversation, renewal alignment.</div>
+    </div>
+
+    <div class="risk-card green">
+      <div class="risk-header"><span class="risk-icon">&#9989;</span><span class="risk-title">Commercial Health &mdash; Stable</span></div>
+      <div class="risk-body">$97K ARR stable. 1 active contract (Activated). No expired products. No documented competitive threats. Firm revenue growing 13%+ YoY &mdash; no evidence of budget pressure or cost-cutting. SDA Client designation maintained. Tenure: 656 days since earliest product. Switching cost is high (7 integrations + MS dependency).</div>
+      <div class="risk-change">This risk is green. Primary risk to ARR is at expansion level (Learn, Analytics) not base ARR. Protect base; monetize whitespace.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Risk Summary</div>
+    <table>
+      <tr><th>Risk Factor</th><th>Score</th><th>Priority</th></tr>
+      <tr><td>Engagement Score (50%)</td><td>&#127937; Amber</td><td>Medium &mdash; schedule site review</td></tr>
+      <tr><td>Two Closed-Lost Expansions</td><td>&#127937; Amber</td><td>Medium &mdash; diagnose and re-engage</td></tr>
+      <tr><td>NPS Non-Response</td><td>&#127937; Amber</td><td>Medium &mdash; confirm and solicit feedback</td></tr>
+      <tr><td>Site Review Gap (185 days)</td><td>&#127937; Amber</td><td>Medium &mdash; book now</td></tr>
+      <tr><td>Workday Risk</td><td>&#9989; Green</td><td>No action required; monitor quarterly</td></tr>
+      <tr><td>Usage Trend</td><td>&#9989; Green</td><td>Growing; no action required</td></tr>
+      <tr><td>Renewal Timeline</td><td>&#9989; Green</td><td>On track; document strategy</td></tr>
+      <tr><td>Commercial Health</td><td>&#9989; Green</td><td>Stable; protect base ARR</td></tr>
+    </table>
+    <div class="source-note">CSM_Renewal_Strategy__c: null (no prior strategy note on record) &bull; Source: All SFDC fields &bull; Jun 8, 2026</div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function switchTab(n) {
+  var panels = document.querySelectorAll('.tab-panel');
+  var btns = document.querySelectorAll('.tab-btn');
+  for (var i = 0; i < panels.length; i++) {
+    panels[i].classList.remove('active');
+  }
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].classList.remove('active');
+  }
+  document.getElementById('tab-' + n).classList.add('active');
+  for (var i = 0; i < btns.length; i++) {
+    if (btns[i].getAttribute('onclick') === 'switchTab(' + n + ')') {
+      btns[i].classList.add('active');
+      break;
+    }
+  }
+}
+
+// Build login chart
+(function() {
+  var logins = [36,36,8,8,31,31,36,61,15,12,6,36,28,43,66,78,21,16,49,35,48,74,10,8,36,25,25,33,8,29];
+  var chart = document.getElementById('login-chart');
+  if (!chart) return;
+  var max = Math.max.apply(null, logins);
+  for (var i = 0; i < logins.length; i++) {
+    var bar = document.createElement('div');
+    bar.className = 'login-bar';
+    var pct = (logins[i] / max) * 100;
+    bar.style.height = pct + '%';
+    bar.title = logins[i] + ' logins';
+    chart.appendChild(bar);
+  }
+})();
+</script>
+</body>
+</html>

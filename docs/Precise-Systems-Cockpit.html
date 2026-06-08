@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light only">
+<title>Precise Systems, Inc. — CSM Account Cockpit</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;background:#f0f2f5;color:#1a1f2e;overflow-x:hidden;font-size:14px}
+.page-header{background:linear-gradient(135deg,#1a2744 0%,#243a6b 100%);color:#fff;padding:18px 20px 14px;border-bottom:3px solid #e8b84b}
+.page-header h1{font-size:20px;font-weight:700;letter-spacing:-0.3px;margin-bottom:4px}
+.page-header .sub{font-size:12px;color:#a8c0e8;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.page-header .sub span{display:flex;align-items:center;gap:4px}
+.badge-risk{background:#dc3545;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700}
+.badge-tier{background:#e8b84b;color:#1a1f2e;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700}
+.badge-sda{background:#17a2b8;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700}
+.refresh-note{font-size:10px;color:#6c8cbf;margin-left:auto}
+
+/* KPI Strip */
+.kpi-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;padding:12px 16px;background:#fff;border-bottom:1px solid #e0e4ec}
+.kpi-card{background:#f8f9fb;border-radius:8px;padding:10px 12px;border:1px solid #e4e8f0;position:relative}
+.kpi-label{font-size:10px;color:#6b7594;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;display:flex;align-items:center;gap:4px}
+.kpi-value{font-size:22px;font-weight:800;margin-top:4px;line-height:1.1}
+.kpi-sub{font-size:10px;color:#8b91a5;margin-top:2px}
+.kpi-red{color:#dc3545}
+.kpi-amber{color:#e8851a}
+.kpi-green{color:#28a745}
+.kpi-blue{color:#2563eb}
+.kpi-card .trend{font-size:10px;font-weight:600;margin-top:3px}
+
+/* Tooltip */
+.tip{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:#dde2ee;color:#6b7594;font-size:9px;font-weight:700;cursor:help;position:relative;flex-shrink:0}
+.tip .tipbox{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);width:220px;padding:8px 10px;background:#1a1f2e;color:#e8ecf4;font-size:11px;font-weight:400;line-height:1.5;border-radius:7px;box-shadow:0 4px 16px rgba(0,0,0,0.25);z-index:9999;white-space:normal;text-align:left}
+.tip:hover .tipbox{display:block}
+
+/* Tab Bar */
+.tab-bar{display:flex;gap:2px;background:#e4e8f0;padding:6px 16px 0;position:sticky;top:0;z-index:100;overflow-x:auto;border-bottom:1px solid #d0d5e0}
+.tab-btn{padding:8px 16px;border:none;background:transparent;color:#5a6178;font-size:12px;font-weight:600;border-radius:6px 6px 0 0;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:all 0.15s}
+.tab-btn.active{background:#fff;color:#1a2744;border-bottom:2px solid #2563eb;box-shadow:0 -2px 6px rgba(0,0,0,.06)}
+.tab-btn:hover:not(.active){background:#f0f3fa;color:#1a2744}
+
+/* Tab Panels */
+.tab-panel{display:none;padding:16px;overflow:visible}
+.tab-panel.active{display:block}
+
+/* Sections */
+.section{background:#fff;border-radius:10px;border:1px solid #e4e8f0;margin-bottom:14px;overflow:visible}
+.section-head{padding:12px 16px 10px;border-bottom:1px solid #f0f2f8;display:flex;align-items:center;gap:8px}
+.section-head h2{font-size:13px;font-weight:700;color:#1a1f2e;letter-spacing:-0.2px}
+.section-body{padding:14px 16px;overflow:visible}
+
+/* Action cards */
+.action-card{border-radius:8px;padding:12px 14px;margin-bottom:10px;border-left:3px solid;display:flex;gap:12px;align-items:flex-start}
+.action-card.red{background:#fff5f5;border-color:#dc3545}
+.action-card.amber{background:#fffaf0;border-color:#e8851a}
+.action-card.blue{background:#f0f5ff;border-color:#2563eb}
+.action-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.action-title{font-size:13px;font-weight:700;margin-bottom:3px}
+.action-why{font-size:12px;color:#4a5270;margin-bottom:4px;line-height:1.5}
+.action-next{font-size:11px;font-weight:600;color:#2563eb;background:#e8f0fe;padding:3px 8px;border-radius:4px;display:inline-block}
+
+/* Engagement Health Cards */
+.health-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;overflow:visible}
+.health-card{background:#f8f9fb;border-radius:8px;padding:12px;border:1px solid #e4e8f0;position:relative;overflow:visible}
+.health-card .label{font-size:10px;color:#6b7594;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;display:flex;align-items:center;gap:4px}
+.health-card .score{font-size:28px;font-weight:800;margin:6px 0 2px;line-height:1}
+.health-card .status-bar{height:4px;border-radius:2px;background:#e4e8f0;margin-top:6px}
+.health-card .status-fill{height:100%;border-radius:2px}
+.health-card .verdict{font-size:11px;font-weight:600;margin-top:4px}
+
+/* Tables */
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:#f4f6fb;color:#5a6178;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:0.4px;padding:8px 10px;border-bottom:1px solid #e4e8f0;text-align:left}
+td{padding:8px 10px;border-bottom:1px solid #f0f3fa;vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f8f9fb}
+
+/* Badges */
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap}
+.badge-green{background:#d4edda;color:#155724}
+.badge-red{background:#f8d7da;color:#721c24}
+.badge-amber{background:#fff3cd;color:#856404}
+.badge-blue{background:#cce5ff;color:#004085}
+.badge-purple{background:#e8d5f5;color:#4b1d8a}
+.badge-grey{background:#e9ecef;color:#495057}
+.badge-teal{background:#d1ecf1;color:#0c5460}
+
+/* Stakeholder cards */
+.people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.person-card{background:#f8f9fb;border-radius:8px;padding:12px;border:1px solid #e4e8f0}
+.person-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;margin-bottom:8px}
+.person-name{font-size:13px;font-weight:700;color:#1a1f2e}
+.person-title{font-size:11px;color:#5a6178;margin-bottom:6px}
+.person-intel{font-size:11px;color:#4a5270;line-height:1.5;border-top:1px solid #e4e8f0;padding-top:6px;margin-top:4px}
+.person-contact{font-size:11px;color:#6b7594;margin-top:4px}
+
+/* Risk cards */
+.risk-card{border-radius:8px;padding:12px 14px;margin-bottom:10px;border:1px solid;overflow:visible}
+.risk-card.red{background:#fff5f5;border-color:#f5c6cb}
+.risk-card.amber{background:#fffaf0;border-color:#fce5b2}
+.risk-card.green{background:#f0fff4;border-color:#c3e6cb}
+.risk-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.risk-title{font-size:13px;font-weight:700;flex:1}
+.risk-body{font-size:12px;color:#4a5270;line-height:1.6;margin-bottom:6px}
+.risk-change{font-size:11px;font-weight:600;color:#28a745;background:#f0fff4;padding:3px 8px;border-radius:4px;display:inline-block;border:1px solid #c3e6cb}
+
+/* Roadmap */
+.roadmap-card{border-radius:8px;padding:12px 14px;margin-bottom:10px;border:1px solid #e4e8f0;background:#fff}
+.roadmap-card.tier1{border-left:3px solid #2563eb}
+.roadmap-card.expansion{border-left:3px solid #7c3aed;background:#faf5ff}
+.roadmap-badge-ship{background:#c3e6cb;color:#155724;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700}
+.roadmap-badge-coming{background:#cce5ff;color:#004085;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700}
+.roadmap-badge-exp{background:#e8d5f5;color:#4b1d8a;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700}
+.roadmap-title{font-size:13px;font-weight:700;margin:4px 0 4px}
+.roadmap-desc{font-size:12px;color:#4a5270;line-height:1.5}
+.roadmap-pain{font-size:11px;font-weight:600;color:#2563eb;background:#e8f0fe;padding:3px 8px;border-radius:4px;display:inline-block;margin-top:6px}
+.tier2-list{list-style:none;padding:0}
+.tier2-list li{padding:6px 0;border-bottom:1px solid #f0f3fa;font-size:12px;display:flex;gap:8px;align-items:center}
+.tier2-list li:last-child{border-bottom:none}
+
+/* Usage bar chart */
+.usage-bar-wrap{margin-bottom:10px}
+.usage-bar-label{display:flex;justify-content:space-between;font-size:11px;color:#6b7594;margin-bottom:3px}
+.usage-bar{height:8px;background:#e4e8f0;border-radius:4px;overflow:hidden}
+.usage-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#2563eb,#60a5fa)}
+
+/* Contract opp card */
+.opp-card{background:#f8f9fb;border-radius:8px;padding:12px;border:1px solid #e4e8f0;margin-bottom:8px}
+.opp-name{font-size:13px;font-weight:700;margin-bottom:4px}
+.opp-meta{display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:#5a6178;margin-bottom:6px}
+.opp-amount{font-size:16px;font-weight:800;color:#1a1f2e}
+
+/* Case status badges */
+.case-open{background:#f8d7da;color:#721c24;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+.case-closed{background:#d4edda;color:#155724;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+
+/* Market table */
+.market-row td:first-child{font-weight:600;color:#1a1f2e;width:100px}
+.market-row td:nth-child(2){color:#4a5270}
+.market-row td:nth-child(3){color:#1a2744;font-size:11px}
+
+/* Info box */
+.info-box{background:#f0f5ff;border:1px solid #bdd4f8;border-radius:8px;padding:10px 12px;font-size:12px;color:#1a2744;line-height:1.6;margin-bottom:12px}
+.warn-box{background:#fffaf0;border:1px solid #fce5b2;border-radius:8px;padding:10px 12px;font-size:12px;color:#4a3100;line-height:1.6;margin-bottom:12px}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+.mini-stat{background:#f8f9fb;border-radius:8px;padding:10px 12px;border:1px solid #e4e8f0;text-align:center}
+.mini-stat .val{font-size:20px;font-weight:800;color:#1a1f2e}
+.mini-stat .lbl{font-size:10px;color:#6b7594;font-weight:600;text-transform:uppercase;margin-top:2px}
+
+@media(max-width:700px){.kpi-strip{grid-template-columns:repeat(3,1fr)}.health-grid{grid-template-columns:repeat(2,1fr)}.people-grid{grid-template-columns:1fr 1fr}.two-col{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="page-header">
+  <h1>Precise Systems, Inc. &mdash; CSM Account Cockpit</h1>
+  <div class="sub">
+    <span>&#128197; Renewal: Feb 29, 2028 &nbsp;(636 days)</span>
+    <span>&#128176; ARR: $155,000</span>
+    <span>&#127981; Lexington Park, MD &bull; Defense &amp; Engineering</span>
+    <span class="badge-tier">Tier 2</span>
+    <span class="badge-risk">1 At-Risk Alert</span>
+    <span class="badge-sda">SDA Client</span>
+    <span class="refresh-note">Monday Full Refresh &bull; June 8, 2026</span>
+  </div>
+</div>
+
+<!-- KPI STRIP -->
+<div class="kpi-strip">
+  <div class="kpi-card">
+    <div class="kpi-label">ARR <span class="tip">&#63;<span class="tipbox">Subscription_ARR_ALL_PRODUCTS__c &mdash; total active subscription revenue. All $155K flows under &ldquo;Other&rdquo; line item in SFDC.</span></span></div>
+    <div class="kpi-value kpi-blue">$155K</div>
+    <div class="kpi-sub">Enterprise / Seg B</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">NPS <span class="tip">&#63;<span class="tipbox">Average_NPS_Score_SFDC__c &mdash; 0-6 = Detractor (red), 7-8 = Passive, 9-10 = Promoter. Last sent Apr 29, 2026. Next: Oct 26, 2026.</span></span></div>
+    <div class="kpi-value kpi-red">6.0</div>
+    <div class="kpi-sub trend" style="color:#dc3545">&#9660; DETRACTOR</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Engagement <span class="tip">&#63;<span class="tipbox">Customer_Engagement_Score__c &mdash; composite engagement index (0-100). 60 = moderate. Services engagement separate: 25%.</span></span></div>
+    <div class="kpi-value kpi-amber">60%</div>
+    <div class="kpi-sub">Services: 25%</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Events 12Mo <span class="tip">&#63;<span class="tipbox">Total_Events_Launched_Last_12Mos_Onboard__c &mdash; Onboarding workflow events launched. 1.31 events/EE = healthy utilization vs 800 EE base.</span></span></div>
+    <div class="kpi-value kpi-green">1,047</div>
+    <div class="kpi-sub">L30D: 95 &darr;</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Onboarding Score <span class="tip">&#63;<span class="tipbox">Global_Onboarding_Score__c &mdash; platform health score for Onboarding product. 73 = healthy configuration. Scale 0-100.</span></span></div>
+    <div class="kpi-value kpi-green">73</div>
+    <div class="kpi-sub">Site Review Overdue</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Renewal <span class="tip">&#63;<span class="tipbox">Next_Renewal_Date__c = Feb 29, 2028. 2 active contracts (00019073, 00019074). Opp at Stage 5: Renewal Solutioning. Strategy: verbal commitment to 3-year. By when?</span></span></div>
+    <div class="kpi-value kpi-blue">636d</div>
+    <div class="kpi-sub">Feb 29, 2028</div>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab(0)">Actions</button>
+  <button class="tab-btn" onclick="switchTab(1)">Account Intel</button>
+  <button class="tab-btn" onclick="switchTab(2)">Use Case</button>
+  <button class="tab-btn" onclick="switchTab(3)">People</button>
+  <button class="tab-btn" onclick="switchTab(4)">Contracts</button>
+  <button class="tab-btn" onclick="switchTab(5)">Product</button>
+  <button class="tab-btn" onclick="switchTab(6)">Usage</button>
+  <button class="tab-btn" onclick="switchTab(7)">Cases</button>
+  <button class="tab-btn" onclick="switchTab(8)">Risk</button>
+</div>
+
+<!-- TAB 0: ACTIONS -->
+<div class="tab-panel active" id="tab-0">
+  <div class="section">
+    <div class="section-head"><h2>Priority Actions &mdash; Week of June 8, 2026</h2></div>
+    <div class="section-body">
+
+      <div class="action-card red">
+        <div class="action-icon">&#128680;</div>
+        <div>
+          <div class="action-title">Resolve Active At-Risk Alert &mdash; NPS 6 Detractor Recovery</div>
+          <div class="action-why">NPS score is 6.0 (detractor threshold), 1 active at-risk alert in SFDC. Last NPS sent Apr 29, 2026. This is the single highest-priority action to address before next NPS cycle (Oct 26, 2026). The NPS gap likely correlates with the expired Recruiting &amp; Onboarding product lines showing in SFDC (these were part of the prior renewal structure).</div>
+          <span class="action-next">&#8594; Schedule NPS recovery call with Christina Payne (CPO). Identify root cause. Log outcome in SFDC.</span>
+        </div>
+      </div>
+
+      <div class="action-card red">
+        <div class="action-icon">&#128203;</div>
+        <div>
+          <div class="action-title">Execute Overdue Site Review &mdash; 319 Days Since Last (Jul 24, 2025)</div>
+          <div class="action-why">Site Review is 319 days overdue &mdash; SFDC Site_Review_Overdue__c = TRUE. No site review in nearly 11 months means no formal platform health check has been conducted. This is a CSM deliverable gap that directly contributes to the NPS detractor status and low services engagement (25%). Activity log shows weekly Workflow Monthly Meeting cadence with Mike Klosicki &mdash; site review needs to be a formal agenda item, not just operational check-ins.</div>
+          <span class="action-next">&#8594; Book dedicated Site Review session (45-60 min) with Julie Lipoff + Christina Payne. Target: before July 24, 2026.</span>
+        </div>
+      </div>
+
+      <div class="action-card red">
+        <div class="action-icon">&#128101;</div>
+        <div>
+          <div class="action-title">First-Ever Onsite F2F Required &mdash; F2F_Overdue = TRUE, No History</div>
+          <div class="action-why">Days_since_last_Onsite_F2F__c is NULL &mdash; there is no recorded F2F visit in SFDC history. Given 13.6 years of tenure and $155K ARR, this is a significant relationship gap. Precise is growing rapidly (multiple contract wins, new VP hires, Innovation Lab opening). The relationship is serviced operationally via weekly calls but has never had an executive in-person touchpoint. Christina Payne was just named CHRO of the Year at WashingtonExec Awards (June 3, 2026) &mdash; ideal moment to celebrate and deepen the executive relationship.</div>
+          <span class="action-next">&#8594; Plan Lexington Park / Crane, IN onsite. Bring AE Kara Sheridan. Target Q3 2026. Congratulate Christina on CHRO of Year award.</span>
+        </div>
+      </div>
+
+      <div class="action-card amber">
+        <div class="action-icon">&#128200;</div>
+        <div>
+          <div class="action-title">Renewal Solutioning &mdash; Verbal Commitment, No Close Date Urgency Yet</div>
+          <div class="action-why">Two renewal opps at Stage 5 (Renewal Solutioning) owned by Andrew Pollard: $155K core + $7K add-on. Renewal Strategy per SFDC: <em>&ldquo;Verbal Commitment to 3-year renewal. By When?&rdquo;</em> &mdash; this is a direct CSM note flagging that the commitment hasn&rsquo;t been formalized. 636 days to renewal provides runway but the at-risk alert and NPS score mean this should not coast. ZoomInfo confirms aggressive hiring (IT and HR roles surge), meaning platform utilization pressure will increase.</div>
+          <span class="action-next">&#8594; Get verbal commitment in writing. Push 3-year paper within 90 days. Frame around contract continuity + platform roadmap value.</span>
+        </div>
+      </div>
+
+      <div class="action-card blue">
+        <div class="action-icon">&#128269;</div>
+        <div>
+          <div class="action-title">Services Engagement at 25% &mdash; Activate Managed Services Value</div>
+          <div class="action-why">Services_Engagement_Score_Percent__c = 25%. Precise has Managed Services in their active product list, meaning they&rsquo;re paying for services they&rsquo;re not fully utilizing. Activity log shows ADP integration automation (daily ADP &rarr; Workflow data flow via Kelly Brennan) &mdash; this is good managed services signal. The gap: no formal quarterly services review. ZoomInfo HR hiring surge (ADP WorkForce Now mentioned) suggests the HR team is expanding, which is an opportunity to demonstrate managed services ROI.</div>
+          <span class="action-next">&#8594; Schedule quarterly Managed Services review. Showcase ADP integration cadence as value proof. Target Megan Sutphin / Ana Richey as champions.</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><h2>Engagement Health</h2></div>
+    <div class="section-body">
+      <div class="health-grid">
+        <div class="health-card">
+          <div class="label">NPS Score <span class="tip">&#63;<span class="tipbox">Average_NPS_Score_SFDC__c. Scale: 0-6 = Detractor (red), 7-8 = Passive, 9-10 = Promoter. Last survey Apr 29, 2026.</span></span></div>
+          <div class="score kpi-red">6.0</div>
+          <div class="status-bar"><div class="status-fill" style="width:60%;background:#dc3545"></div></div>
+          <div class="verdict" style="color:#dc3545">Detractor &mdash; Urgent</div>
+        </div>
+        <div class="health-card">
+          <div class="label">Engagement Score <span class="tip">&#63;<span class="tipbox">Customer_Engagement_Score__c (0-100). Composite of platform usage, meeting cadence, support responsiveness. 60 = moderate health.</span></span></div>
+          <div class="score kpi-amber">60</div>
+          <div class="status-bar"><div class="status-fill" style="width:60%;background:#e8851a"></div></div>
+          <div class="verdict" style="color:#e8851a">Moderate &mdash; Monitor</div>
+        </div>
+        <div class="health-card">
+          <div class="label">Services Engagement <span class="tip">&#63;<span class="tipbox">Services_Engagement_Score_Percent__c. % of contracted managed services being actively utilized. 25% = significant underutilization of paid services.</span></span></div>
+          <div class="score kpi-red">25%</div>
+          <div class="status-bar"><div class="status-fill" style="width:25%;background:#dc3545"></div></div>
+          <div class="verdict" style="color:#dc3545">Low &mdash; Action Required</div>
+        </div>
+        <div class="health-card">
+          <div class="label">Onboarding Score <span class="tip">&#63;<span class="tipbox">Global_Onboarding_Score__c. Platform configuration health. 73/100 = good foundation but room for optimization. Event breakdowns (new hire vs. transfers) not populated in LifeSuite telemetry.</span></span></div>
+          <div class="score kpi-green">73</div>
+          <div class="status-bar"><div class="status-fill" style="width:73%;background:#28a745"></div></div>
+          <div class="verdict" style="color:#28a745">Healthy Configuration</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 1: ACCOUNT INTEL -->
+<div class="tab-panel" id="tab-1">
+  <div class="two-col">
+    <div>
+      <div class="section">
+        <div class="section-head"><h2>Company Overview</h2></div>
+        <div class="section-body">
+          <div class="info-box">
+            Precise Systems, Inc. is a private defense engineering and professional services firm founded in 1990 and headquartered in Lexington Park, MD (near Naval Air Station Patuxent River). The company provides engineering, technical logistics, and acquisition management solutions primarily to the U.S. Navy and Department of Defense. 800 employees. Revenue ~$195M. No parent company &mdash; independent HQ.
+          </div>
+          <table>
+            <tr><td style="font-weight:600;width:130px">Founded</td><td>1990 (35 years)</td></tr>
+            <tr><td style="font-weight:600">Headquarters</td><td>Lexington Park, MD (NAS Pax River corridor)</td></tr>
+            <tr><td style="font-weight:600">Employees</td><td>800 (ZI: 500&ndash;1,000 range)</td></tr>
+            <tr><td style="font-weight:600">Revenue</td><td>~$195M ($100M&ndash;$250M range)</td></tr>
+            <tr><td style="font-weight:600">Entity Type</td><td>Private / Independent</td></tr>
+            <tr><td style="font-weight:600">Industry</td><td>Architecture, Engineering &amp; Design / Defense</td></tr>
+            <tr><td style="font-weight:600">Key Markets</td><td>NAVAIR, NSWC Crane, U.S. Navy EW, DoD</td></tr>
+            <tr><td style="font-weight:600">Locations</td><td>14 offices (ZoomInfo) &mdash; MD, IN, CA, AZ + others</td></tr>
+            <tr><td style="font-weight:600">Rival Tenure</td><td>13.6 years (Tenure_Earliest_product__c = 4,959 days)</td></tr>
+            <tr><td style="font-weight:600">LinkedIn</td><td>4,138 followers</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head"><h2>Key Awards &amp; Recognition (2025&ndash;2026)</h2></div>
+        <div class="section-body">
+          <table>
+            <tr><th>Award</th><th>Date</th></tr>
+            <tr><td>Christina Payne: CHRO of the Year &mdash; WashingtonExec Chief Officer Awards</td><td>Jun 2026</td></tr>
+            <tr><td>Named to Inc. 2026 Best Workplaces List</td><td>Jun 2026</td></tr>
+            <tr><td>#2 Military Friendly Spouse Employer &amp; #3 Military Friendly Employer 2026</td><td>Nov 2025</td></tr>
+            <tr><td>Scott Pfister: GovCon Executive of Year ($75M&ndash;$300M category)</td><td>Nov 2025</td></tr>
+            <tr><td>Top 100 HR Team Finalist &mdash; OnCon Icon Awards</td><td>Oct 2025</td></tr>
+            <tr><td>xTech AI Grand Challenge Finalist &mdash; $25K prize</td><td>Jul 2025</td></tr>
+            <tr><td>5 Star Employer &mdash; VETS Indexes 2026</td><td>May 2026</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section">
+        <div class="section-head"><h2>Market Dynamics</h2></div>
+        <div class="section-body">
+          <table>
+            <tr><th>When</th><th>What Happened</th><th>HR Implication</th></tr>
+            <tr class="market-row">
+              <td>Mar 2026</td>
+              <td>$102M NSWC Crane EW contract awarded</td>
+              <td>Surge hiring in Indiana; onboarding volume spike expected; Crane Division expansion = new hire workflow load</td>
+            </tr>
+            <tr class="market-row">
+              <td>Apr 2026</td>
+              <td>MOU with Seatrec + Airtronics for Navy PSAP</td>
+              <td>Partnership hiring; cross-company onboarding complexity; Airtronics affiliate = potential multi-entity workflow need</td>
+            </tr>
+            <tr class="market-row">
+              <td>Jan 2026</td>
+              <td>JV &ldquo;Secise&rdquo; awarded 5-year Navy Corrosion Control contract</td>
+              <td>JV employees may flow through Precise ATS/onboarding; integration complexity if Secise has separate HR</td>
+            </tr>
+            <tr class="market-row">
+              <td>Jun 2026</td>
+              <td>IT hiring surge: MATLAB, Java, EW simulation roles</td>
+              <td>Technical recruiting volume high; Military Hire XML feed case just resolved (May 2026) &mdash; candidate pipeline active</td>
+            </tr>
+            <tr class="market-row">
+              <td>Apr 2026</td>
+              <td>HR hiring surge: ADP, ADP WorkForce Now, SharePoint roles</td>
+              <td>HR team expanding; ADP integration is core to their tech stack; Indeed embed case resolved (Apr 2026)</td>
+            </tr>
+            <tr class="market-row">
+              <td>May 2026</td>
+              <td>New VP Strategic Capture (Mark Gerasch) hired</td>
+              <td>Growth posture; more contract wins expected; sustained or increasing hiring pace through 2026&ndash;2027</td>
+            </tr>
+            <tr class="market-row">
+              <td>Dec 2025</td>
+              <td>EVP Strategic Capture Mark Coleman departed to Xenith Solutions</td>
+              <td>Leadership transition; new CGO hired (Matthew Orsino Nov 2025); potential org restructuring = elevated onboarding events</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head"><h2>Competitive Position</h2></div>
+        <div class="section-body">
+          <div class="info-box">Precise Systems operates in the defense professional services space (NAVAIR, NSWC Crane, EW, logistics). Key competitors are mid-tier government contractors. No competitive threat signals identified in SFDC (Renewal_Risks_Competitive_Threats__c = null). Company is growing &mdash; OASIS+ contract vehicle win (Jan 2025, 4 domains) provides broad federal access. Independent, privately held = single buyer relationship.</div>
+          <table>
+            <tr><th>Attribute</th><th>Assessment</th></tr>
+            <tr><td>Parent company risk</td><td><span class="badge badge-green">None &mdash; Independent</span></td></tr>
+            <tr><td>Competitive threats</td><td><span class="badge badge-green">None flagged in SFDC</span></td></tr>
+            <tr><td>Revenue trajectory</td><td><span class="badge badge-green">Growing &mdash; multiple 2026 contract wins</span></td></tr>
+            <tr><td>HR sophistication</td><td><span class="badge badge-blue">High &mdash; CPO titled, award-winning HR team</span></td></tr>
+            <tr><td>Recruiting volume</td><td><span class="badge badge-blue">High &mdash; multi-state, cleared positions, Military Hire</span></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 2: USE CASE -->
+<div class="tab-panel" id="tab-2">
+  <div class="section">
+    <div class="section-head"><h2>Executive Summary</h2></div>
+    <div class="section-body">
+      <div class="info-box">
+        Precise Systems is a 13.6-year Rival customer running Onboarding (workflow events) and Recruiting as their primary operational platforms, with Managed Services handling integration automation (ADP &rarr; Rival data pipeline). The platform drives the onboarding of cleared defense professionals across 14 locations, including growing volume from new contract wins (NSWC Crane $102M, Navy EW). Core value is managing complex, multi-location new hire and potentially transfer/offboarding workflows for a distributed, security-cleared workforce. The ADP integration is a daily operational dependency managed by the services team (Kelly Brennan). Recruiting and Onboarding are listed as &ldquo;Expired Products&rdquo; in SFDC, suggesting their ARR ($155K under &ldquo;Other&rdquo;) may reflect a consolidated or repackaged contract rather than active product-line billing &mdash; verify at next review.
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="section">
+        <div class="section-head"><h2>Product Cards</h2></div>
+        <div class="section-body">
+          <div style="background:#f8f9fb;border-radius:8px;padding:12px;border:1px solid #e4e8f0;margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <span style="font-weight:700;font-size:13px">Onboarding (Workflow)</span>
+              <span class="badge badge-green">Active</span>
+            </div>
+            <div style="font-size:11px;color:#4a5270;line-height:1.6">
+              <strong>Use Case:</strong> New hire onboarding workflows for cleared defense professionals; multi-location (MD, IN, CA, AZ+); likely includes military hire, standard NDA/clearance processing, and orientation sequences.<br>
+              <strong>Pain It Solves:</strong> Managing consistent onboarding across 14+ distributed sites with security clearance requirements and complex conditional logic that commodity HR systems cannot handle.<br>
+              <strong>Value Delivered:</strong> 1,047 events launched last 12 months = 1.31 events/EE &mdash; strong utilization relative to 800-person org. Platform actively processing new hires. YTD 503 events through June 8 = on track for ~1,000+ events in 2026.<br>
+              <strong style="color:#dc3545">Risk to Value:</strong> Event type breakdown (new hire vs. transfer vs. offboard) not populated in telemetry &mdash; if most events are basic new hire only, lifecycle expansion is untapped and switching cost perception may be lower than actual.
+            </div>
+          </div>
+
+          <div style="background:#f8f9fb;border-radius:8px;padding:12px;border:1px solid #e4e8f0;margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <span style="font-weight:700;font-size:13px">Recruiting (Connect ATS)</span>
+              <span class="badge badge-amber">Listed as Expired in SFDC</span>
+            </div>
+            <div style="font-size:11px;color:#4a5270;line-height:1.6">
+              <strong>Use Case:</strong> Applicant tracking for cleared defense talent; military hire XML feed (custom integration with Military Hire job board, case resolved May 2026); Indeed embed (case resolved Apr 2026).<br>
+              <strong>Pain It Solves:</strong> Security-cleared candidate pipeline management; Military Friendly employer brand ($1 &amp; $2 rankings) requires strong military hire infrastructure.<br>
+              <strong>Value Delivered:</strong> Active job board integrations (Military Hire, Indeed) suggest daily recruiting activity. Resume count chart case (Mar 2026) confirms reporting usage.<br>
+              <strong style="color:#e8851a">Risk to Value:</strong> SFDC shows Recruiting as &ldquo;Expired_Products__c&rdquo; &mdash; verify whether this is a contract artifact or a true product status change. Clarify at Site Review.
+            </div>
+          </div>
+
+          <div style="background:#f8f9fb;border-radius:8px;padding:12px;border:1px solid #e4e8f0">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <span style="font-weight:700;font-size:13px">Managed Services</span>
+              <span class="badge badge-green">Active</span>
+            </div>
+            <div style="font-size:11px;color:#4a5270;line-height:1.6">
+              <strong>Use Case:</strong> ADP WorkForce Now &rarr; Rival integration (daily automated data feed: new hires from ADP pushed to Rival workflow). Kelly Brennan (Rival) manages the daily feed. Activity log shows daily &ldquo;ADP Category Inbound Results&rdquo; + &ldquo;RivalHR Export Available for Pickup&rdquo; emails.<br>
+              <strong>Pain It Solves:</strong> Removes manual HR data entry; ensures onboarding triggers automatically from HRIS hire event.<br>
+              <strong style="color:#dc3545">Risk to Value:</strong> Services_Engagement_Score = 25% despite managed integration running daily &mdash; likely means proactive strategic services (CAB usage review, platform optimization) are not being consumed. CAB usage review case (Dec 2025, closed Jun 2026) confirms engagement gap.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section">
+        <div class="section-head"><h2>Expansion Vectors</h2></div>
+        <div class="section-body">
+          <table>
+            <tr><th>Product</th><th>Observed Pain Signal</th><th>Entry Point</th></tr>
+            <tr>
+              <td><strong>Lifecycle Events</strong><br><span class="badge badge-purple">Not Active</span></td>
+              <td>Transfer/Promotion events in telemetry not populated; company growing via acquisitions and JVs = high transfer/promotion volume</td>
+              <td>Site Review &mdash; show transfer/promotion workflow templates; calculate events-per-EE opportunity</td>
+            </tr>
+            <tr>
+              <td><strong>Offboarding</strong><br><span class="badge badge-purple">Not Active</span></td>
+              <td>Offboarding events null in LifeSuite; at a defense firm, cleared employee offboarding (badge return, system access revoke) is a compliance requirement</td>
+              <td>Compliance angle &mdash; cleared personnel offboarding is a DoD requirement, not optional</td>
+            </tr>
+            <tr>
+              <td><strong>Performance (Heartbeat ex)</strong><br><span class="badge badge-grey">Expired</span></td>
+              <td>Ex-Heartbeat (Perform) in SilkRoad product history &mdash; was once active, discontinued. Company has grown 3x since. Leadership accountability at executive level now.</td>
+              <td>Re-engage via Christina Payne; reframe as manager effectiveness tool for 14-site distributed leadership</td>
+            </tr>
+            <tr>
+              <td><strong>Learning (WingSpan ex)</strong><br><span class="badge badge-grey">Closed Lost 2021</span></td>
+              <td>Learning opp ($109K) was closed lost in Jun 2021. Precise has military-focused training obligations; NAVAIR/Navy contracts often require documented skill development</td>
+              <td>Revisit with DoD compliance angle &mdash; xTech AI finalist signals tech upskilling need; new CGO may sponsor</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head"><h2>Summary Assessment</h2></div>
+        <div class="section-body">
+          <div class="three-col">
+            <div class="mini-stat">
+              <div class="val" style="color:#e8851a">Medium</div>
+              <div class="lbl">Switching Cost</div>
+            </div>
+            <div class="mini-stat">
+              <div class="val" style="color:#28a745">High</div>
+              <div class="lbl">Whitespace</div>
+            </div>
+            <div class="mini-stat">
+              <div class="val" style="color:#2563eb">On Track</div>
+              <div class="lbl">Renewal</div>
+            </div>
+          </div>
+          <div style="margin-top:10px;font-size:11px;color:#4a5270;line-height:1.6">
+            Switching cost is medium &mdash; ADP integration creates operational dependency, but if event type breakdown is only new hire (not transfer/offboard), the breadth of platform embedding is narrower than it could be. Whitespace is high: lifecycle events, offboarding, and potentially Performance/Learning represent 2&ndash;3x current ARR opportunity. Renewal is on track given 636-day runway and verbal commitment, but NPS detractor status and at-risk alert require resolution before close.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 3: PEOPLE -->
+<div class="tab-panel" id="tab-3">
+  <div class="section">
+    <div class="section-head"><h2>Key Stakeholders &mdash; Precise Systems</h2></div>
+    <div class="section-body">
+      <div class="people-grid">
+        <div class="person-card">
+          <div class="person-avatar" style="background:#1a2744">CP</div>
+          <div class="person-name">Christina Payne</div>
+          <div class="person-title">Chief People Officer</div>
+          <div style="margin-bottom:6px"><span class="badge badge-blue">Executive Sponsor</span> <span class="badge badge-green">Champion</span></div>
+          <div class="person-contact">cpayne@goprecise.com &bull; 301-737-8246 &bull; M: 443-624-9508</div>
+          <div class="person-intel">Promoted to CPO Jul 2023. Named CHRO of the Year at 2026 WashingtonExec Chief Officer Awards (Jun 3, 2026). WashingtonExec &ldquo;Executives to Watch&rdquo; 2024. Leading People strategy through rapid expansion &mdash; acquisitions, new contracts, 14+ locations. Primary executive relationship &mdash; engage immediately on CHRO award win. ZoomInfo accuracy: 98, validated May 2026.</div>
+        </div>
+
+        <div class="person-card">
+          <div class="person-avatar" style="background:#2563eb">JL</div>
+          <div class="person-name">Julie Lipoff</div>
+          <div class="person-title">Director of Recruiting</div>
+          <div style="margin-bottom:6px"><span class="badge badge-blue">Power User</span></div>
+          <div class="person-contact">jlipoff@goprecise.com &bull; 301-863-3655</div>
+          <div class="person-intel">Director of Recruiting &mdash; owns the ATS/Recruiting platform daily. Military Friendly employer rankings require robust military hire pipeline. Active cases: Military Hire XML feed (May 2026), Indeed embed (Apr 2026). Key stakeholder for Recruiting product roadmap conversations and any ATS expansion discussion.</div>
+        </div>
+
+        <div class="person-card">
+          <div class="person-avatar" style="background:#28a745">MS</div>
+          <div class="person-name">Megan Sutphin</div>
+          <div class="person-title">Manager, Human Resource</div>
+          <div style="margin-bottom:6px"><span class="badge badge-teal">Operational Champion</span></div>
+          <div class="person-contact">msutphin@goprecise.com</div>
+          <div class="person-intel">HR Manager &mdash; likely primary day-to-day onboarding platform user. No phone on file. Appears in recent opp modifications (Jun 4, 2026). Key contact for workflow configuration, new hire process changes, and managed services expansion conversations.</div>
+        </div>
+
+        <div class="person-card">
+          <div class="person-avatar" style="background:#7c3aed">AR</div>
+          <div class="person-name">Ana Richey</div>
+          <div class="person-title">Human Resources Manager</div>
+          <div style="margin-bottom:6px"><span class="badge badge-teal">Operational</span></div>
+          <div class="person-contact">arichey@goprecise.com &bull; 301-737-7100</div>
+          <div class="person-intel">HR Manager &mdash; likely supports onboarding operations. One of multiple HR managers indicating geographic/functional division of HR responsibilities across 14 locations. Potential champion for lifecycle events expansion.</div>
+        </div>
+
+        <div class="person-card">
+          <div class="person-avatar" style="background:#e8851a">JT</div>
+          <div class="person-name">Joseph Tolarski</div>
+          <div class="person-title">Sr. Director of Information Technology</div>
+          <div style="margin-bottom:6px"><span class="badge badge-grey">Technical</span></div>
+          <div class="person-contact">jtolarski@goprecise.com &bull; 301-880-0045</div>
+          <div class="person-intel">Sr. Director of IT &mdash; technical stakeholder for ADP integration, any API/SSO changes, and future system architecture discussions. ZoomInfo hiring scoops show IT hiring surge (MATLAB, Java, Active Directory roles) &mdash; IT team expanding significantly. Integration health conversations should involve him.</div>
+        </div>
+
+        <div class="person-card">
+          <div class="person-avatar" style="background:#dc3545">CP</div>
+          <div class="person-name">Cindy Pfister</div>
+          <div class="person-title">HR / Facility Specialist</div>
+          <div style="margin-bottom:6px"><span class="badge badge-teal">Operational</span></div>
+          <div class="person-contact">cmpfister@goprecise.com &bull; 301-737-7132</div>
+          <div class="person-intel">Most recently modified contact (Jun 5, 2026). Note: Scott Pfister (CEO) was named GovCon Executive of Year Nov 2025 &mdash; possible family relation. HR/Facility Specialist role suggests she handles daily HR operations and facility onboarding steps. Active system user.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="section">
+      <div class="section-head"><h2>Rival Team</h2></div>
+      <div class="section-body">
+        <table>
+          <tr><th>Name</th><th>Role</th><th>Focus</th></tr>
+          <tr><td><strong>Andrew Pollard</strong></td><td>CSM (Owner)</td><td>Renewal opp owner ($155K + $7K opps). Strategic relationship. Renewal solutioning stage.</td></tr>
+          <tr><td><strong>Mike Klosicki</strong></td><td>Services Consultant</td><td>Weekly Workflow Monthly Meeting cadence. Handles Military Hire XML, Indeed embed, operational cases. Primary day-to-day contact.</td></tr>
+          <tr><td><strong>Kelly Brennan</strong></td><td>Services / Integration</td><td>Manages daily ADP &rarr; Rival data pipeline. Daily &ldquo;ADP Category Inbound Results&rdquo; emails. Core managed services delivery.</td></tr>
+          <tr><td><strong>Kara Sheridan</strong></td><td>AE (Sales)</td><td>Closed multiple past renewals and add-ons. Most recently closed Enterprise Package add-on Mar 2026 ($8K). HHM licenses sold Apr/May 2025.</td></tr>
+          <tr><td><strong>Poornima Farrar</strong></td><td>Services</td><td>Sent &ldquo;Congrats and new feature in Recruit&rdquo; email Jun 5, 2026. Feature adoption communication.</td></tr>
+          <tr><td><strong>Michael de los Reyes</strong></td><td>Services / Workflow</td><td>Monthly workflow meeting participant. Internal auto-reply responder Jun 4, 2026.</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><h2>Executive Leadership &mdash; Precise Systems</h2></div>
+      <div class="section-body">
+        <table>
+          <tr><th>Name</th><th>Title</th><th>Note</th></tr>
+          <tr><td><strong>Scott Pfister</strong></td><td>CEO / President</td><td>GovCon Executive of Year 2025 ($75M&ndash;$300M). Strategic accounts &mdash; note potential family: Cindy Pfister on Rival.</td></tr>
+          <tr><td><strong>Angela Rothwell</strong></td><td>Senior VP, Finance</td><td>Financial decision-maker; in SFDC contacts. Key for multi-year renewal commercial terms.</td></tr>
+          <tr><td><strong>Matthew Orsino</strong></td><td>Chief Growth Officer</td><td>Hired Nov 2025. &ldquo;DoD ecosystem expertise.&rdquo; New growth posture leader &mdash; multiple BD VPs hired in parallel.</td></tr>
+          <tr><td><strong>Mark Gerasch</strong></td><td>VP, Strategic Capture</td><td>Hired May 2026. Replaced Mark Coleman (departed Dec 2025 to Xenith Solutions).</td></tr>
+          <tr><td><strong>Summer Raley</strong></td><td>VP, BD &mdash; NAVAIR</td><td>Hired Mar 2026. NAVAIR-specific BD leader.</td></tr>
+          <tr><td><strong>Mike Risik</strong></td><td>VP, Business Development</td><td>Hired Mar 2026. 20+ years Navy/defense BD.</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 4: CONTRACTS -->
+<div class="tab-panel" id="tab-4">
+  <div class="section">
+    <div class="section-head"><h2>Active Contracts</h2></div>
+    <div class="section-body">
+      <table>
+        <tr><th>Contract #</th><th>Status</th><th>Start Date</th><th>End Date</th><th>Renewal Term</th><th>SFDC</th></tr>
+        <tr>
+          <td><strong>00019073</strong></td>
+          <td><span class="badge badge-green">Activated</span></td>
+          <td>Mar 25, 2026</td>
+          <td>Feb 28, 2028</td>
+          <td>12 months</td>
+          <td><a href="https://rivalhr.lightning.force.com/lightning/r/Contract/800Vs000013tEbFIAU/view" style="color:#2563eb;font-size:11px">Open</a></td>
+        </tr>
+        <tr>
+          <td><strong>00019074</strong></td>
+          <td><span class="badge badge-green">Activated</span></td>
+          <td>Mar 1, 2026</td>
+          <td>Feb 28, 2028</td>
+          <td>12 months</td>
+          <td><a href="https://rivalhr.lightning.force.com/lightning/r/Contract/800Vs000013tNzYIAU/view" style="color:#2563eb;font-size:11px">Open</a></td>
+        </tr>
+      </table>
+      <div class="warn-box" style="margin-top:10px">Both contracts run Mar 2026 &ndash; Feb 2028. Renewal term = 12 months each. Despite the verbal 3-year commitment, contracts are structured as 2-year. The renewal strategy note in SFDC reads: <em>&ldquo;Verbal Commitment to 3-year renewal. By When?&rdquo;</em> &mdash; the question mark suggests this has not been formally committed. Confirm 3-year term with Angela Rothwell (SVP Finance).</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><h2>Active Renewal Opportunities</h2></div>
+    <div class="section-body">
+      <div class="opp-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div class="opp-name"><a href="https://rivalhr.lightning.force.com/lightning/r/Opportunity/006Vs00000Wtm9dIAB/view" style="color:#1a1f2e;text-decoration:none">Precise Systems, Inc. &mdash; Renewal Opportunity (Core)</a></div>
+            <div class="opp-meta">
+              <span><span class="badge badge-blue">Stage 5: Renewal Solutioning</span></span>
+              <span>Type: Renewal</span>
+              <span>Owner: Andrew Pollard</span>
+              <span>Close: Feb 28, 2028</span>
+              <span>Created: Mar 25, 2026</span>
+              <span>Probability: 40%</span>
+            </div>
+          </div>
+          <div class="opp-amount">$155,000</div>
+        </div>
+        <div style="font-size:11px;color:#4a5270">Potential Renewal ARR: $155,000. Next Step: Not populated &mdash; fill in SFDC with renewal strategy milestone.</div>
+      </div>
+
+      <div class="opp-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div class="opp-name"><a href="https://rivalhr.lightning.force.com/lightning/r/Opportunity/006Vs00000WtW3GIAV/view" style="color:#1a1f2e;text-decoration:none">Precise Systems, Inc. &mdash; Renewal Opportunity (Add-on)</a></div>
+            <div class="opp-meta">
+              <span><span class="badge badge-blue">Stage 5: Renewal Solutioning</span></span>
+              <span>Type: Renewal</span>
+              <span>Owner: Andrew Pollard</span>
+              <span>Close: Feb 28, 2028</span>
+              <span>Probability: 40%</span>
+            </div>
+          </div>
+          <div class="opp-amount">$7,025</div>
+        </div>
+        <div style="font-size:11px;color:#4a5270">Potential Renewal ARR: $7,025.36. Likely represents the Enterprise Package add-on closed Mar 2026.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><h2>Historical Wins &amp; Losses (Selected)</h2></div>
+    <div class="section-body">
+      <table>
+        <tr><th>Opportunity</th><th>Type</th><th>Amount</th><th>Close</th><th>Outcome</th></tr>
+        <tr><td>Recruiting/Onboarding/Integration/Managed Services Renewal</td><td>Renewal</td><td>$295,949</td><td>Mar 2026</td><td><span class="badge badge-green">Won</span></td></tr>
+        <tr><td>Enterprise Package Add-On</td><td>Add-On</td><td>$8,051</td><td>Mar 2026</td><td><span class="badge badge-green">Won</span></td></tr>
+        <tr><td>4 Additional RM Licenses</td><td>Add-On</td><td>$2,014</td><td>Jul 2025</td><td><span class="badge badge-green">Won</span></td></tr>
+        <tr><td>10 Additional HHM Licenses</td><td>Add-On</td><td>$7,562</td><td>Apr 2025</td><td><span class="badge badge-green">Won</span></td></tr>
+        <tr><td>HHM Add-On</td><td>Add-On</td><td>$15,123</td><td>Apr 2025</td><td><span class="badge badge-green">Won</span></td></tr>
+        <tr><td>2 Additional RMs</td><td>Add-On</td><td>$0</td><td>Sep 2024</td><td><span class="badge badge-red">Lost</span></td></tr>
+        <tr><td>Onboarding/Recruiting/Integration Renewal</td><td>Renewal</td><td>$145,600</td><td>Mar 2024</td><td><span class="badge badge-green">Won</span></td></tr>
+        <tr><td>OTC Cross-Sell</td><td>Cross-Sell</td><td>$10,000</td><td>Sep 2023</td><td><span class="badge badge-red">Lost</span></td></tr>
+        <tr><td>Learning (WingSpan) &mdash; New Business</td><td>Cross-Sell</td><td>$108,983</td><td>Jun 2021</td><td><span class="badge badge-red">Lost</span></td></tr>
+        <tr><td>Managed Services &mdash; New Business</td><td>Cross-Sell</td><td>$90,000</td><td>Mar 2020</td><td><span class="badge badge-green">Won</span></td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 5: PRODUCT -->
+<div class="tab-panel" id="tab-5">
+  <div class="section">
+    <div class="section-head"><h2>Active Projects &amp; In-Flight Items</h2></div>
+    <div class="section-body">
+      <table>
+        <tr><th>Project / Activity</th><th>Owner</th><th>Status</th><th>Notes</th></tr>
+        <tr><td><strong>Weekly Workflow Monthly Meeting</strong></td><td>Mike Klosicki / Michael de los Reyes</td><td><span class="badge badge-green">Active</span></td><td>Recurring operational meeting cadence. Last logged Jun 4, 2026.</td></tr>
+        <tr><td><strong>ADP &rarr; Rival Daily Integration</strong></td><td>Kelly Brennan</td><td><span class="badge badge-green">Running</span></td><td>Daily automated feed: ADP employees &rarr; Rival Workflow trigger. &ldquo;ADP Employees to Workflow&rdquo; email daily. Core managed services dependency.</td></tr>
+        <tr><td><strong>Military Hire XML Feed</strong></td><td>Mike Klosicki</td><td><span class="badge badge-green">Resolved</span></td><td>Case 00997166 &mdash; custom XML feed for Military Hire job board. Closed May 26, 2026.</td></tr>
+        <tr><td><strong>Indeed CX Embed</strong></td><td>Mike Klosicki</td><td><span class="badge badge-green">Resolved</span></td><td>Case 00996574 &mdash; Indeed embed into ATS. Closed Apr 29, 2026.</td></tr>
+        <tr><td><strong>Salary Issue Resolution</strong></td><td>Mike Klosicki</td><td><span class="badge badge-green">Closed</span></td><td>Case 00996417 &mdash; salary field issue. Resolved Apr 21, 2026.</td></tr>
+        <tr><td><strong>CAB Usage Review</strong></td><td>Blair Brandow</td><td><span class="badge badge-green">Closed</span></td><td>Case 00991749 &mdash; opened Dec 2025, closed Jun 5, 2026. Long-running usage review suggests adoption gap discussions were ongoing.</td></tr>
+        <tr><td><strong>New Feature in Recruit</strong></td><td>Poornima Farrar</td><td><span class="badge badge-blue">Comms Sent</span></td><td>Email &ldquo;Congrats and new feature in Recruit&rdquo; sent Jun 5, 2026. Feature adoption outreach active.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><h2>Product Roadmap &mdash; Tier 1 (Direct Pain Match)</h2></div>
+    <div class="section-body">
+      <div class="roadmap-card tier1">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
+          <span class="roadmap-badge-ship">SHIPPED</span>
+          <span style="font-size:11px;color:#6b7594">2026</span>
+        </div>
+        <div class="roadmap-title">New Feature in Recruit &mdash; (Feature comms sent Jun 5, 2026)</div>
+        <div class="roadmap-desc">A new Rival Recruit feature was announced to Precise Systems on Jun 5, 2026 by Poornima Farrar. Feature details unspecified in SFDC activity log &mdash; verify specifics with services team. Likely related to recent ATS enhancements given active job board integration work (Indeed, Military Hire).</div>
+        <span class="roadmap-pain">Pain/Use Case: Active Recruiting usage confirmed by recent job board integration cases. Feature adoption directly relevant.</span>
+      </div>
+
+      <div class="roadmap-card tier1">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
+          <span class="roadmap-badge-ship">AVAILABLE</span>
+          <span style="font-size:11px;color:#6b7594">Current Platform</span>
+        </div>
+        <div class="roadmap-title">Transfer / Promotion Lifecycle Events (Workflow)</div>
+        <div class="roadmap-desc">TransferPromotion_Events_Onboard__c is null in LifeSuite telemetry &mdash; Precise is not using lifecycle event types beyond basic new hire workflows. Given rapid growth (multiple contract wins, new VP hires, 14 locations), transfer and promotion event volume is likely high but being handled manually or outside the platform.</div>
+        <span class="roadmap-pain">Pain/Use Case: Growing headcount from contract wins creates constant transfer/promotion activity. Manual processing = compliance risk for cleared workforce.</span>
+      </div>
+
+      <div class="roadmap-card tier1">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
+          <span class="roadmap-badge-ship">AVAILABLE</span>
+          <span style="font-size:11px;color:#6b7594">Current Platform</span>
+        </div>
+        <div class="roadmap-title">Offboarding Workflow Events</div>
+        <div class="roadmap-desc">Offboarding_Events_Onboard__c = null. For a defense contractor with security clearances, offboarding is a compliance-critical process: badge deactivation, system access revocation, clearance reporting. This is not optional &mdash; it&rsquo;s a contractual obligation. The platform is not being used for this.</div>
+        <span class="roadmap-pain">Pain/Use Case: DoD cleared personnel offboarding requires documented checklist completion. Manual process = insider threat and compliance risk.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><h2>Roadmap &mdash; Tier 2 (Active Products, No Direct Signal)</h2></div>
+    <div class="section-body">
+      <ul class="tier2-list">
+        <li><span class="roadmap-badge-ship">SHIPPED</span> ADP WorkForce Now Integration Enhancements &mdash; Ongoing managed integration improvements; ZoomInfo confirms ADP as core HR tech stack</li>
+        <li><span class="roadmap-badge-ship">SHIPPED</span> Indeed Embed / CX Embed Enhancements &mdash; Recently resolved case; likely new embed features rolled out</li>
+        <li><span class="roadmap-badge-coming">ROADMAP</span> Job Board Integration Expansion &mdash; Military job boards beyond Military Hire; relevant given #1&ndash;#3 Military Friendly rankings</li>
+        <li><span class="roadmap-badge-coming">ROADMAP</span> Resume / Reporting Enhancements &mdash; Resume count chart case (Mar 2026) confirms active reporting usage; additional analytics features directly relevant</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><h2>Expansion Roadmap (Products Not Owned)</h2></div>
+    <div class="section-body">
+      <div class="roadmap-card expansion">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
+          <span class="roadmap-badge-exp">EXPANSION</span>
+          <span style="font-size:11px;color:#7c3aed">Not Currently Active</span>
+        </div>
+        <div class="roadmap-title">Performance Management (formerly Heartbeat)</div>
+        <div class="roadmap-desc">Ex-Heartbeat appears in SilkRoad product history &mdash; was once active, lapsed. The company now has 14 locations, 800 employees, multiple VP-level hires, and a CPO who just won CHRO of the Year. Performance management at scale for a distributed DoD workforce is a compelling re-entry case. Prior closed loss not documented in SFDC.</div>
+        <span class="roadmap-pain">Pain: Distributed 14-site leadership needs consistent performance frameworks. Reframe with Christina Payne.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 6: USAGE -->
+<div class="tab-panel" id="tab-6">
+  <div class="section">
+    <div class="section-head"><h2>LifeSuite Telemetry &mdash; Onboarding (June 8, 2026)</h2></div>
+    <div class="section-body">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
+        <div class="mini-stat">
+          <div class="val kpi-green">1,047</div>
+          <div class="lbl">Events Last 12Mo</div>
+        </div>
+        <div class="mini-stat">
+          <div class="val kpi-amber">95</div>
+          <div class="lbl">Events L30D</div>
+        </div>
+        <div class="mini-stat">
+          <div class="val kpi-blue">503</div>
+          <div class="lbl">Events YTD (2026)</div>
+        </div>
+        <div class="mini-stat">
+          <div class="val kpi-blue">18</div>
+          <div class="lbl">Unique Logins Today</div>
+        </div>
+      </div>
+
+      <div class="warn-box">
+        <strong>L30D Events Trend: DECLINING &mdash;</strong> L30D peaked at ~150 events around May 16 and has dropped to 95 as of June 8 (-37% over ~3 weeks). This is a meaningful decline in 30-day workflow activity. Could reflect seasonal hiring pause, but warrants proactive monitoring. Compare against same period last year at Site Review.
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="section">
+      <div class="section-head"><h2>L30D Events Trend (Last 20 Days)</h2></div>
+      <div class="section-body">
+        <div class="usage-bar-wrap"><div class="usage-bar-label"><span>Jun 8</span><span>95</span></div><div class="usage-bar"><div class="usage-bar-fill" style="width:63%"></div></div></div>
+        <div class="usage-bar-wrap"><div class="usage-bar-label"><span>Jun 7</span><span>104</span></div><div class="usage-bar"><div class="usage-bar-fill" style="width:69%"></div></div></div>
+        <div class="usage-bar-wrap"><div class="usage-bar-label"><span>Jun 6</span><span>107</span></div><div class="usage-bar"><div class="usage-bar-fill" style="width:71%"></div></div></div>
+        <div class="usage-bar-wrap"><div class="usage-bar-label"><span>Jun 5</span><span>109</span></div><div class="usage-bar"><div class="usage-bar-fill" style="width:73%"></div></div></div>
+        <div class="usage-bar-wrap"><div class="usage-bar-label"><span>Jun 4</span><span>114</span></div><div class="usage-bar"><div class="usage-bar-fill" style="width:76%"></div></div></div>
+        <div class="usage-bar-wrap"><div class="usage-bar-label"><span>Jun 3</span><span>112</span></div><div class="usage-bar"><div class="usage-bar-fill" style="width:75%"></div></div></div>
+        <div class="usage-bar-wrap"><div class="usage-bar-label"><span>Jun 2</span><span>107</span></div><div class="usage-bar"><div class="usage-bar-fill" style="width:71%"></div></div></div>
+        <div class="usage-bar-wrap"><div class="usage-bar-label"><span>Jun 1</span><span>102</span></div><div class="usage-bar"><div class="usage-bar-fill" style="width:68%"></div></div></div>
+        <div class="usage-bar-wrap"><div class="usage-bar-label"><span>May 31</span><span>112</span></div><div class="usage-bar"><div class="usage-bar-fill" style="width:75%"></div></div></div>
+        <div class="usage-bar-wrap"><div class="usage-bar-label"><span>May 30</span><span>115</span></div><div class="usage-bar"><div class="usage-bar-fill" style="width:77%"></div></div></div>
+        <div class="usage-bar-wrap"><div class="usage-bar-label"><span>May 29</span><span>121</span></div><div class="usage-bar"><div class="usage-bar-fill" style="width:81%"></div></div></div>
+        <div class="usage-bar-wrap"><div class="usage-bar-label"><span>May 28</span><span>135</span></div><div class="usage-bar"><div class="usage-bar-fill" style="width:90%"></div></div></div>
+        <div class="usage-bar-wrap"><div class="usage-bar-label"><span>May 27</span><span>134</span></div><div class="usage-bar"><div class="usage-bar-fill" style="width:89%"></div></div></div>
+        <div class="usage-bar-wrap"><div class="usage-bar-label"><span>May 26</span><span>128</span></div><div class="usage-bar"><div class="usage-bar-fill" style="width:85%"></div></div></div>
+        <div class="usage-bar-wrap"><div class="usage-bar-label"><span>May 25</span><span>128</span></div><div class="usage-bar"><div class="usage-bar-fill" style="width:85%"></div></div></div>
+        <div class="usage-bar-wrap"><div class="usage-bar-label"><span>May 24</span><span>131</span></div><div class="usage-bar"><div class="usage-bar-fill" style="width:87%"></div></div></div>
+        <div class="usage-bar-wrap"><div class="usage-bar-label"><span>May 23</span><span>138</span></div><div class="usage-bar"><div class="usage-bar-fill" style="width:92%"></div></div></div>
+        <div class="usage-bar-wrap"><div class="usage-bar-label"><span>May 22</span><span>137</span></div><div class="usage-bar"><div class="usage-bar-fill" style="width:91%"></div></div></div>
+        <div class="usage-bar-wrap"><div class="usage-bar-label"><span>May 21</span><span>140</span></div><div class="usage-bar"><div class="usage-bar-fill" style="width:93%"></div></div></div>
+        <div class="usage-bar-wrap"><div class="usage-bar-label"><span>May 20</span><span>144</span></div><div class="usage-bar"><div class="usage-bar-fill" style="width:96%"></div></div></div>
+        <div class="usage-bar-wrap"><div class="usage-bar-label"><span>May 16</span><span style="font-weight:700;color:#e8851a">150 (peak)</span></div><div class="usage-bar"><div class="usage-bar-fill" style="width:100%;background:linear-gradient(90deg,#e8851a,#f5a623)"></div></div></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section">
+        <div class="section-head"><h2>Utilization Analysis</h2></div>
+        <div class="section-body">
+          <table>
+            <tr><th>Metric</th><th>Value</th><th>Assessment</th></tr>
+            <tr><td>Events / Employee (12Mo)</td><td>1.31</td><td><span class="badge badge-green">Strong Utilization</span></td></tr>
+            <tr><td>L30D Events (current)</td><td>95</td><td><span class="badge badge-amber">Declining &darr;37%</span></td></tr>
+            <tr><td>YTD 2026 Events</td><td>503 (thru Jun 8)</td><td><span class="badge badge-green">On Pace for 1,000+</span></td></tr>
+            <tr><td>Unique Logins (today)</td><td>18</td><td><span class="badge badge-blue">Active Users</span></td></tr>
+            <tr><td>New Hire Event Breakdown</td><td>Null</td><td><span class="badge badge-amber">Verify: Unconfirmed</span></td></tr>
+            <tr><td>Transfer/Promo Events</td><td>Null</td><td><span class="badge badge-red">Not Utilized</span></td></tr>
+            <tr><td>Offboarding Events</td><td>Null</td><td><span class="badge badge-red">Not Utilized</span></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head"><h2>Instance Details</h2></div>
+        <div class="section-body">
+          <table>
+            <tr><td style="font-weight:600;width:130px">LS Code</td><td>Precise</td></tr>
+            <tr><td style="font-weight:600">Customer Name</td><td>Precise Systems, Inc.</td></tr>
+            <tr><td style="font-weight:600">Usage Region</td><td>United States</td></tr>
+            <tr><td style="font-weight:600">Countries</td><td>United States</td></tr>
+            <tr><td style="font-weight:600">Site Review</td><td><span style="color:#dc3545;font-weight:700">OVERDUE</span> &mdash; Last Jul 24, 2025 (319 days)</td></tr>
+            <tr><td style="font-weight:600">Last F2F</td><td><span style="color:#dc3545;font-weight:700">Never Recorded</span></td></tr>
+            <tr><td style="font-weight:600">Active Users Today</td><td>18 (Unique_User_Logins_Onboard__c)</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head"><h2>Open Questions</h2></div>
+        <div class="section-body">
+          <ul style="font-size:12px;color:#4a5270;line-height:2;padding-left:18px">
+            <li>Are all 1,047 events new hire, or do they include transfers/promotions?</li>
+            <li>Why are Transfer/Promotion and Offboarding event fields null?</li>
+            <li>Is Unique_User_Logins_L30D_Onboard__c always 0? (All 30 records show 0.0) &mdash; field may be deprecated or misconfigured</li>
+            <li>Does the $155K ARR under &ldquo;Other&rdquo; reflect a bundled contract or product classification gap?</li>
+            <li>What caused the L30D drop from 150 to 95? Seasonal, config change, or hiring pause?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 7: CASES -->
+<div class="tab-panel" id="tab-7">
+  <div class="section">
+    <div class="section-head"><h2>Case Activity &mdash; Last 12 Months (18 Cases)</h2></div>
+    <div class="section-body">
+      <div class="three-col" style="margin-bottom:14px">
+        <div class="mini-stat">
+          <div class="val kpi-green">18</div>
+          <div class="lbl">Total Cases (12Mo)</div>
+        </div>
+        <div class="mini-stat">
+          <div class="val kpi-green">0</div>
+          <div class="lbl">Open Cases</div>
+        </div>
+        <div class="mini-stat">
+          <div class="val kpi-blue">~14d</div>
+          <div class="lbl">Median Resolution</div>
+        </div>
+      </div>
+      <table>
+        <tr><th>Case #</th><th>Subject</th><th>Priority</th><th>Created</th><th>Closed</th><th>Days</th><th>Owner</th></tr>
+        <tr><td>00997166</td><td>Precise Systems X Military Hire - Custom XML Feed</td><td><span class="badge badge-grey">Low</span></td><td>May 11, 2026</td><td>May 26, 2026</td><td>15</td><td>Mike Klosicki</td></tr>
+        <tr><td>00996574</td><td>CX Embed - Indeed</td><td><span class="badge badge-grey">Low</span></td><td>Apr 20, 2026</td><td>Apr 29, 2026</td><td>9</td><td>Mike Klosicki</td></tr>
+        <tr><td>00996417</td><td>Salary Issue</td><td><span class="badge badge-grey">Low</span></td><td>Apr 14, 2026</td><td>Apr 21, 2026</td><td>7</td><td>Mike Klosicki</td></tr>
+        <tr><td>00996330</td><td>Auto-reply (Junk)</td><td><span class="badge badge-amber">Moderate</span></td><td>Apr 10, 2026</td><td>Apr 10, 2026</td><td>&lt;1</td><td>Junk Queue</td></tr>
+        <tr><td>00995326</td><td>Resume Count Chart</td><td><span class="badge badge-grey">Low</span></td><td>Mar 5, 2026</td><td>Apr 29, 2026</td><td>55</td><td>Kelly Brennan</td></tr>
+        <tr><td>00993123</td><td>Error Issue</td><td><span class="badge badge-grey">Low</span></td><td>Jan 20, 2026</td><td>Jan 21, 2026</td><td>1</td><td>Kelly Brennan</td></tr>
+        <tr><td>00992344</td><td>Jaden Forbes (individual record)</td><td><span class="badge badge-grey">Low</span></td><td>Dec 17, 2025</td><td>Dec 22, 2025</td><td>5</td><td>Kelly Brennan</td></tr>
+        <tr><td>00992197</td><td>E-Verify Data Purge &mdash; Jan 2026</td><td><span class="badge badge-red">High</span></td><td>Dec 12, 2025</td><td>Jan 2, 2026</td><td>21</td><td>Milica Mirkovic</td></tr>
+        <tr><td>00991749</td><td>CAB Usage Review</td><td><span class="badge badge-grey">Low</span></td><td>Dec 2, 2025</td><td>Jun 5, 2026</td><td><strong style="color:#dc3545">186</strong></td><td>Blair Brandow</td></tr>
+        <tr><td>00991165</td><td>New Task Summary &mdash; Links create line breaks</td><td><span class="badge badge-grey">Low</span></td><td>Nov 18, 2025</td><td>Mar 23, 2026</td><td><strong style="color:#e8851a">125</strong></td><td>Mike Klosicki</td></tr>
+        <tr><td>00990081</td><td>E-verify &mdash; Carolyn Lewis-Shake</td><td><span class="badge badge-grey">Low</span></td><td>Oct 20, 2025</td><td>Nov 3, 2025</td><td>14</td><td>Mike Klosicki</td></tr>
+        <tr><td>00987031</td><td>William Hoang (individual)</td><td><span class="badge badge-grey">Low</span></td><td>Oct 1, 2025</td><td>Oct 2, 2025</td><td>1</td><td>Kelly Brennan</td></tr>
+        <tr><td>00987012</td><td>Military Hire Custom XML</td><td><span class="badge badge-grey">Low</span></td><td>Oct 1, 2025</td><td>Oct 13, 2025</td><td>12</td><td>Kelly Brennan</td></tr>
+        <tr><td>00986922</td><td>Denise Torres (individual)</td><td><span class="badge badge-grey">Low</span></td><td>Sep 29, 2025</td><td>Oct 1, 2025</td><td>2</td><td>Kelly Brennan</td></tr>
+        <tr><td>00986858</td><td>Employee Referrals page not working in Recruit</td><td><span class="badge badge-grey">Low</span></td><td>Sep 26, 2025</td><td>Jan 13, 2026</td><td><strong style="color:#e8851a">109</strong></td><td>Kelly Brennan</td></tr>
+        <tr><td>00985932</td><td>Eval questions disappearing</td><td><span class="badge badge-grey">Low</span></td><td>Aug 28, 2025</td><td>Sep 11, 2025</td><td>14</td><td>Kelly Brennan</td></tr>
+        <tr><td>00985337</td><td>Sonjoa McSween (individual)</td><td><span class="badge badge-grey">Low</span></td><td>Aug 11, 2025</td><td>Aug 14, 2025</td><td>3</td><td>Mike Klosicki</td></tr>
+        <tr><td>00985320</td><td>Darlene Ferri-Kurkjack (individual)</td><td><span class="badge badge-grey">Low</span></td><td>Aug 11, 2025</td><td>Aug 11, 2025</td><td>&lt;1</td><td>Mike Klosicki</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><h2>Resolution Time Analysis</h2></div>
+    <div class="section-body">
+      <div class="warn-box">
+        <strong>2 Long-Running Cases of Note:</strong><br>
+        <strong>CAB Usage Review (00991749)</strong> &mdash; Opened Dec 2, 2025, closed Jun 5, 2026 = <strong>186 days</strong>. This is the longest case in the period and directly correlates with the 25% Services Engagement score. A 6-month usage review suggests ongoing services engagement challenges were being discussed but not resolved.<br><br>
+        <strong>Employee Referrals not working (00986858)</strong> &mdash; Opened Sep 26, 2025, closed Jan 13, 2026 = <strong>109 days</strong>. A 3.5-month product bug affecting Employee Referrals in Recruit is a notable user experience failure, especially for a Military Friendly employer that relies on referrals.
+      </div>
+      <table>
+        <tr><th>Metric</th><th>Value</th></tr>
+        <tr><td>Total cases (12Mo)</td><td>18</td></tr>
+        <tr><td>Fastest close</td><td>&lt;1 day (routine junk/individual name cases)</td></tr>
+        <tr><td>Median close</td><td>~7&ndash;14 days</td></tr>
+        <tr><td>Slowest close</td><td>186 days (CAB Usage Review)</td></tr>
+        <tr><td>High priority cases</td><td>1 (E-Verify Data Purge, 21 days)</td></tr>
+        <tr><td>Open cases today</td><td>0</td></tr>
+        <tr><td>Primary support owner</td><td>Mike Klosicki (6 cases), Kelly Brennan (7 cases)</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 8: RISK -->
+<div class="tab-panel" id="tab-8">
+  <div class="section">
+    <div class="section-head"><h2>Risk Assessment &mdash; June 8, 2026</h2></div>
+    <div class="section-body">
+
+      <div class="risk-card red">
+        <div class="risk-header">
+          <span style="font-size:18px">&#128308;</span>
+          <span class="risk-title">NPS Detractor + Active At-Risk Alert</span>
+          <span class="badge badge-red">HIGH RISK</span>
+        </div>
+        <div class="risk-body">
+          <strong>Evidence:</strong> NPS = 6.0 (detractor band: 0-6). Count_of_Active_At_Risk_Alerts__c = 1. Last NPS survey sent Apr 29, 2026 &mdash; recent. A 6.0 NPS is not a historical anomaly that may have improved; it was measured 40 days ago. At a detractor score, the customer is more likely to churn at renewal and may actively recommend against Rival to peers in the defense contractor community.<br><br>
+          <strong>Context:</strong> Possible root causes include the long-running CAB Usage Review (186 days), the Employee Referrals bug (109 days), low Services Engagement (25%), and the overdue Site Review. The platform is running (1,047 events) but the support and strategic engagement experience has been poor.
+        </div>
+        <span class="risk-change">What moves this to green: NPS recovery call with Christina Payne, root cause identified and documented, resolution plan agreed within 30 days, re-survey target &gt;7 at Oct 2026 cycle.</span>
+      </div>
+
+      <div class="risk-card red">
+        <div class="risk-header">
+          <span style="font-size:18px">&#128308;</span>
+          <span class="risk-title">Site Review 319 Days Overdue &amp; No F2F on Record</span>
+          <span class="badge badge-red">HIGH RISK</span>
+        </div>
+        <div class="risk-body">
+          <strong>Evidence:</strong> Site_Review_Overdue__c = TRUE. Last_Site_Review_Date__c = Jul 24, 2025 (319 days ago). Last_Onsite_F2F__c = NULL (no record exists). Site review is a core CSM deliverable for Tier 2 accounts and directly impacts NPS, renewal confidence, and platform adoption visibility.<br><br>
+          <strong>Context:</strong> Weekly operational calls are running (Workflow Monthly Meeting with Mike Klosicki) but these are not equivalent to formal site reviews. The lack of any F2F in the recorded history of a 13.6-year customer represents a significant relationship investment gap.
+        </div>
+        <span class="risk-change">What moves this to green: Site review scheduled and completed before Aug 8, 2026 (before 1-year mark). F2F visit planned for Q3 2026 with Andrew Pollard + Kara Sheridan attending.</span>
+      </div>
+
+      <div class="risk-card amber">
+        <div class="risk-header">
+          <span style="font-size:18px">&#128993;</span>
+          <span class="risk-title">Services Engagement 25% &mdash; Managed Services Value at Risk</span>
+          <span class="badge badge-amber">MODERATE RISK</span>
+        </div>
+        <div class="risk-body">
+          <strong>Evidence:</strong> Services_Engagement_Score_Percent__c = 25%. Despite active Managed Services contract (ADP integration running daily), the overall services engagement score is critically low. The CAB Usage Review case running 186 days (Dec 2025 &ndash; Jun 2026) confirms there were ongoing services utilization discussions that took 6 months to resolve.<br><br>
+          <strong>Context:</strong> The ADP daily integration is running (Kelly Brennan managing), but proactive services (platform optimization reviews, quarterly business reviews, configuration updates) are not being delivered. At 25% engagement, the perceived value of Managed Services may be low from Precise&rsquo;s perspective, creating renewal leverage risk.
+        </div>
+        <span class="risk-change">What moves this to green: Quarterly Managed Services review scheduled and delivered. Services engagement documented above 60% by renewal date.</span>
+      </div>
+
+      <div class="risk-card amber">
+        <div class="risk-header">
+          <span style="font-size:18px">&#128993;</span>
+          <span class="risk-title">L30D Event Volume Declining (-37% in 3 Weeks)</span>
+          <span class="badge badge-amber">MODERATE &mdash; MONITOR</span>
+        </div>
+        <div class="risk-body">
+          <strong>Evidence:</strong> L30D events peaked at 150 on May 16, 2026 and have declined to 95 as of June 8 &mdash; a 37% drop in 3 weeks. YTD events (503) remain strong, and 12-month events (1,047) are healthy. The decline may be seasonal (summer hiring pause typical at defense contractors post-Memorial Day) or could reflect a hiring slowdown following the burst of Q1 contract wins.<br><br>
+          <strong>Ratio check:</strong> 1.31 events/EE/year (12Mo basis) = strong utilization. Not a churn signal on its own, but combined with detractor NPS, the trend bears monitoring.
+        </div>
+        <span class="risk-change">What moves this to green: Confirm seasonal pattern at Site Review. If not seasonal, investigate configuration or adoption issues. Target L30D back above 120 by Aug 2026.</span>
+      </div>
+
+      <div class="risk-card amber">
+        <div class="risk-header">
+          <span style="font-size:18px">&#128993;</span>
+          <span class="risk-title">Expired Product Lines (Recruiting &amp; Onboarding)</span>
+          <span class="badge badge-amber">VERIFY</span>
+        </div>
+        <div class="risk-body">
+          <strong>Evidence:</strong> Expired_Products__c = &ldquo;Recruiting, Onboarding&rdquo; in SFDC while Active_Products2__c = &ldquo;Recruiting, Onboarding, Other, Managed Services.&rdquo; This apparent contradiction needs clarification. The $155K ARR is allocated entirely to &ldquo;Other&rdquo; in the product ARR breakdown fields (all other product ARR fields = $0). This suggests either (1) a contract reclassification, (2) a platform migration, or (3) a data quality issue.<br><br>
+          <strong>Risk:</strong> If Recruiting and Onboarding are factually expired and the customer is running on legacy/consolidated contract terms, there may be product support or upgrade path implications that aren&rsquo;t being communicated.
+        </div>
+        <span class="risk-change">What moves this to green: Clarify with Kara Sheridan (AE) on contract structure. Update SFDC ARR fields to reflect correct product-line allocation. Discuss at Site Review.</span>
+      </div>
+
+      <div class="risk-card green">
+        <div class="risk-header">
+          <span style="font-size:18px">&#128994;</span>
+          <span class="risk-title">Competitive / Parent Company Risk</span>
+          <span class="badge badge-green">LOW RISK</span>
+        </div>
+        <div class="risk-body">
+          <strong>Evidence:</strong> Renewal_Risks_Competitive_Threats__c = null. No competitive threats flagged. ZoomInfo confirms Precise Systems is an independent, privately held company with no parent (ultimateParentId = 0). No vendor consolidation risk from a corporate parent. No Workday expansion signals in activity log or market intel. ADP is the primary HRIS and it integrates with Rival rather than competing with it.
+        </div>
+        <span class="risk-change">Status: Healthy. Monitor for new C-suite hires who may introduce unfamiliar vendor preferences (two new VPs + new CGO hired in 2025&ndash;2026).</span>
+      </div>
+
+      <div class="risk-card green">
+        <div class="risk-header">
+          <span style="font-size:18px">&#128994;</span>
+          <span class="risk-title">Commercial Renewal Timing</span>
+          <span class="badge badge-green">LOW RISK &mdash; MONITOR</span>
+        </div>
+        <div class="risk-body">
+          <strong>Evidence:</strong> Next_Renewal_Date__c = Feb 29, 2028 = 636 days from today. Renewal Solutioning stage (Stage 5). Two active opps totaling ~$162K. Verbal 3-year commitment noted. Plenty of runway to execute renewal strategy properly. However, the &ldquo;By When?&rdquo; notation in the strategy field means this hasn&rsquo;t been formally captured.<br><br>
+          <strong>Context:</strong> The company has renewed every cycle since 2019. No renewal losses in Rival history. Loyalty is strong on the commercial side; the challenge is the experience quality (NPS).
+        </div>
+        <span class="risk-change">What moves this to green: 3-year paper submitted within 90 days of NPS recovery. Close renewal opp to Stage 7 (Contract Sent) by Q4 2026.</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(n) {
+  var panels = document.querySelectorAll('.tab-panel');
+  var btns = document.querySelectorAll('.tab-btn');
+  for (var i = 0; i < panels.length; i++) { panels[i].classList.remove('active'); }
+  for (var i = 0; i < btns.length; i++) { btns[i].classList.remove('active'); }
+  document.getElementById('tab-' + n).classList.add('active');
+  for (var i = 0; i < btns.length; i++) {
+    if (btns[i].getAttribute('onclick') === 'switchTab(' + n + ')') {
+      btns[i].classList.add('active');
+      break;
+    }
+  }
+}
+</script>
+</body>
+</html>
