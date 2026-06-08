@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light only">
+<title>WilmerHale — CSM Account Cockpit</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;background:#f1f3f8;color:#1a1f2e;overflow-x:hidden;}
+.page-wrap{max-width:1100px;margin:0 auto;padding:14px 16px;}
+/* HEADER */
+.hdr{background:#ffffff;border-radius:12px;padding:18px 22px;margin-bottom:12px;border:1px solid #e3e6ef;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.hdr-left h1{font-size:20px;font-weight:700;color:#1a1f2e;}
+.hdr-left p{font-size:12px;color:#6b7280;margin-top:3px;}
+.hdr-badges{display:flex;gap:8px;flex-wrap:wrap;}
+.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.3px;}
+.badge-blue{background:#dbeafe;color:#1d4ed8;}
+.badge-amber{background:#fef3c7;color:#b45309;}
+.badge-red{background:#fee2e2;color:#b91c1c;}
+.badge-green{background:#d1fae5;color:#065f46;}
+.badge-purple{background:#ede9fe;color:#6d28d9;}
+.badge-gray{background:#f3f4f6;color:#374151;}
+/* KPI STRIP */
+.kpi-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:12px;}
+@media(max-width:800px){.kpi-strip{grid-template-columns:repeat(3,1fr);}}
+.kpi-card{background:#ffffff;border-radius:10px;padding:14px 14px;border:1px solid #e3e6ef;text-align:center;}
+.kpi-card .kpi-val{font-size:22px;font-weight:800;color:#1a1f2e;line-height:1.1;}
+.kpi-card .kpi-lbl{font-size:10px;color:#6b7280;margin-top:4px;text-transform:uppercase;letter-spacing:.5px;}
+.kpi-card .kpi-sub{font-size:10px;color:#6b7280;margin-top:2px;}
+.kpi-green .kpi-val{color:#059669;}
+.kpi-amber .kpi-val{color:#d97706;}
+.kpi-red .kpi-val{color:#dc2626;}
+/* TAB BAR */
+.tab-bar{display:flex;gap:2px;background:#e4e7f0;border-radius:10px;padding:4px;overflow-x:auto;white-space:nowrap;position:sticky;top:0;z-index:100;margin-bottom:14px;}
+.tab-btn{padding:9px 16px;border:none;background:transparent;color:#5a6178;font-size:12px;font-weight:600;border-radius:7px;cursor:pointer;white-space:nowrap;transition:all .15s;}
+.tab-btn.active{background:#ffffff;color:#1a1f2e;box-shadow:0 1px 3px rgba(0,0,0,.12);}
+.tab-panel{display:none;padding:0;}
+.tab-panel.active{display:block;}
+/* SECTIONS */
+.section{background:#ffffff;border-radius:10px;padding:18px 20px;margin-bottom:12px;border:1px solid #e3e6ef;}
+.section h2{font-size:14px;font-weight:700;color:#1a1f2e;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #f0f1f5;}
+.section h3{font-size:12px;font-weight:700;color:#374151;margin-bottom:10px;margin-top:14px;}
+/* CARDS GRID */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;}
+.card{background:#f8f9fb;border-radius:8px;padding:14px;border:1px solid #e8eaf0;}
+.card-title{font-size:12px;font-weight:700;color:#1a1f2e;margin-bottom:6px;}
+.card-body{font-size:11px;color:#4b5563;line-height:1.5;}
+/* TABLES */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:11px;}
+th{background:#f3f4f6;padding:7px 10px;text-align:left;font-weight:700;color:#374151;border-bottom:1px solid #e5e7eb;}
+td{padding:7px 10px;color:#374151;border-bottom:1px solid #f3f4f6;vertical-align:top;}
+tr:hover td{background:#f9fafb;}
+/* ACTION ITEMS */
+.action-card{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:16px 18px;margin-bottom:10px;}
+.action-card.red-action{background:#fff5f5;border-color:#fecaca;}
+.action-card.green-action{background:#f0fdf4;border-color:#bbf7d0;}
+.action-num{font-size:20px;font-weight:900;color:#d97706;margin-right:10px;}
+.action-num.red-num{color:#dc2626;}
+.action-num.green-num{color:#059669;}
+.action-title{font-size:13px;font-weight:700;color:#1a1f2e;display:inline;}
+.action-body{font-size:11px;color:#4b5563;margin-top:6px;line-height:1.5;}
+.action-step{font-size:11px;background:#ffffff;border-left:3px solid #f59e0b;padding:6px 10px;margin-top:8px;border-radius:0 6px 6px 0;color:#1a1f2e;}
+.action-step.red-step{border-color:#dc2626;}
+.action-step.green-step{border-color:#059669;}
+/* HEALTH CARDS */
+.health-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;overflow:visible;}
+@media(max-width:700px){.health-grid{grid-template-columns:repeat(2,1fr);}}
+.health-card{background:#f8f9fb;border-radius:10px;padding:14px;text-align:center;border:1px solid #e8eaf0;position:relative;overflow:visible;}
+.health-score{font-size:28px;font-weight:900;margin-bottom:4px;}
+.health-lbl{font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;}
+.health-sub{font-size:10px;color:#9ca3af;margin-top:3px;}
+/* TOOLTIP */
+.tip-wrap{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:#e5e7eb;color:#6b7280;font-size:9px;font-weight:700;cursor:help;position:relative;margin-left:5px;vertical-align:middle;}
+.tip-wrap .tip-box{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:240px;padding:10px 12px;background:#1a1f2e;color:#fff;font-size:10px;font-weight:400;line-height:1.5;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.18);z-index:9999;white-space:normal;}
+.tip-wrap:hover .tip-box{display:block;}
+/* RISK CARDS */
+.risk-card{border-radius:10px;padding:16px 18px;margin-bottom:10px;border-left:4px solid;}
+.risk-red{background:#fff5f5;border-color:#dc2626;}
+.risk-amber{background:#fffbeb;border-color:#f59e0b;}
+.risk-green{background:#f0fdf4;border-color:#22c55e;}
+.risk-icon{font-size:16px;margin-right:8px;}
+.risk-title{font-size:13px;font-weight:700;color:#1a1f2e;}
+.risk-body{font-size:11px;color:#4b5563;margin-top:6px;line-height:1.55;}
+.risk-fix{font-size:10px;background:#ffffff;padding:6px 10px;border-radius:6px;margin-top:8px;color:#374151;border:1px solid #e5e7eb;}
+.risk-fix strong{color:#1a1f2e;}
+/* PEOPLE */
+.people-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;}
+.person-card{background:#f8f9fb;border-radius:10px;padding:14px;border:1px solid #e8eaf0;}
+.person-avatar{width:36px;height:36px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#1d4ed8;margin-bottom:10px;}
+.person-name{font-size:12px;font-weight:700;color:#1a1f2e;}
+.person-title{font-size:10px;color:#6b7280;margin-top:2px;}
+.person-note{font-size:10px;color:#4b5563;margin-top:6px;padding-top:6px;border-top:1px solid #e8eaf0;line-height:1.4;}
+/* ROADMAP */
+.rm-tier1{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px 16px;margin-bottom:10px;}
+.rm-tier2-item{padding:6px 0;border-bottom:1px solid #f0f1f5;font-size:11px;color:#374151;display:flex;gap:8px;align-items:flex-start;}
+.rm-tier2-item:last-child{border-bottom:none;}
+.rm-expand{background:#faf5ff;border:1px solid #ddd6fe;border-radius:10px;padding:14px 16px;margin-bottom:10px;}
+.rm-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.4px;margin-right:6px;}
+.shipped{background:#d1fae5;color:#065f46;}
+.coming{background:#fef3c7;color:#92400e;}
+/* USAGE */
+.usage-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+@media(max-width:700px){.usage-grid{grid-template-columns:repeat(2,1fr);}}
+.usage-kpi{background:#f8f9fb;border-radius:10px;padding:14px;text-align:center;border:1px solid #e8eaf0;}
+.usage-kpi .uval{font-size:24px;font-weight:900;color:#1a1f2e;}
+.usage-kpi .ulbl{font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-top:4px;}
+.usage-kpi .usub{font-size:10px;color:#9ca3af;margin-top:2px;}
+/* INLINE STATUS PILLS */
+.pill{padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;}
+.pill-open{background:#fee2e2;color:#b91c1c;}
+.pill-closed{background:#d1fae5;color:#065f46;}
+.pill-hi{background:#fef3c7;color:#b45309;}
+.pill-mod{background:#e0e7ff;color:#3730a3;}
+.pill-low{background:#f3f4f6;color:#374151;}
+/* TWO COL */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:700px){.two-col{grid-template-columns:1fr;}}
+.info-row{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid #f3f4f6;font-size:11px;}
+.info-row:last-child{border-bottom:none;}
+.info-lbl{color:#6b7280;min-width:130px;font-weight:600;}
+.info-val{color:#1a1f2e;}
+/* SFDC LINK */
+a.sfdc-link{color:#1d4ed8;text-decoration:none;font-size:10px;}
+a.sfdc-link:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-left">
+    <h1>Wilmer Cutler Pickering Hale and Dorr LLP</h1>
+    <p>CSM Account Cockpit &nbsp;&#183;&nbsp; Monday Full Refresh &nbsp;&#183;&nbsp; <strong>Jun 8, 2026</strong> &nbsp;&#183;&nbsp; <a class="sfdc-link" href="https://rival.lightning.force.com/lightning/r/Account/0016000000ItvbzAAB/view" target="_blank">Open in SFDC &#8599;</a></p>
+  </div>
+  <div class="hdr-badges">
+    <span class="badge badge-blue">Enterprise</span>
+    <span class="badge badge-gray">Tier 3</span>
+    <span class="badge badge-amber">Site Review Overdue</span>
+    <span class="badge badge-green">0 At-Risk Alerts</span>
+    <span class="badge badge-purple">Renewal Apr 1, 2028</span>
+  </div>
+</div>
+
+<!-- KPI STRIP -->
+<div class="kpi-strip">
+  <div class="kpi-card">
+    <div class="kpi-val">$84,925</div>
+    <div class="kpi-lbl">Total ARR</div>
+    <div class="kpi-sub">Segment B / Enterprise</div>
+  </div>
+  <div class="kpi-card kpi-green">
+    <div class="kpi-val">75%</div>
+    <div class="kpi-lbl">Engagement Score
+      <span class="tip-wrap">?<span class="tip-box">Customer_Engagement_Score__c in SFDC. Services Engagement Score Percent = 75%. Scale 0–100%. Reflects activity cadence, case volume, and touchpoint frequency.</span></span>
+    </div>
+    <div class="kpi-sub">Services: 75%</div>
+  </div>
+  <div class="kpi-card kpi-amber">
+    <div class="kpi-val">100</div>
+    <div class="kpi-lbl">Onboarding Score
+      <span class="tip-wrap">?<span class="tip-box">Global_Onboarding_Score__c in SFDC. Score of 100 = fully onboarded to the platform configuration. Does not reflect day-to-day usage health.</span></span>
+    </div>
+    <div class="kpi-sub">Cross-Sell Score: 100</div>
+  </div>
+  <div class="kpi-card kpi-amber">
+    <div class="kpi-val">NPS 0</div>
+    <div class="kpi-lbl">Avg NPS
+      <span class="tip-wrap">?<span class="tip-box">Average_NPS_Score_SFDC__c. Last NPS sent: Apr 21, 2026. Next send: Oct 18, 2026. Score of 0 = passive/detractor range. No CSAT data available.</span></span>
+    </div>
+    <div class="kpi-sub">Last sent Apr 21, 2026</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-val">668</div>
+    <div class="kpi-lbl">Days to Renewal</div>
+    <div class="kpi-sub">Apr 1, 2028</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-val">322</div>
+    <div class="kpi-lbl">Events (12mo)</div>
+    <div class="kpi-sub">20 last 30 days</div>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab(0)">Actions</button>
+  <button class="tab-btn" onclick="switchTab(1)">Account Intel</button>
+  <button class="tab-btn" onclick="switchTab(2)">Use Case</button>
+  <button class="tab-btn" onclick="switchTab(3)">People</button>
+  <button class="tab-btn" onclick="switchTab(4)">Contracts</button>
+  <button class="tab-btn" onclick="switchTab(5)">Product</button>
+  <button class="tab-btn" onclick="switchTab(6)">Usage</button>
+  <button class="tab-btn" onclick="switchTab(7)">Cases</button>
+  <button class="tab-btn" onclick="switchTab(8)">Risk</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TAB 0 — ACTIONS
+═══════════════════════════════════════════════════════════════ -->
+<div class="tab-panel active" id="tab-0">
+
+<div class="action-card red-action">
+  <span class="action-num red-num">1</span><span class="action-title">Schedule Site Review — Overdue (No Date on Record)</span>
+  <div class="action-body">Site_Review_Overdue__c = TRUE. Last_Site_Review_Date__c = NULL — no site review has ever been logged in SFDC. For a Tier 3 Enterprise account at $84,925 ARR with a 2028 renewal, this is the single highest-priority gap. Site reviews are the primary vehicle for demonstrating value, surfacing expansion whitespace, and building executive relationships.</div>
+  <div class="action-step red-step"><strong>Next Step:</strong> Email Lizet Garcia (CHRO) and Denise Quinlan (HRIS Manager, POC for SRT) to schedule a 60-min platform health review. Anchor on WH's peak hiring season and the "Workflow &amp; Recruit enhancements/upcoming releases" conversation Bernard Jackson had on May 27-28.</div>
+</div>
+
+<div class="action-card">
+  <span class="action-num">2</span><span class="action-title">Close Loop on AI Capabilities / Roadmap Discussion</span>
+  <div class="action-body">Activity log shows multiple emails in late April / early May 2026 with subject "WH-Rival - Discuss AI capabilities/roadmap - Reschedule" and "Workflow &amp; Recruit enhancements/upcoming releases" (Bernard Jackson, May 27-28). This signals active product curiosity — they rescheduled an AI roadmap call. Confirm whether that call happened and capture outcomes. ROSI Employee Agent (Workflow 2026.1.04) and AI Outreach Analytics (Recruit 2026.9) are directly relevant to their interests.</div>
+  <div class="action-step"><strong>Next Step:</strong> Verify with Bernard Jackson that the AI capabilities meeting occurred. If not, re-schedule and prepare demo of ROSI Employee Agent + AI Outreach Analytics for Recruiting. If it did happen, document outcomes in SFDC Activity and follow up with product roadmap PDF.</div>
+</div>
+
+<div class="action-card">
+  <span class="action-num">3</span><span class="action-title">Address Integration Migration Project — Track Completion</span>
+  <div class="action-body">Activity log shows "WilmerHale/Rival Integration Migration" email on May 18, 2026. "Enabling ROSI" thread from May 8-14 and "Source with ROSI Error" case (Closed Apr 29, Low) suggests a recent integration change or ROSI enablement in progress. This migration needs proper documentation and a confirmed go-live status to prevent future support escalations.</div>
+  <div class="action-step"><strong>Next Step:</strong> Confirm with Denise Quinlan / Scott Wilson (Director, Application Development) that the integration migration is complete and stable. Log status in SFDC. If any open items remain, create a tracked case.</div>
+</div>
+
+<div class="action-card">
+  <span class="action-num">4</span><span class="action-title">Validate NPS Score &amp; Build Executive Relationship</span>
+  <div class="action-body">Average NPS = 0 (passive/detractor range). ZoomInfo confirms CHRO is Lizet Garcia. No CHRO-level relationship logged in SFDC activities — all engagement is operational (Denise Quinlan, HRIS, technical contacts). An NPS of 0 with no executive touchpoint before the Oct 2026 next NPS cycle is a retention vulnerability. ZoomInfo scoops show WH had peak HR open roles in April 2026 — they are actively building the team, not reducing it.</div>
+  <div class="action-step"><strong>Next Step:</strong> Request an introduction to Lizet Garcia (CHRO) via Denise Quinlan or Lindsey Higgins (Firmwide Director, Legal Recruiting). Frame as a strategic check-in on the platform ahead of fall busy season.</div>
+</div>
+
+<div class="action-card green-action">
+  <span class="action-num green-num">5</span><span class="action-title">Capitalize on Peak Hiring Signal — Expansion Conversation</span>
+  <div class="action-body">ZoomInfo scoops (Apr 2026): WilmerHale has more open Legal roles than at any time in the past 12 months AND more open HR roles than in the past 6 months. Annual revenue ~$375M, 2,350 employees, 19 office locations, 1,100+ attorneys. This is a high-volume period for both Recruiting and Onboarding. Cross-sell score is 100 — the system sees maximum whitespace. Expired products include Onboarding and Recruiting (legacy SilkRoad contracts being replaced by current subscriptions).</div>
+  <div class="action-step green-step"><strong>Next Step:</strong> In the site review conversation, surface usage benchmarks vs. peer AmLaw firms. Highlight Sequential Interviewing (coming soon in Recruit) and Bulk Action Forms Review (Workflow 2026.2.09) as timely additions for high-volume lateral hiring.</div>
+</div>
+
+<!-- ENGAGEMENT HEALTH -->
+<div class="section">
+  <h2>Engagement Health</h2>
+  <div class="health-grid">
+    <div class="health-card">
+      <div class="health-score" style="color:#d97706;">75%</div>
+      <div class="health-lbl">Customer Engagement
+        <span class="tip-wrap">?<span class="tip-box">SFDC field: Customer_Engagement_Score__c = 75 / CustomerEngagementScoreNUMBER__c = 0.75. Combines touchpoint cadence, case interactions, and activity patterns. 75% = moderate. Industry median for Tier 3 is ~70-80%.</span></span>
+      </div>
+      <div class="health-sub">Moderate — monitor</div>
+    </div>
+    <div class="health-card">
+      <div class="health-score" style="color:#dc2626;">⚠ Overdue</div>
+      <div class="health-lbl">Site Review
+        <span class="tip-wrap">?<span class="tip-box">SFDC field: Site_Review_Overdue__c = TRUE. Last_Site_Review_Date__c = NULL (never logged). Days_since_last_Site_Review__c = NULL. Site reviews are required periodically for all Enterprise accounts.</span></span>
+      </div>
+      <div class="health-sub">No review on record</div>
+    </div>
+    <div class="health-card">
+      <div class="health-score" style="color:#059669;">OK</div>
+      <div class="health-lbl">Onsite F2F
+        <span class="tip-wrap">?<span class="tip-box">SFDC field: Onsite_F2F_Overdue__c = FALSE. Days_since_last_Onsite_F2F__c = NULL / Last_Onsite_F2F_Date__c = NULL. Not yet triggered as overdue — but no F2F on record either.</span></span>
+      </div>
+      <div class="health-sub">Not yet overdue</div>
+    </div>
+    <div class="health-card">
+      <div class="health-score" style="color:#d97706;">NPS 0</div>
+      <div class="health-lbl">Avg NPS
+        <span class="tip-wrap">?<span class="tip-box">SFDC field: Average_NPS_Score_SFDC__c = 0. Scale: 0-6 = Detractor (RED), 7-8 = Passive (AMBER), 9-10 = Promoter (GREEN). Score of 0 = Detractor/Passive boundary. Last sent Apr 21, 2026. Next: Oct 18, 2026.</span></span>
+      </div>
+      <div class="health-sub">Last sent Apr 21, 2026</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TAB 1 — ACCOUNT INTEL
+═══════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-1">
+
+<div class="section">
+  <h2>Company Overview</h2>
+  <div class="two-col">
+    <div>
+      <div class="info-row"><span class="info-lbl">Full Legal Name</span><span class="info-val">Wilmer Cutler Pickering Hale and Dorr LLP</span></div>
+      <div class="info-row"><span class="info-lbl">Short Name</span><span class="info-val">WilmerHale</span></div>
+      <div class="info-row"><span class="info-lbl">Founded</span><span class="info-val">2004 (merger of Wilmer Cutler &amp; Pickering with Hale and Dorr)</span></div>
+      <div class="info-row"><span class="info-lbl">Industry</span><span class="info-val">Law Firms &amp; Legal Services — AmLaw 50</span></div>
+      <div class="info-row"><span class="info-lbl">HQ</span><span class="info-val">Washington, DC (SFDC billing: Boston, MA)</span></div>
+      <div class="info-row"><span class="info-lbl">Employees</span><span class="info-val">2,350 (ZoomInfo) | 1,100+ attorneys (firm website)</span></div>
+      <div class="info-row"><span class="info-lbl">Revenue</span><span class="info-val">~$375M (ZoomInfo: $250M–$500M range)</span></div>
+      <div class="info-row"><span class="info-lbl">Offices</span><span class="info-val">19 locations (US + Europe)</span></div>
+    </div>
+    <div>
+      <div class="info-row"><span class="info-lbl">Type</span><span class="info-val">Private Partnership (LLP)</span></div>
+      <div class="info-row"><span class="info-lbl">Parent / Ultimate Parent</span><span class="info-val">None (independent firm)</span></div>
+      <div class="info-row"><span class="info-lbl">Key Practices</span><span class="info-val">Litigation, IP, Corporate, Regulatory, Securities, Appellate, Antitrust, Tax, Labor &amp; Employment</span></div>
+      <div class="info-row"><span class="info-lbl">Notable Clients</span><span class="info-val">Meta (~$67M fees in 2023), tech, life sciences, financial institutions</span></div>
+      <div class="info-row"><span class="info-lbl">Social</span><span class="info-val">LinkedIn: 13,745 followers | Twitter: 5,285</span></div>
+      <div class="info-row"><span class="info-lbl">ZoomInfo ID</span><span class="info-val">32639922</span></div>
+      <div class="info-row"><span class="info-lbl">SFDC Tenure</span><span class="info-val">~14.9 years (5,457 days, Tenure_Earliest_product__c)</span></div>
+    </div>
+  </div>
+  <h3>About</h3>
+  <p style="font-size:11px;color:#4b5563;line-height:1.6;">WilmerHale is a full-service international law firm with offices throughout the United States and Europe. Known for high-stakes litigation, IP, and regulatory work at the intersection of government and business. In 2025, the firm was named Law360 Firm of the Year, recognized across Appellate, Class Action, Compliance, IP, Transportation, and Trials practices. The firm earns approximately 30% of its revenue (~$500M) from federal government-related work — a figure that became central to a significant legal dispute in 2025 (see Market Dynamics).</p>
+</div>
+
+<div class="section">
+  <h2>Market Dynamics</h2>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Date</th><th>Event</th><th>HR / People Implication</th></tr>
+      <tr>
+        <td>Mar–May 2025</td>
+        <td>Trump EO targeted WilmerHale (EO 14250), directing federal agencies to terminate contracts and suspend clearances. Federal judge declared it <strong>unconstitutional</strong> and permanently blocked it (May 27, 2025).</td>
+        <td>Created a period of significant firm-wide uncertainty. ~$500M (~30% of revenue) tied to federal contracts was threatened. HR teams would have been on high alert for potential headcount impacts. Resolution = firm emerged stronger, but stress period likely accelerated internal process reviews.</td>
+      </tr>
+      <tr>
+        <td>Apr 2026</td>
+        <td>Stephanie Avakian (Chair, Securities &amp; Financial Services) departed WilmerHale to become Global General Counsel at Barclays.</td>
+        <td>Loss of a senior department chair. Triggers internal succession, potential practice group restructuring, and possible lateral hiring to backfill. High-activity period for Recruiting and Onboarding.</td>
+      </tr>
+      <tr>
+        <td>Jan 2026</td>
+        <td>14 counsel/special counsel elevated to partnership (effective Jan 1, 2026). 14 promotions also in 2025.</td>
+        <td>Annual promotion cycles generate onboarding events (new equity partner documentation, benefit enrollment changes, compensation structure changes). High-volume Workflow use case.</td>
+      </tr>
+      <tr>
+        <td>Apr 2026</td>
+        <td>ZoomInfo scoop: WilmerHale has more open Legal roles than any time in past 12 months.</td>
+        <td>Peak recruiting activity. High volume of lateral attorney hires across practice groups. Rival Recruit ATS directly handling this pipeline.</td>
+      </tr>
+      <tr>
+        <td>Apr 2026</td>
+        <td>ZoomInfo scoop: WilmerHale has more open HR roles than any time in past 6 months — including Training &amp; Development specialists.</td>
+        <td>HR org is actively building. T&amp;D focus suggests investment in onboarding quality and employee development. Strong signal that HR leadership values people programs.</td>
+      </tr>
+      <tr>
+        <td>2026</td>
+        <td>WilmerHale recognized by Chambers USA, Law360 (Firm of the Year), IAM Patent 1000. Named #15 Top Workplace in Greater Washington (2025).</td>
+        <td">Employer brand is strong. Culture and employee experience investments are paying off. HR/People team is credited with top-workplace rankings — strengthens case for Rival's value to CHROs.</td>
+      </tr>
+      <tr>
+        <td>2025-2026</td>
+        <td>BigLaw lateral partner market described as "slow" overall, but WilmerHale's hiring activity is above-trend based on ZI signals.</td>
+        <td>Lateral hiring is operationally complex — attorneys come with existing client relationships, bar admissions, benefit preferences. Each lateral hire generates multiple Workflow/Onboarding events.</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Competitive Landscape — BigLaw Peers</h2>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Firm</th><th>Size (Attorneys)</th><th>Position</th><th>Relevance to WilmerHale</th></tr>
+      <tr><td>Covington &amp; Burling</td><td>~1,300</td><td>DC-based, regulatory/litigation focus</td><td>Direct competitive peer — same client base, similar regulatory practice</td></tr>
+      <tr><td>Latham &amp; Watkins</td><td>~3,000</td><td>Largest BigLaw firm globally</td><td>Competes for laterals; different scale but overlapping practices</td></tr>
+      <tr><td>Skadden Arps</td><td>~1,700</td><td>M&amp;A / corporate dominant</td><td>IP and corporate overlap; different culture</td></tr>
+      <tr><td>Arnold &amp; Porter</td><td>~1,100</td><td>DC-based, regulatory/government</td><td>Very similar profile — government work, regulatory</td></tr>
+      <tr><td>Cooley LLP</td><td>~1,200</td><td>Tech/VC/startup focus</td><td>Competes for tech company client relationships</td></tr>
+    </table>
+  </div>
+  <p style="font-size:10px;color:#9ca3af;margin-top:8px;">Source: Public firm data. Headcount approximate. HR implications: peer firm hiring moves directly affect WilmerHale's lateral market and onboarding volume.</p>
+</div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TAB 2 — USE CASE
+═══════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-2">
+
+<div class="section">
+  <h2>Executive Summary</h2>
+  <p style="font-size:12px;color:#374151;line-height:1.65;">WilmerHale uses Rival for two core HR workflows: <strong>Onboarding (Rival Workflow)</strong> and <strong>Recruiting (Rival Recruit)</strong>, plus an "Other" category covering integrations and platform add-ons. The firm's annual hiring volume includes partner elevations (14/year), lateral attorney hires (above-market trend in 2026), and staff recruitment across 19 offices and 2,350 employees. Rival handles the complexity that standard HRIS platforms cannot: multi-step, conditional onboarding flows with practice group-specific variations, compliance tasks (I-9/E-Verify), and a full ATS pipeline for external and internal candidates. The platform has been in use for ~15 years. Active cases show day-to-day operational reliance for task reopening, form management, and integration stability. Key contacts are HRIS-level administrators — CHRO relationship is not yet established.</p>
+</div>
+
+<div class="section">
+  <h2>Product Use Cases</h2>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">Onboarding / Workflow</div>
+      <div class="card-body">
+        <strong>ARR:</strong> $33,329 (39% of total)<br><br>
+        <strong>Use Case:</strong> New hire onboarding workflows for attorneys (lateral hires, associates, summer associates) and staff across 19 offices. Partner elevation workflows. Compliance tasks including I-9, E-Verify, benefits enrollment.<br><br>
+        <strong>Pain It Solves:</strong> Law firm onboarding is uniquely complex — practice-group-specific tasks, bar admission requirements, security clearance documentation, and equity partner documentation differ by individual. Generic HRIS onboarding cannot handle this conditional logic.<br><br>
+        <strong>Value Delivered:</strong> Consistent, auditable onboarding experience across distributed offices. Reduced manual HR effort. Compliance documentation tracking. Recent cases show active daily use (task reopening, form resubmission).<br><br>
+        <strong>Risk to Value:</strong> Usage is showing: 322 events in 12 months = ~0.14 events/employee. For a 2,350-person firm with high turnover/lateral activity, this is <em>low</em>. Verify: are other event types not tracked here? Is the Onboarding module used for all attorney hires or only some?
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Recruiting / Rival Recruit</div>
+      <div class="card-body">
+        <strong>ARR:</strong> $42,373 (50% of total)<br><br>
+        <strong>Use Case:</strong> Full ATS for lateral attorney hiring and staff recruitment. Manages requisitions, job postings, candidate pipelines, offers. ROSI AI sourcing recently enabled (case: "Source with ROSI Error" Apr 2026, "Enabling ROSI" thread May 2026).<br><br>
+        <strong>Pain It Solves:</strong> AmLaw firms run high-volume, highly competitive talent pipelines. Managing lateral attorney candidates (who may have active matters at competing firms), partner sourcing, and diverse staff hiring requires a purpose-built ATS with strong privacy controls and complex approval workflows.<br><br>
+        <strong>Value Delivered:</strong> Centralized candidate pipeline, ROSI AI sourcing for proactive outreach, data privacy compliance tools (PII anonymization just shipped in 2026.9). Lindsey Higgins (Firmwide Director, Legal Recruiting) is a key power user.<br><br>
+        <strong>Risk to Value:</strong> MFA inquiry (case Apr 2026) suggests security requirements are growing. New PII Anonymization (Recruit 2026.9) directly addresses GDPR/data retention needs — high-value feature to highlight.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Other / Integrations</div>
+      <div class="card-body">
+        <strong>ARR:</strong> $9,224 (11% of total)<br><br>
+        <strong>Use Case:</strong> SilkRoad-Managed Integration (listed in SilkRoad_Products__c). Likely covers HRIS integration (Workday or other system) to push new hire data into downstream systems.<br><br>
+        <strong>Pain It Solves:</strong> Law firms use multiple systems (HRIS, payroll, time/billing, conflicts). Integration layer ensures Rival Workflow events trigger the right actions in connected systems without manual data entry.<br><br>
+        <strong>Value Delivered:</strong> Reduced data errors, faster time-to-productive for new hires. Active integration migration project (May 2026 activity logs).<br><br>
+        <strong>Risk to Value:</strong> "Trusted External Domain help" case (Apr 2026) suggests SSO/authentication configuration. Integration reliability is ongoing — Scott Wilson (Director, App Dev) is the technical owner.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Expansion Vectors</h2>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Product</th><th>Observed Pain / Signal</th><th>Entry Point</th></tr>
+      <tr>
+        <td><span class="badge badge-purple">Rival Learn (WingSpan)</span></td>
+        <td>ZI scoop (Apr 2026): WilmerHale hiring T&amp;D specialists. "Professional Development Manager" contacts in SFDC (Bronagh Hollywood, Joshua Vaughn). Law firms heavily invest in associate development programs and CLE compliance.</td>
+        <td>Connect with Bronagh Hollywood / Joshua Vaughn in site review. Frame Learn as a unified platform alongside Workflow — same vendor, same employee experience.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-purple">Rival Perform (HeartBeat)</span></td>
+        <td>Annual partner evaluation cycles, associate performance reviews, and "up or out" decisions are core BigLaw HR processes. Currently no performance product active.</td>
+        <td>Introduce in the context of partner elevation workflows — tie Perform to the annual promotion cycle already running in Workflow.</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Summary Signals</h2>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">Switching Cost</div>
+      <div class="card-body">HIGH. ~15 years of tenure. Deeply embedded Workflow configurations (practice-group-specific, compliance-heavy). Active integration layer. Known contacts at HRIS/admin level. Replacement would require 12-18 months of re-configuration.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Whitespace</div>
+      <div class="card-body">SIGNIFICANT. Learn (WingSpan) for T&amp;D, Perform (HeartBeat) for partner evaluations. Cross-sell score = 100 in SFDC. Expansion conversation enabled by active hiring surge and AI interest signals.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Renewal Health</div>
+      <div class="card-body">STABLE. 668 days out (Apr 1, 2028). 2 active contracts (both end Mar 31, 2028, 12-mo renewal term). Renewal opp at Stage 5. No competitive threat logged. No at-risk alerts. Primary risk is NPS=0 and no CHRO relationship.</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TAB 3 — PEOPLE
+═══════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-3">
+
+<div class="section">
+  <h2>Key Stakeholders</h2>
+  <div class="people-grid">
+    <div class="person-card">
+      <div class="person-avatar">LG</div>
+      <div class="person-name">Lizet Garcia</div>
+      <div class="person-title">Chief Human Resources Officer (ZoomInfo) / Director Human Resources (SFDC)</div>
+      <div class="person-note"><span class="badge badge-red" style="font-size:9px;">Executive Target</span> ZI accuracy: 95%. ZI title = CHRO. SFDC shows "Director HR." Validated Apr 2026 in ZoomInfo. No direct Rival interaction logged — relationship gap. Priority contact for site review and executive alignment.</div>
+    </div>
+    <div class="person-card">
+      <div class="person-avatar">DQ</div>
+      <div class="person-name">Denise Quinlan</div>
+      <div class="person-title">HRIS Manager — POC for SRT</div>
+      <div class="person-note"><span class="badge badge-blue" style="font-size:9px;">Champion</span> Primary technical POC for Rival. Listed explicitly as "POC for SRT" (SilkRoad Technology). Active on cases. Direct entry point for all operational requests.</div>
+    </div>
+    <div class="person-card">
+      <div class="person-avatar">LH</div>
+      <div class="person-name">Lindsey B. Higgins</div>
+      <div class="person-title">Firmwide Director, Legal Recruiting</div>
+      <div class="person-note"><span class="badge badge-blue" style="font-size:9px;">Power User</span> Firmwide oversight of legal recruiting. Direct Rival Recruit user. Key stakeholder for Recruiting roadmap conversations, especially Sequential Interviewing (coming soon).</div>
+    </div>
+    <div class="person-card">
+      <div class="person-avatar">SK</div>
+      <div class="person-name">Seth Koziol</div>
+      <div class="person-title">HRIS Administrator</div>
+      <div class="person-note"><span class="badge badge-gray" style="font-size:9px;">Technical</span> Day-to-day HRIS admin. Likely handles system configuration changes, user provisioning, and integration data. Good contact for usage details and technical escalations.</div>
+    </div>
+    <div class="person-card">
+      <div class="person-avatar">LE</div>
+      <div class="person-name">Lisa Edmunds</div>
+      <div class="person-title">HRIS</div>
+      <div class="person-note"><span class="badge badge-gray" style="font-size:9px;">Technical</span> HRIS team member. Active in system management alongside Seth Koziol and Denise Quinlan.</div>
+    </div>
+    <div class="person-card">
+      <div class="person-avatar">EC</div>
+      <div class="person-name">Elizabeth Collins</div>
+      <div class="person-title">Staff Recruiting Manager (SFDC) / Dir. HR Employee Relations &amp; Recruiting (ZI)</div>
+      <div class="person-note"><span class="badge badge-blue" style="font-size:9px;">Key User</span> ZI accuracy: 95%. Manages staff recruiting and HR employee relations. Active contact; ZI validated Jan 2026. Dual owner of Recruiting and HR relationships.</div>
+    </div>
+    <div class="person-card">
+      <div class="person-avatar">SW</div>
+      <div class="person-name">Scott Wilson</div>
+      <div class="person-title">Director, Application Development</div>
+      <div class="person-note"><span class="badge badge-gray" style="font-size:9px;">Technical Sponsor</span> IT owner of Rival integration layer. Engaged during integration migration project (May 2026). Key contact for any API or system-level changes.</div>
+    </div>
+    <div class="person-card">
+      <div class="person-avatar">PP</div>
+      <div class="person-name">Philip Pelletier</div>
+      <div class="person-title">Head of Information Technology Services</div>
+      <div class="person-note"><span class="badge badge-amber" style="font-size:9px;">IT Leadership</span> IT leadership. Relevant for MFA/SSO discussions, security requirements, and any enterprise-level IT decisions affecting Rival's integration or authentication.</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Additional Contacts</h2>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Name</th><th>Title</th><th>Relevance</th></tr>
+      <tr><td>Jessica Natbony</td><td>Regional Manager, Legal Personnel &amp; Recruitment</td><td>Regional Recruiting — West (Palo Alto area based on mobile)</td></tr>
+      <tr><td>Cecilia Luppi</td><td>Manager, Legal Personnel &amp; Recruitment</td><td>Legal personnel management, LA area</td></tr>
+      <tr><td>Caryn Webster</td><td>Legal Personnel and Development Analytics Manager</td><td>Analytics — useful for usage reporting conversations</td></tr>
+      <tr><td>Bronagh Hollywood</td><td>Professional Development Manager</td><td>T&amp;D — expansion target for Rival Learn</td></tr>
+      <tr><td>Joshua Vaughn</td><td>Professional Development and Training Manager</td><td>T&amp;D — expansion target for Rival Learn</td></tr>
+      <tr><td>Annamarie Marinelli</td><td>Training Manager</td><td>Training team — Rival Learn expansion</td></tr>
+      <tr><td>Mara Goldsmith</td><td>Business Relationship Manager</td><td>Vendor management — may be involved in renewal decisions</td></tr>
+      <tr><td>Jodi Green</td><td>Business Relationship Manager</td><td>Vendor management — renewal stakeholder</td></tr>
+      <tr><td>Andrew Blake</td><td>Contracts &amp; Vendor Specialist</td><td>Procurement / contracts — renewal process owner</td></tr>
+      <tr><td>Camela Furry</td><td>Contracts Analyst</td><td>Contracts team — renewal documentation</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Rival Team</h2>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Role</th><th>Name</th><th>Activity / Focus</th></tr>
+      <tr><td>CSM / AE</td><td>Bernard Jackson</td><td>Primary Rival contact. Owner of renewal opp (Stage 5). Active on WH/Rival Meeting threads (May 2026), AI capabilities/roadmap discussion, ROSI enablement, and Workflow &amp; Recruit enhancements outreach.</td></tr>
+      <tr><td>Support (Primary)</td><td>RAndrew Saavedra</td><td>High-volume case owner. Handled welcome email discrepancy, task reopening, form issues, manager team setup in Onboarding.</td></tr>
+      <tr><td>Support</td><td>Kelly Brennan</td><td>Source with ROSI errors, voluntary self-ID form, AI roadmap rescheduling coordination.</td></tr>
+      <tr><td>Support</td><td>Raymond Romero</td><td>Trusted external domain, task reopening.</td></tr>
+      <tr><td>Support</td><td>Edward Oropeza</td><td>New hire form reopening.</td></tr>
+      <tr><td>Support</td><td>Rica Lopez</td><td>Job template error (XML integration), task notification case.</td></tr>
+    </table>
+  </div>
+</div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TAB 4 — CONTRACTS
+═══════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-4">
+
+<div class="section">
+  <h2>Active Contracts</h2>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Contract #</th><th>Status</th><th>Start Date</th><th>End Date</th><th>Renewal Term</th><th>SFDC</th></tr>
+      <tr>
+        <td>00019025</td>
+        <td><span class="pill pill-closed">Activated</span></td>
+        <td>Feb 18, 2026</td>
+        <td>Mar 31, 2028</td>
+        <td>12 months</td>
+        <td><a class="sfdc-link" href="https://rival.lightning.force.com/lightning/r/Contract/800Vs00000yz5D8IAI/view" target="_blank">View &#8599;</a></td>
+      </tr>
+      <tr>
+        <td>00019028</td>
+        <td><span class="pill pill-closed">Activated</span></td>
+        <td>Feb 20, 2026</td>
+        <td>Mar 31, 2028</td>
+        <td>12 months</td>
+        <td><a class="sfdc-link" href="https://rival.lightning.force.com/lightning/r/Contract/800Vs00000zF2kuIAC/view" target="_blank">View &#8599;</a></td>
+      </tr>
+    </table>
+  </div>
+  <p style="font-size:10px;color:#9ca3af;margin-top:8px;">Both contracts co-terminus Mar 31, 2028. 12-mo auto-renewal terms. 2 active contracts (Number_of_Active_Contracts__c = 2).</p>
+</div>
+
+<div class="section">
+  <h2>ARR Breakdown</h2>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Product</th><th>ARR</th><th>% of Total</th><th>Status</th></tr>
+      <tr><td>Recruiting (Rival Recruit)</td><td>$42,373</td><td>50%</td><td><span class="pill pill-closed">Active</span></td></tr>
+      <tr><td>Onboarding (Rival Workflow)</td><td>$33,329</td><td>39%</td><td><span class="pill pill-closed">Active</span></td></tr>
+      <tr><td>Other / Integrations</td><td>$9,224</td><td>11%</td><td><span class="pill pill-closed">Active</span></td></tr>
+      <tr><td><strong>TOTAL</strong></td><td><strong>$84,925</strong></td><td><strong>100%</strong></td><td></td></tr>
+      <tr><td>Performance, Learn, Managed Services, Search</td><td>$0</td><td>—</td><td><span class="pill pill-low">Not Active</span></td></tr>
+    </table>
+  </div>
+  <p style="font-size:10px;color:#9ca3af;margin-top:8px;">Expired_Products__c = "Onboarding, Recruiting" — legacy SilkRoad contracts expired and replaced by current Rival subscriptions. SilkRoad_Products__c = "Recruiting; Onboarding; SilkRoad-Managed Integration".</p>
+</div>
+
+<div class="section">
+  <h2>Active Opportunities</h2>
+  <div class="card" style="margin-bottom:10px;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;">
+      <div>
+        <div class="card-title">Wilmer Cutler Pickering Hale and Dorr LLP - Renewal Opportunity</div>
+        <div class="card-body">
+          <strong>Stage:</strong> <span class="badge badge-blue">5. Renewal Solutioning</span> &nbsp;
+          <strong>Type:</strong> Renewal &nbsp;
+          <strong>Owner:</strong> Andrew Pollard<br>
+          <strong>Potential Renewal ARR:</strong> $24,757 &nbsp;|&nbsp; <strong>Close Date:</strong> Mar 31, 2028<br>
+          <strong>Probability:</strong> 40% &nbsp;|&nbsp; <strong>Created:</strong> Feb 20, 2026 &nbsp;|&nbsp; <strong>Last Modified:</strong> Jun 3, 2026<br>
+          <strong>Next Step:</strong> None logged in SFDC
+        </div>
+      </div>
+      <a class="sfdc-link" href="https://rival.lightning.force.com/lightning/r/Opportunity/006Vs00000UnPAWIA3/view" target="_blank">View in SFDC &#8599;</a>
+    </div>
+  </div>
+  <p style="font-size:10px;color:#9ca3af;">Note: Renewal opp shows $24,757 Potential_Renewal_ARR vs. $84,925 current ARR — verify whether this captures partial product renewals. Amount field = $24,757 only. Recommend clarifying with Bernard Jackson whether additional renewal opps cover the full $84,925 ARR.</p>
+</div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TAB 5 — PRODUCT
+═══════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-5">
+
+<div class="section">
+  <h2>Active Projects &amp; In-Flight Activity</h2>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">ROSI Enablement — In Progress</div>
+      <div class="card-body">Activity log: "Enabling ROSI" thread (May 8-14, 2026, Bernard Jackson). "Source with ROSI Error" case closed Apr 29. ROSI = AI sourcing tool in Rival Recruit. Enablement may be complete or near-complete. Confirm go-live status and adoption.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Integration Migration — May 2026</div>
+      <div class="card-body">"WilmerHale/Rival Integration Migration" email May 18, 2026. Scott Wilson (Director, App Dev) involved. Migration appears completed or near-completion. Confirm with technical contacts and document outcome.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">AI Capabilities/Roadmap Discussion</div>
+      <div class="card-body">Multiple emails Apr-May 2026 re: "AI capabilities/roadmap" (rescheduled). Bernard Jackson driving. Indicates executive interest in Rival's AI direction — ROSI Employee Agent and AI Outreach Analytics are key talking points.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Workflow &amp; Recruit Enhancements</div>
+      <div class="card-body">Outreach from Bernard Jackson May 27-28: "Rival-WH - Workflow &amp; Recruit enhancements/upcoming releases." Active product conversation in flight — coordinate roadmap items below with this thread.</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Product Roadmap — Tier 1: High Relevance</h2>
+
+  <div class="rm-tier1">
+    <div style="margin-bottom:8px;"><span class="rm-badge coming">COMING SOON</span><strong>Sequential Interviewing — Rival Recruit</strong></div>
+    <div style="font-size:11px;color:#374151;line-height:1.55;">Recruit will support scheduling back-to-back interviews with multiple interviewers in a defined order — time blocks, breaks, sequencing controls. Source: Recruit 2026.9 &amp; 2026.10.<br><br>
+    <strong>Why it matters for WilmerHale:</strong> Law firm lateral hiring involves "callback" interview days with multiple partners across practices — a coordinated, sequential process is standard. This feature directly maps to how WilmerHale interviews lateral attorney candidates. Lindsey Higgins (Firmwide Director, Legal Recruiting) should see a demo.</div>
+  </div>
+
+  <div class="rm-tier1">
+    <div style="margin-bottom:8px;"><span class="rm-badge shipped">SHIPPED</span><strong>PII Anonymization (Beta) — Rival Recruit 2026.9</strong></div>
+    <div style="font-size:11px;color:#374151;line-height:1.55;">Automatic PII masking for pipeline candidates after configurable retention period (30-365 days). Covers names, emails, resumes, documents, communications.<br><br>
+    <strong>Why it matters for WilmerHale:</strong> Case log shows MFA inquiry (Apr 2026) — security and privacy requirements are active concerns. WilmerHale handles sensitive attorney data and is subject to GDPR for European offices. This feature reduces data liability for candidate records. Also: law firms maintain strict conflicts-of-interest processes that require careful data handling.</div>
+  </div>
+
+  <div class="rm-tier1">
+    <div style="margin-bottom:8px;"><span class="rm-badge shipped">SHIPPED</span><strong>ROSI Employee Agent — Rival Workflow 2026.1.04</strong></div>
+    <div style="font-size:11px;color:#374151;line-height:1.55;">AI assistant that helps employees complete Workflow events — surfaces assigned tasks, answers questions in natural language, provides contextual guidance. Respects role-based permissions. Enabled per-portal (Admin vs. Employee).<br><br>
+    <strong>Why it matters for WilmerHale:</strong> Active interest in AI capabilities (Apr-May 2026 roadmap discussions). Lateral attorneys joining WilmerHale from other firms often have less familiarity with internal processes. ROSI can reduce HR support burden by answering "what do I do next?" questions directly in the portal. Direct connection to the WH/Rival AI discussion being coordinated by Bernard Jackson.</div>
+  </div>
+
+  <div class="rm-tier1">
+    <div style="margin-bottom:8px;"><span class="rm-badge shipped">SHIPPED</span><strong>Bulk Action — Forms Review &amp; Approval — Workflow 2026.2.09 &amp; 2026.1.08</strong></div>
+    <div style="font-size:11px;color:#374151;line-height:1.55;">Review and approve multiple forms from a centralized dashboard. Supports Classic and Smart Forms. Team task support, improved preview, PDF signature support.<br><br>
+    <strong>Why it matters for WilmerHale:</strong> Annual partner elevation cycles (14 partners in Jan 2026) generate simultaneous form reviews. I-9 and compliance forms for large cohort hires (summer associate classes) require batch review. Reduces HR team overhead significantly during peak periods.</div>
+  </div>
+
+  <div class="rm-tier1">
+    <div style="margin-bottom:8px;"><span class="rm-badge shipped">SHIPPED</span><strong>AI Outreach Analytics — Rival Recruit 2026.9</strong></div>
+    <div style="font-size:11px;color:#374151;line-height:1.55;">Track ROSI AI outreach in Custom Analytics: drafts created, emails sent, unique candidates reached, user attribution.<br><br>
+    <strong>Why it matters for WilmerHale:</strong> ROSI enablement is actively in progress. Analytics visibility will help Lindsey Higgins and the recruiting team prove ROI of AI sourcing to firm leadership — critical for continued investment in the tool.</div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Product Roadmap — Tier 2: Active Products (No Direct Signal)</h2>
+  <div class="rm-tier2-item"><span class="rm-badge shipped">SHIPPED</span> Recruit 2026.10: Recycle Bin Auto-Purge — configurable GDPR-compliant resume purging</div>
+  <div class="rm-tier2-item"><span class="rm-badge shipped">SHIPPED</span> Recruit 2026.9: Interview Scheduling UI Redesign — clearer layout, editable candidate/interviewer messaging</div>
+  <div class="rm-tier2-item"><span class="rm-badge shipped">SHIPPED</span> Recruit 2026.9: Indeed Source Path — granular indeed attribution in analytics</div>
+  <div class="rm-tier2-item"><span class="rm-badge shipped">SHIPPED</span> Recruit 2026.9: ROSI Search Performance — 4-6x faster broad candidate searches</div>
+  <div class="rm-tier2-item"><span class="rm-badge shipped">SHIPPED</span> Recruit 2026.6: Automated Email Notification on Candidate Import — GDPR notify-on-sourcing compliance</div>
+  <div class="rm-tier2-item"><span class="rm-badge shipped">SHIPPED</span> Recruit 2026.3: ROSI Source Tracking — auto-tags applications from ROSI outreach links</div>
+  <div class="rm-tier2-item"><span class="rm-badge shipped">SHIPPED</span> Workflow 2026.2.09: New Task Details Experience — streamlined single-page task configuration</div>
+  <div class="rm-tier2-item"><span class="rm-badge shipped">SHIPPED</span> Workflow 2026.1.08: Default Landing Page Selection — users set preferred dashboard tab</div>
+  <div class="rm-tier2-item"><span class="rm-badge shipped">SHIPPED</span> Workflow 2026.1.08: Malay &amp; Swedish Language Support — global office expansion</div>
+  <div class="rm-tier2-item"><span class="rm-badge shipped">SHIPPED</span> Workflow 2026.1.06: Task Completion Dates in Dashboard Summary</div>
+  <div class="rm-tier2-item"><span class="rm-badge shipped">SHIPPED</span> Workflow 2026.1.05: Improved Task Search, Expanded Task Retrieval, Enhanced Security</div>
+</div>
+
+<div class="section">
+  <h2>Expansion Opportunities</h2>
+  <div class="rm-expand">
+    <div style="margin-bottom:6px;"><span class="badge badge-purple">Rival Learn (WingSpan)</span> <strong>T&amp;D Program Delivery</strong></div>
+    <div style="font-size:11px;color:#4b5563;line-height:1.55;">ZoomInfo scoop (Apr 2026): WilmerHale hiring T&amp;D specialists. Three professional development managers in SFDC. BigLaw CLE compliance and associate training are significant ongoing investments. Rival Learn would centralize training delivery in the same platform as Onboarding — same employee experience, single vendor.</div>
+  </div>
+  <div class="rm-expand">
+    <div style="margin-bottom:6px;"><span class="badge badge-purple">Rival Perform (HeartBeat)</span> <strong>Partner Evaluation &amp; Associate Review Cycles</strong></div>
+    <div style="font-size:11px;color:#4b5563;line-height:1.55;">Annual partner evaluation and associate "up or out" reviews are formalized, multi-step processes in BigLaw. Currently no Perform active. Workflow already handles some of the trigger events (promotion workflows) — Perform would add the structured review layer. Entry point: Jonathan Rosenfeld (Partner, Chair Labor &amp; Employment) as a business champion.</div>
+  </div>
+</div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TAB 6 — USAGE
+═══════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-6">
+
+<div class="section">
+  <h2>LifeSuite Telemetry — Onboarding / Workflow</h2>
+  <div class="usage-grid">
+    <div class="usage-kpi">
+      <div class="uval">322</div>
+      <div class="ulbl">Events (12 Months)</div>
+      <div class="usub">Total_Events_Launched_Last_12Mos</div>
+    </div>
+    <div class="usage-kpi">
+      <div class="uval">20</div>
+      <div class="ulbl">Events (30 Days)</div>
+      <div class="usub">Total_Events_Launched_Last_30Ds</div>
+    </div>
+    <div class="usage-kpi">
+      <div class="uval">240</div>
+      <div class="ulbl">Events YTD</div>
+      <div class="usub">Total_Events_YTD_Onboard</div>
+    </div>
+    <div class="usage-kpi">
+      <div class="uval">7</div>
+      <div class="ulbl">Unique Logins</div>
+      <div class="usub">Unique_User_Logins (all-time)</div>
+    </div>
+  </div>
+  <p style="font-size:10px;color:#9ca3af;margin-bottom:10px;">Data as of Jun 8, 2026 (most recent LifeSuite record). LSCode = WilmerHale. Active_Users_Onboard__c = NULL (field not populated). Unique_User_Logins_L30D = 0 (verify: may reflect admin logins only, not employee portal).</p>
+</div>
+
+<div class="section">
+  <h2>Utilization Analysis</h2>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">Events-per-Employee Ratio</div>
+      <div class="card-body">
+        322 events / 2,350 employees = <strong>0.137 events/employee/year</strong><br><br>
+        <span class="badge badge-amber">Caution</span> Low utilization ratio. Industry benchmark: 0.5+ events/EE/year for healthy onboarding adoption. Two interpretations:<br><br>
+        1. <strong>Underutilization risk:</strong> Not all hires are being processed through Rival Workflow — some offices or departments may be using manual processes.<br>
+        2. <strong>Scope limitation:</strong> Rival may be used only for specific event types (e.g., lateral attorneys only, not all staff). Verify scope with Denise Quinlan.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">YTD Trend</div>
+      <div class="card-body">
+        240 events YTD (Jan 1 – Jun 8, 2026) = <strong>~40/month pace</strong><br>
+        322 events in trailing 12 months = <strong>~26.8/month average</strong><br><br>
+        <span class="badge badge-green">Accelerating</span> YTD pace (40/mo) is significantly above prior-year average (26.8/mo). This aligns with ZoomInfo scoop data showing peak hiring activity in 2026.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">30-Day Activity</div>
+      <div class="card-body">
+        20 events in last 30 days vs. 40/month YTD pace = <strong>below current trend</strong>.<br><br>
+        Unique logins L30D = 0 (verify: this may be an admin metric, not employee portal logins). If accurate, suggests recent lull in platform activity. Cross-reference with case volume — no new cases in last 10 days suggests overall account is currently stable.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Event Type Breakdown</div>
+      <div class="card-body">
+        New_Hire_Onboarding, Offboarding, TransferPromotion fields = <strong>NULL</strong> (not populated in LifeSuite records). Cannot determine event type mix.<br><br>
+        <span class="badge badge-amber">Verify:</span> Ask Denise Quinlan what event types are actively running. Are offboarding and transfer events configured and in use, or only new hire onboarding?
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Instance &amp; Services Details</h2>
+  <div class="two-col">
+    <div>
+      <div class="info-row"><span class="info-lbl">LSCode</span><span class="info-val">WilmerHale</span></div>
+      <div class="info-row"><span class="info-lbl">Active Products</span><span class="info-val">Other, Onboarding, Recruiting</span></div>
+      <div class="info-row"><span class="info-lbl">SilkRoad Products</span><span class="info-val">Recruiting; Onboarding; SilkRoad-Managed Integration</span></div>
+      <div class="info-row"><span class="info-lbl">SDA Client</span><span class="info-val">No (SDA_Client__c = false)</span></div>
+      <div class="info-row"><span class="info-lbl">Managed Services</span><span class="info-val">None active</span></div>
+    </div>
+    <div>
+      <div class="info-row"><span class="info-lbl">Site Review Status</span><span class="info-val"><span class="pill pill-open">Overdue</span> — No date on record</span></div>
+      <div class="info-row"><span class="info-lbl">Onsite F2F Status</span><span class="info-val"><span class="pill pill-closed">Not Overdue</span> — No date on record</span></div>
+      <div class="info-row"><span class="info-lbl">Geographic Usage</span><span class="info-val">Unverified — Usage_Region_A__c = NULL</span></div>
+      <div class="info-row"><span class="info-lbl">Onboarding Score</span><span class="info-val">100 (Global_Onboarding_Score__c)</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Open Questions — Usage Intelligence Gaps</h2>
+  <ul style="font-size:11px;color:#4b5563;line-height:1.8;padding-left:18px;">
+    <li>Are all 19 offices using Rival Workflow, or only select locations?</li>
+    <li>What event types are in use? (New hire only vs. offboarding, transfers, promotions)</li>
+    <li>How many total new hires/year at WilmerHale? (Expected 300-500 based on firm size and lateral activity)</li>
+    <li>Is Rival Workflow used for summer associate programs (June-August cohort)?</li>
+    <li>ROSI enablement: confirmed go-live? How many recruiters actively sourcing with ROSI?</li>
+    <li>Unique_User_Logins_L30D = 0 — is this admin-side metric only, or does it capture employee portal activity?</li>
+  </ul>
+</div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TAB 7 — CASES
+═══════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-7">
+
+<div class="section">
+  <h2>Cases — Last 12 Months (16 Total)</h2>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Case #</th><th>Subject</th><th>Priority</th><th>Status</th><th>Created</th><th>Closed</th><th>Days Open</th><th>Owner</th></tr>
+      <tr><td>00997706</td><td>RC | Onboarding Welcome Email Discrepancy for Sunita Hazara</td><td><span class="pill pill-hi">High</span></td><td><span class="pill pill-closed">Closed</span></td><td>May 26, 2026</td><td>Jun 8, 2026</td><td>13</td><td>RAndrew Saavedra</td></tr>
+      <tr><td>00996838</td><td>Source with ROSI Error</td><td><span class="pill pill-low">Low</span></td><td><span class="pill pill-closed">Closed</span></td><td>Apr 29, 2026</td><td>Apr 29, 2026</td><td>&lt;1</td><td>Kelly Brennan</td></tr>
+      <tr><td>00996754</td><td>Trusted External Domain help</td><td><span class="pill pill-hi">High</span></td><td><span class="pill pill-closed">Closed</span></td><td>Apr 27, 2026</td><td>Apr 28, 2026</td><td>1</td><td>Raymond Romero</td></tr>
+      <tr><td>00996648</td><td>Reopening a task "Review New Hire Form"</td><td><span class="pill pill-hi">High</span></td><td><span class="pill pill-closed">Closed</span></td><td>Apr 22, 2026</td><td>Apr 22, 2026</td><td>&lt;1</td><td>RAndrew Saavedra</td></tr>
+      <tr><td>00996255</td><td>Do you have a MFA solution for recruiting module?</td><td><span class="pill pill-hi">High</span></td><td><span class="pill pill-closed">Closed</span></td><td>Apr 8, 2026</td><td>Apr 10, 2026</td><td>2</td><td>RAndrew Saavedra</td></tr>
+      <tr><td>00996010</td><td>RC | Issue with adding New Hired Manager to Managers Team in RedCarpet</td><td><span class="pill pill-mod">Moderate</span></td><td><span class="pill pill-closed">Closed</span></td><td>Mar 31, 2026</td><td>Apr 2, 2026</td><td>2</td><td>RAndrew Saavedra</td></tr>
+      <tr><td>00995790</td><td>RC | WilmerHale — New York Sick and Safe Amended Policy</td><td><span class="pill pill-mod">Moderate</span></td><td><span class="pill pill-closed">Closed</span></td><td>Mar 23, 2026</td><td>Mar 25, 2026</td><td>2</td><td>RAndrew Saavedra</td></tr>
+      <tr><td>00994430</td><td>Wilmerhale — RC — Voluntary Self-ID Form</td><td><span class="pill pill-low">Low</span></td><td><span class="pill pill-closed">Closed</span></td><td>Feb 4, 2026</td><td>Feb 6, 2026</td><td>2</td><td>Kelly Brennan</td></tr>
+      <tr><td>00992938</td><td>Re open task / form</td><td><span class="pill pill-hi">High</span></td><td><span class="pill pill-closed">Closed</span></td><td>Jan 13, 2026</td><td>Jan 13, 2026</td><td>&lt;1</td><td>Edward Oropeza</td></tr>
+      <tr><td>00992661</td><td>OH- Job Template Error — Integration (xml)</td><td><span class="pill pill-mod">Moderate</span></td><td><span class="pill pill-closed">Closed</span></td><td>Jan 6, 2026</td><td>Jan 14, 2026</td><td>8</td><td>Rica Lopez</td></tr>
+      <tr><td>00992424</td><td>FW: You have one or more new tasks to complete</td><td><span class="pill pill-mod">Moderate</span></td><td><span class="pill pill-closed">Closed</span></td><td>Dec 19, 2025</td><td>Dec 23, 2025</td><td>4</td><td>Rica Lopez</td></tr>
+      <tr><td>00992205</td><td>Important: E-Verify Data Purge Scheduled for January 2026</td><td><span class="pill pill-hi">High</span></td><td><span class="pill pill-closed">Closed</span></td><td>Dec 12, 2025</td><td>Jan 4, 2026</td><td>23</td><td>Milica Mirkovic</td></tr>
+      <tr><td>00990272</td><td>Reopen New Hire forms</td><td><span class="pill pill-hi">High</span></td><td><span class="pill pill-closed">Closed</span></td><td>Oct 24, 2025</td><td>Oct 24, 2025</td><td>&lt;1</td><td>Edward Oropeza</td></tr>
+      <tr><td>00986948</td><td>RC — Reopen a new hire form for an attorney named Andrea Paul</td><td><span class="pill pill-hi">High</span></td><td><span class="pill pill-closed">Closed</span></td><td>Sep 29, 2025</td><td>Sep 30, 2025</td><td>1</td><td>RAndrew Saavedra</td></tr>
+      <tr><td>00986773</td><td>Reopen a task</td><td><span class="pill pill-hi">High</span></td><td><span class="pill pill-closed">Closed</span></td><td>Sep 24, 2025</td><td>Sep 24, 2025</td><td>&lt;1</td><td>Raymond Romero</td></tr>
+      <tr><td>00986577</td><td>RC — Re-open a task</td><td><span class="pill pill-hi">High</span></td><td><span class="pill pill-closed">Closed</span></td><td>Sep 17, 2025</td><td>Sep 19, 2025</td><td>2</td><td>RAndrew Saavedra</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Case Analysis</h2>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">Resolution Time</div>
+      <div class="card-body">
+        <strong>Median time-to-close:</strong> ~1-2 days<br>
+        <strong>Fastest:</strong> &lt;1 day (multiple task-reopen cases)<br>
+        <strong>Slowest:</strong> 23 days (E-Verify Data Purge — complexity)<br>
+        <strong>Most recent open:</strong> Case 00997706 took 13 days — longest recent resolution. Welcome email discrepancy is a user-facing issue that required investigation.<br><br>
+        <strong>Overall:</strong> Support responsiveness is strong. No chronic open cases. No escalations visible.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Case Pattern Analysis</div>
+      <div class="card-body">
+        <strong>Task/Form Reopening (7 cases = 44%):</strong> Largest category. Reflects active use of the platform — new hires frequently need forms re-opened for corrections or resubmission. Not a product defect; operational workflow pattern for law firms.<br><br>
+        <strong>Compliance/Policy (3 cases):</strong> NY Sick &amp; Safe Policy, Voluntary Self-ID Form, E-Verify Purge. Compliance-driven requests — WilmerHale is proactive about regulatory compliance.<br><br>
+        <strong>Integration/Technical (2 cases):</strong> XML Job Template Error, Trusted External Domain. Technical infrastructure questions — stable, not recurring.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Security Signals</div>
+      <div class="card-body">
+        <strong>MFA Inquiry (Apr 2026):</strong> "Do you have a MFA solution for recruiting module?" filed as High priority — answered by support team. Suggests IT security requirements are growing. Philip Pelletier (Head of IT Services) may be driving this requirement.<br><br>
+        <strong>Trusted External Domain (Apr 2026):</strong> SSO/external authentication configuration. Likely tied to integration migration work.<br><br>
+        <strong>Implication:</strong> Security posture is tightening at WilmerHale. Ensure Rival's security documentation (SOC 2, SSO/SAML capabilities) is readily available.
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TAB 8 — RISK
+═══════════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-8">
+
+<div class="risk-card risk-amber">
+  <span class="risk-icon">🟡</span><span class="risk-title">No Site Review on Record — Relationship Visibility Gap</span>
+  <div class="risk-body">Site_Review_Overdue__c = TRUE. Last_Site_Review_Date__c = NULL. For an account with ~15 years of tenure and $84,925 ARR, no documented site review creates a structural blind spot. All current engagement is operational (HRIS contacts, support cases). No strategic relationship with CHRO or executive layer. Renewal is 668 days away — sufficient time to build, but must start now.
+  <br><br><strong>Evidence:</strong> SFDC health fields (Overall, Product, Relationship health scores all NULL). NPS = 0 (passive/detractor). No CHRO touchpoints in activity log. All 30 recent tasks are support-related emails.</div>
+  <div class="risk-fix"><strong>What would move this to green:</strong> Complete one site review with Lizet Garcia (CHRO) and Denise Quinlan in Q3 2026. Document outcomes in SFDC. Establish quarterly strategic cadence.</div>
+</div>
+
+<div class="risk-card risk-amber">
+  <span class="risk-icon">🟡</span><span class="risk-title">NPS = 0 — Passive/Detractor Signal Without Context</span>
+  <div class="risk-body">Average_NPS_Score_SFDC__c = 0. Scale: 9-10 = Promoter, 7-8 = Passive, 0-6 = Detractor. Score of 0 represents the lowest possible detractor signal. Last sent Apr 21, 2026; next Oct 18, 2026. However: no CSAT field is populated, no renewal risk field is populated, no at-risk alerts. The 0 score may reflect a response pattern issue (respondent misunderstood scale) rather than genuine dissatisfaction. <strong>Cannot confirm either way without follow-up.</strong>
+  <br><br><strong>Evidence:</strong> Average_NPS_Score_SFDC__c = 0. Average_Support_CSAT_Score__c = NULL. Renewal_Risks_Competitive_Threats__c = NULL. Count_of_Active_At_Risk_Alerts__c = 0.</div>
+  <div class="risk-fix"><strong>What would move this to green:</strong> Proactively reach out to NPS respondent(s) from the April 2026 survey to understand their feedback. Address any legitimate concerns. Confirm whether score reflects a single detractor response or aggregate sentiment.</div>
+</div>
+
+<div class="risk-card risk-amber">
+  <span class="risk-icon">🟡</span><span class="risk-title">Usage Underutilization — Low Events-per-Employee Ratio</span>
+  <div class="risk-body">322 Onboarding events in 12 months for a 2,350-person firm = 0.14 events/employee/year. If WilmerHale hires 15-20% of headcount annually (350-470 hires, typical for BigLaw), only 322 events suggests either: (a) Rival is used for a subset of hires/event types only, or (b) platform adoption has room to grow significantly. Low utilization reduces perceived switching cost.
+  <br><br><strong>Evidence:</strong> Total_Events_Launched_Last_12Mos_Onboard__c = 322. NumberOfEmployees = 2,350. Event type breakdown fields (New Hire, Offboarding, Transfer) = NULL. ZI scoop: WilmerHale at peak Legal and HR hiring — event volume should be rising.</div>
+  <div class="risk-fix"><strong>What would move this to green:</strong> Site review should include a usage review. Understand which event types and offices are configured. Help WilmerHale expand Workflow use to offboarding, transfer, and promotion events. YTD trend (240 events through June = ~40/month) is positive — accelerating.</div>
+</div>
+
+<div class="risk-card risk-green">
+  <span class="risk-icon">🟢</span><span class="risk-title">No Competitive Threat Logged — Market Position Stable</span>
+  <div class="risk-body">Renewal_Risks_Competitive_Threats__c = NULL. No competitor mentions in case history. No Workday consolidation signals in activity log. WilmerHale is an independent law firm with no parent company making top-down vendor consolidation decisions. The firm has used Rival for ~15 years.
+  <br><br><strong>Evidence:</strong> SFDC competitive field = NULL. Independent firm (no parent). 15-year tenure. SilkRoad-managed integration suggests deep platform dependency. No Chorus calls found to check for competitor mentions — Chorus data unavailable for this account.</div>
+  <div class="risk-fix"><strong>What would move this to amber:</strong> A new CPO/CHRO hire who previously championed a competing platform, or a management consulting engagement recommending vendor rationalization. Watch for CHRO turnover given that ZI title (CHRO) differs from SFDC title (Director HR) — verify Lizet Garcia's current role and tenure.</div>
+</div>
+
+<div class="risk-card risk-green">
+  <span class="risk-icon">🟢</span><span class="risk-title">Regulatory/Political Risk — Executive Order Resolved</span>
+  <div class="risk-body">Trump Executive Order 14250 (Mar 2025) targeted WilmerHale, threatening to terminate federal contracts and suspend security clearances. Federal judge declared it unconstitutional and permanently blocked it (May 27, 2025). Permanent injunction issued June 3, 2025. The firm has fully prevailed.
+  <br><br><strong>Evidence:</strong> CBS News, Bloomberg Law, CNBC, WBUR coverage (May-June 2025). Court: U.S. District Court DC, Judge Richard Leon. Outcome: EO struck down entirely, permanent injunction blocking all defendants.</div>
+  <div class="risk-fix"><strong>Current status:</strong> GREEN — fully resolved. The episode demonstrated the firm's resilience and willingness to fight regulatory overreach. May have strengthened internal culture and cohesion. No ongoing HR risk from this event.</div>
+</div>
+
+<div class="risk-card risk-amber">
+  <span class="risk-icon">🟡</span><span class="risk-title">Renewal Opportunity ARR Gap — Needs Clarification</span>
+  <div class="risk-body">Current ARR = $84,925. Renewal opportunity (Stage 5) shows Potential_Renewal_ARR__c = $24,757 and Amount = $24,757. This represents only 29% of current ARR. Either: (a) multiple renewal opps cover different product lines and only one is logged, or (b) there is a risk of contract contraction at renewal. CSM_Renewal_Strategy__c = NULL (no renewal strategy logged).
+  <br><br><strong>Evidence:</strong> SFDC opp record. No NextStep logged on the renewal opp. 668 days to renewal = comfortable runway, but strategy gap needs to be addressed.</div>
+  <div class="risk-fix"><strong>What would move this to green:</strong> Verify with Bernard Jackson whether the $24,757 opp covers only one product line. Log CSM renewal strategy in SFDC. Ensure all $84,925 ARR is covered by renewal opportunities before Q4 2027.</div>
+</div>
+
+<div class="risk-card risk-green">
+  <span class="risk-icon">🟢</span><span class="risk-title">Commercial Health — Contracts Active, No Churn Signals</span>
+  <div class="risk-body">2 active contracts, both running through March 31, 2028. No expired products in current subscription. Cross-sell score = 100 (maximum whitespace signal). 0 active at-risk alerts. Account is classified as Enterprise / Segment B. Account renewal at Stage 5 (Renewal Solutioning) — proactively managed by Andrew Pollard.
+  <br><br><strong>Evidence:</strong> All SFDC commercial fields clean. No competitive threat. No case escalations. Active product conversation with WilmerHale team in May 2026.</div>
+  <div class="risk-fix"><strong>What would move this to amber:</strong> NPS detractor follow-up reveals deeper dissatisfaction, or renewal ARR gap ($24,757 vs $84,925) is not explained by separate opp records.</div>
+</div>
+
+</div>
+
+</div><!-- end page-wrap -->
+
+<script>
+function switchTab(n) {
+  var panels = document.querySelectorAll('.tab-panel');
+  var btns = document.querySelectorAll('.tab-btn');
+  for (var i = 0; i < panels.length; i++) { panels[i].classList.remove('active'); }
+  for (var i = 0; i < btns.length; i++) { btns[i].classList.remove('active'); }
+  document.getElementById('tab-' + n).classList.add('active');
+  for (var i = 0; i < btns.length; i++) {
+    if (btns[i].getAttribute('onclick') === 'switchTab(' + n + ')') {
+      btns[i].classList.add('active'); break;
+    }
+  }
+}
+</script>
+</body>
+</html>
