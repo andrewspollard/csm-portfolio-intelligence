@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light only">
+<title>GroupM — CSM Account Cockpit</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif; background: #f8f9fb; color: #1a1f2e; overflow-x: hidden; font-size: 14px; line-height: 1.5; }
+.container { max-width: 100%; padding: 16px; }
+/* HEADER */
+.header { background: #ffffff; border-radius: 12px; padding: 18px 24px; margin-bottom: 16px; border: 1px solid #e4e7f0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.header-left { display: flex; align-items: center; gap: 16px; }
+.logo-circle { width: 48px; height: 48px; border-radius: 50%; background: #003b85; color: #ffffff; font-weight: 700; font-size: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.acct-name { font-size: 20px; font-weight: 700; color: #1a1f2e; }
+.acct-meta { font-size: 12px; color: #6b7280; margin-top: 2px; }
+.badge-tier { background: #003b85; color: #ffffff; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+.badge-sda { background: #f59e0b; color: #ffffff; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+.header-right { text-align: right; }
+.renewal-alert { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 8px 14px; font-size: 12px; }
+.renewal-days { font-size: 22px; font-weight: 800; color: #d97706; }
+.refresh-note { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+/* KPI STRIP */
+.kpi-strip { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 16px; }
+.kpi-card { background: #ffffff; border: 1px solid #e4e7f0; border-radius: 10px; padding: 14px 16px; }
+.kpi-label { font-size: 11px; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.kpi-val { font-size: 20px; font-weight: 800; color: #1a1f2e; }
+.kpi-sub { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+.kpi-green { border-left: 3px solid #10b981; }
+.kpi-amber { border-left: 3px solid #f59e0b; }
+.kpi-blue { border-left: 3px solid #3b82f6; }
+.kpi-red { border-left: 3px solid #ef4444; }
+/* TAB BAR */
+.tab-bar { display: flex; gap: 2px; background: #e8eaf0; border-radius: 10px; padding: 4px; overflow-x: auto; white-space: nowrap; position: sticky; top: 0; z-index: 100; margin-bottom: 16px; }
+.tab-btn { padding: 9px 16px; border: none; background: transparent; color: #5a6178; font-size: 12px; font-weight: 600; border-radius: 8px; cursor: pointer; white-space: nowrap; font-family: inherit; }
+.tab-btn.active { background: #ffffff; color: #1a1f2e; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+/* PANELS */
+.tab-panel { display: none; overflow: visible; }
+.tab-panel.active { display: block; }
+/* SECTIONS */
+.section { background: #ffffff; border: 1px solid #e4e7f0; border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; overflow: visible; }
+.section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #6b7280; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #f3f4f6; }
+/* ACTIONS */
+.action-card { border: 1px solid #e4e7f0; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; border-left: 4px solid #3b82f6; }
+.action-card.urgent { border-left-color: #ef4444; }
+.action-card.amber { border-left-color: #f59e0b; }
+.action-num { font-size: 10px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em; }
+.action-title { font-size: 15px; font-weight: 700; color: #1a1f2e; margin: 4px 0 6px; }
+.action-why { font-size: 13px; color: #4b5563; margin-bottom: 8px; }
+.action-next { font-size: 12px; background: #f0f4ff; color: #3b5bdb; border-radius: 6px; padding: 6px 10px; display: inline-block; font-weight: 600; }
+/* HEALTH GRID */
+.health-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px; overflow: visible; }
+.health-card { background: #f8f9fb; border: 1px solid #e4e7f0; border-radius: 10px; padding: 14px 16px; text-align: center; overflow: visible; position: relative; }
+.health-score { font-size: 28px; font-weight: 800; }
+.health-label { font-size: 11px; color: #6b7280; margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+.score-green { color: #10b981; }
+.score-amber { color: #f59e0b; }
+.score-red { color: #ef4444; }
+.score-gray { color: #9ca3af; }
+/* TOOLTIP */
+.tip { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; background: #eef0f4; color: #8b91a5; font-size: 10px; font-weight: 700; cursor: help; position: relative; }
+.tip .tip-box { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); width: 240px; padding: 10px 12px; background: #1a1f2e; color: #fff; font-size: 11px; font-weight: 400; line-height: 1.5; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,.2); z-index: 9999; white-space: normal; text-align: left; }
+.tip:hover .tip-box { display: block; }
+/* TABLES */
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; padding: 8px 12px; border-bottom: 2px solid #e4e7f0; background: #f8f9fb; }
+td { padding: 10px 12px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; color: #374151; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #f9fafb; }
+/* STATUS BADGES */
+.badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.badge-green { background: #d1fae5; color: #065f46; }
+.badge-amber { background: #fef3c7; color: #92400e; }
+.badge-red { background: #fee2e2; color: #991b1b; }
+.badge-blue { background: #dbeafe; color: #1e40af; }
+.badge-gray { background: #f3f4f6; color: #374151; }
+.badge-purple { background: #ede9fe; color: #5b21b6; }
+/* PEOPLE CARDS */
+.people-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.person-card { border: 1px solid #e4e7f0; border-radius: 10px; padding: 14px 16px; }
+.person-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #ffffff; margin-bottom: 10px; flex-shrink: 0; }
+.person-name { font-weight: 700; font-size: 13px; color: #1a1f2e; }
+.person-title { font-size: 11px; color: #6b7280; margin-bottom: 6px; }
+.person-intel { font-size: 12px; color: #4b5563; border-top: 1px solid #f3f4f6; padding-top: 8px; margin-top: 8px; }
+/* RISK CARDS */
+.risk-card { border: 1px solid #e4e7f0; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+.risk-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.risk-title { font-size: 14px; font-weight: 700; color: #1a1f2e; }
+.risk-body { font-size: 13px; color: #4b5563; margin-bottom: 10px; }
+.risk-change { font-size: 12px; background: #f0fdf4; color: #065f46; border-radius: 6px; padding: 6px 10px; border-left: 3px solid #10b981; }
+.risk-change-amber { background: #fefce8; color: #713f12; border-left-color: #f59e0b; }
+/* PRODUCT ROADMAP */
+.roadmap-card { border: 1px solid #e4e7f0; border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; }
+.roadmap-card.tier1 { border-left: 4px solid #3b82f6; }
+.roadmap-card.expansion { border: 1px dashed #8b5cf6; background: #faf5ff; }
+.badge-shipped { background: #d1fae5; color: #065f46; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+.badge-coming { background: #dbeafe; color: #1e40af; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+.badge-expansion { background: #ede9fe; color: #5b21b6; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+.roadmap-feature { font-size: 13px; font-weight: 700; color: #1a1f2e; margin: 4px 0; }
+.roadmap-desc { font-size: 12px; color: #4b5563; margin-bottom: 6px; }
+.roadmap-pain { font-size: 12px; background: #f0f4ff; color: #3730a3; border-radius: 6px; padding: 6px 10px; }
+/* CONTRACT CARDS */
+.opp-card { border: 1px solid #e4e7f0; border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; }
+.opp-amount { font-size: 18px; font-weight: 800; color: #1a1f2e; }
+/* USAGE CHART BARS */
+.bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.bar-label { font-size: 12px; color: #6b7280; width: 80px; flex-shrink: 0; text-align: right; }
+.bar-track { flex: 1; background: #f3f4f6; border-radius: 4px; height: 20px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; font-size: 11px; font-weight: 600; color: #ffffff; }
+/* TWO COL */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+/* METRIC CARD */
+.metric-card { background: #f8f9fb; border: 1px solid #e4e7f0; border-radius: 10px; padding: 16px; text-align: center; }
+.metric-big { font-size: 32px; font-weight: 800; color: #1a1f2e; }
+.metric-label { font-size: 12px; color: #6b7280; margin-top: 4px; }
+/* STRATEGY QUOTE */
+.strategy-quote { background: #f0f4ff; border-left: 4px solid #3b82f6; border-radius: 0 8px 8px 0; padding: 14px 18px; font-size: 13px; color: #1e3a5f; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="logo-circle">GM</div>
+    <div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="acct-name">GroupM</span>
+        <span class="badge-tier">Tier 1</span>
+        <span class="badge-sda">SDA</span>
+        <span class="badge" style="background:#dbeafe;color:#1e40af;font-size:10px;">Enterprise</span>
+      </div>
+      <div class="acct-meta">Advertising &amp; Marketing · New York, NY · 42,000 employees · Parent: WPP PLC → WPP Media Ltd</div>
+      <div class="acct-meta" style="margin-top:4px;">CSM: Andrew Pollard · AE: Kara Sheridan · SFDC: 0016000000Iu3CrAAJ</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="renewal-alert">
+      <div style="font-size:11px;color:#92400e;font-weight:600;">RENEWAL DUE</div>
+      <div class="renewal-days">62 days</div>
+      <div style="font-size:12px;color:#b45309;">Aug 4, 2026 · Stage: 5 · 40% prob</div>
+    </div>
+    <div class="refresh-note">Monday Full Refresh · Jun 8, 2026</div>
+  </div>
+</div>
+
+<!-- KPI STRIP -->
+<div class="kpi-strip">
+  <div class="kpi-card kpi-blue">
+    <div class="kpi-label">ARR</div>
+    <div class="kpi-val">$314K</div>
+    <div class="kpi-sub">Onboarding only</div>
+  </div>
+  <div class="kpi-card kpi-green">
+    <div class="kpi-label">Engagement</div>
+    <div class="kpi-val">100%</div>
+    <div class="kpi-sub">Score: 100 / 100</div>
+  </div>
+  <div class="kpi-card kpi-green">
+    <div class="kpi-label">Events L30D</div>
+    <div class="kpi-val">285</div>
+    <div class="kpi-sub">12mo: 2,598</div>
+  </div>
+  <div class="kpi-card kpi-amber">
+    <div class="kpi-label">Open Cases</div>
+    <div class="kpi-val">13</div>
+    <div class="kpi-sub">2 High priority</div>
+  </div>
+  <div class="kpi-card kpi-green">
+    <div class="kpi-label">Logins L7D</div>
+    <div class="kpi-val">17</div>
+    <div class="kpi-sub">Today: Jun 8</div>
+  </div>
+  <div class="kpi-card kpi-amber">
+    <div class="kpi-label">NPS (avg)</div>
+    <div class="kpi-val">0.0</div>
+    <div class="kpi-sub">Last sent Apr 17</div>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab(0)">Actions</button>
+  <button class="tab-btn" onclick="switchTab(1)">Account Intel</button>
+  <button class="tab-btn" onclick="switchTab(2)">Use Case</button>
+  <button class="tab-btn" onclick="switchTab(3)">People</button>
+  <button class="tab-btn" onclick="switchTab(4)">Contracts</button>
+  <button class="tab-btn" onclick="switchTab(5)">Product</button>
+  <button class="tab-btn" onclick="switchTab(6)">Usage</button>
+  <button class="tab-btn" onclick="switchTab(7)">Cases</button>
+  <button class="tab-btn" onclick="switchTab(8)">Risk</button>
+</div>
+
+<!-- TAB 0: ACTIONS -->
+<div class="tab-panel active" id="tab-0">
+
+  <div class="section">
+    <div class="section-title">Priority Actions This Week</div>
+    
+    <div class="action-card urgent">
+      <div class="action-num">Action 1 · Renewal · URGENT</div>
+      <div class="action-title">Execute Renewal Pricing Call — Wed Jun 10 (2 days)</div>
+      <div class="action-why">Renewal call is scheduled for this Wednesday 10AM ET with Patryk Mochalski and Emily Chan. Three event-based pricing options (1/2/3-year) need to be finalized before then. Employee-based pricing is confirmed off the table. Internal pricing prep with MDLR + Kara must happen first. Contract 00018433 expires Aug 3 — 56 days from call day.</div>
+      <span class="action-next">Prep 1/2/3-year event pricing deck → send to Kara + MDLR for Tuesday approval → deliver options Wednesday</span>
+    </div>
+
+    <div class="action-card amber">
+      <div class="action-num">Action 2 · Risk · HIGH</div>
+      <div class="action-title">Monitor WPP Cost-Cutting Mandate — License Compliance Watch Active</div>
+      <div class="action-why">WPP Q1 2026 revenue fell 6.6% YoY. WPP Media (GroupM rebrand) was the single biggest drag, down 8.5% LFL. CEO Cindy Rose's Elevate28 strategy includes vendor consolidation and headcount cuts. Strategy note: "Begin discussions in Q2 while also monitoring License Compliance." Ensure usage data is being pulled to surface compliance leverage if needed at renewal.</div>
+      <span class="action-next">Pull Perceptive integration report → validate user/license count → bring compliance data to Wed call</span>
+    </div>
+
+    <div class="action-card amber">
+      <div class="action-num">Action 3 · Escalation · ACTIVE</div>
+      <div class="action-title">Resolve High-Priority Case: Perceptive Content Export Failure (00997972)</div>
+      <div class="action-why">High-priority case opened Jun 3, currently "Pending Technical Services" with Raymond Romero. Perceptive integration is central to GroupM's onboarding workflow — export failures directly impact new hire processing. Two prior Perceptive-related cases closed in late 2025. Pattern of recurring integration friction.</div>
+      <span class="action-next">Follow up with Raymond Romero for ETA → flag to Patryk/Emily if SLA at risk → log update in SFDC</span>
+    </div>
+
+    <div class="action-card">
+      <div class="action-num">Action 4 · Strategic · UPCOMING</div>
+      <div class="action-title">Hard Sell Managed Services as Part of Renewal Package</div>
+      <div class="action-why">CSM strategy note states: "Will also make hard sell for Managed Services as part of next Renewal while mentioning this during year." This is the Aug 2026 renewal. GroupM's Perceptive integration has required repeated support cases — Managed Services could absorb ongoing integration overhead and reduce case volume. SilkRoad Products confirms: SilkRoad-Managed Integration is active.</div>
+      <span class="action-next">Build Managed Services ROI case around Perceptive support case volume → include as Option C in renewal offer</span>
+    </div>
+
+    <div class="action-card">
+      <div class="action-num">Action 5 · Relationship · MONITOR</div>
+      <div class="action-title">Validate GroupM → WPP Media Rebrand Impact on Contacts &amp; Contracts</div>
+      <div class="action-why">May 2025: GroupM rebranded as WPP Media. Emily Chan and Patryk Mochalski email domains updated to @wppmedia.com (confirmed in SFDC). Contract 00018433 references GroupM entity — may need review for contractual continuity. Some contacts still show @groupm.com. Confirm legal entity for Aug renewal contract.</div>
+      <span class="action-next">Confirm legal signing entity is WPP Media or GroupM LLC → update SFDC contacts to wppmedia.com → note on opp</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Engagement Health</div>
+    <div class="health-grid">
+      <div class="health-card">
+        <div class="health-score score-green">100%</div>
+        <div class="health-label">Engagement Score <span class="tip">?<span class="tip-box">Customer_Engagement_Score__c = 100.0. Measures contact activity, login frequency, and CSM cadence completeness. 100 = fully engaged; no lapsed contacts, regular touchpoints.</span></span></div>
+      </div>
+      <div class="health-card">
+        <div class="health-score score-green">100%</div>
+        <div class="health-label">Services Engagement <span class="tip">?<span class="tip-box">Services_Engagement_Score_Percent__c = 100.0. Measures active services consulting and implementation engagement. 100 = services team actively engaged with account.</span></span></div>
+      </div>
+      <div class="health-card">
+        <div class="health-score score-green">100</div>
+        <div class="health-label">Onboarding Score <span class="tip">?<span class="tip-box">Global_Onboarding_Score__c = 100. Platform configuration and utilization score for the Onboarding product. 100 = fully configured, events running, no critical gaps detected.</span></span></div>
+      </div>
+      <div class="health-card">
+        <div class="health-score score-gray">—</div>
+        <div class="health-label">Overall Health <span class="tip">?<span class="tip-box">Overall_Health_Score__c = null. Not yet calculated by Rival system. Verify: Product_Health_Score__c and Relationship_Health_Score__c are also null — this score requires manual entry or automated calculation that has not run for this account.</span></span></div>
+      </div>
+    </div>
+    <div style="margin-top:16px;">
+      <div style="font-size:12px;color:#6b7280;margin-bottom:8px;"><strong>Cadence Indicators</strong></div>
+      <table>
+        <tr><td style="font-weight:600;width:220px;">Last Site Review</td><td>May 12, 2026 <span class="badge badge-green">27 days ago · Not overdue</span></td></tr>
+        <tr><td style="font-weight:600;">Last Onsite F2F</td><td>Feb 25, 2026 <span class="badge badge-amber">103 days ago · Not flagged overdue</span></td></tr>
+        <tr><td style="font-weight:600;">Last Chorus Call</td><td>Jun 3, 2026 — "GroupM / Rival Monthly Meeting" <span class="badge badge-green">5 days ago</span></td></tr>
+        <tr><td style="font-weight:600;">WPP Media Touchbase</td><td>Jun 2, 2026 — Randy Havel <span class="badge badge-green">6 days ago</span></td></tr>
+        <tr><td style="font-weight:600;">Last NPS Sent</td><td>Apr 17, 2026 · Next: Oct 14, 2026 <span class="badge badge-amber">Score: 0.0 — Review needed</span></td></tr>
+        <tr><td style="font-weight:600;">Active At-Risk Alerts</td><td>0 <span class="badge badge-green">Clean</span></td></tr>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- TAB 1: ACCOUNT INTEL -->
+<div class="tab-panel" id="tab-1">
+  <div class="section">
+    <div class="section-title">Company Overview</div>
+    <div class="two-col">
+      <div>
+        <p style="font-size:13px;color:#374151;margin-bottom:12px;">GroupM (now rebranded as <strong>WPP Media</strong> since May 2025) is WPP's global media investment management arm, founded in 2003 and headquartered in New York City. It manages media spend for some of the world's largest advertisers across the agency brands EssenceMediacom, Mindshare, and Wavemaker — all now consolidated under a single operating model. GroupM controls an estimated $60B+ in annual media spend globally.</p>
+        <table>
+          <tr><th colspan="2">Key Facts</th></tr>
+          <tr><td>Employees</td><td>42,000 (ZoomInfo verified)</td></tr>
+          <tr><td>Revenue</td><td>$14.3B (ZoomInfo)</td></tr>
+          <tr><td>Industry</td><td>Advertising &amp; Marketing / Business Services</td></tr>
+          <tr><td>HQ</td><td>New York City, NY</td></tr>
+          <tr><td>Parent</td><td>WPP Media Ltd → WPP PLC (London)</td></tr>
+          <tr><td>Founded</td><td>2003</td></tr>
+          <tr><td>Type</td><td>Private subsidiary</td></tr>
+          <tr><td>Tenure with Rival</td><td>~16 years (5,835 days)</td></tr>
+          <tr><td>Rival Products</td><td>Onboarding, SilkRoad-Managed Integration</td></tr>
+          <tr><td>Platform URL</td><td>squareone.groupm.com (RedCarpet)</td></tr>
+        </table>
+      </div>
+      <div>
+        <table>
+          <tr><th colspan="2">Corporate Structure</th></tr>
+          <tr><td>Ultimate Parent</td><td>WPP PLC (London) — £18.97B revenue, 104,000 employees</td></tr>
+          <tr><td>Immediate Parent</td><td>WPP Media Ltd</td></tr>
+          <tr><td>Agency Brands</td><td>EssenceMediacom, Mindshare, Wavemaker (all consolidated)</td></tr>
+          <tr><td>New Branding</td><td>"WPP Media" — announced May 2025, CEO Brian Lesser</td></tr>
+          <tr><td>Sub-unit type</td><td>Former/New Name (transition entity per ZoomInfo)</td></tr>
+          <tr><td>AM Segment</td><td>A (top-tier account)</td></tr>
+        </table>
+        <div style="margin-top:14px;">
+          <div style="font-size:12px;color:#6b7280;font-weight:600;margin-bottom:6px;">HR Dept Size (ZoomInfo)</div>
+          <div class="bar-row"><div class="bar-label">HR (112)</div><div class="bar-track"><div class="bar-fill" style="width:112px;background:#3b82f6;">112</div></div></div>
+          <div class="bar-row"><div class="bar-label">Marketing</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:#e5e7eb;color:#374151;">1,319 (largest dept)</div></div></div>
+          <div class="bar-row"><div class="bar-label">Finance</div><div class="bar-track"><div class="bar-fill" style="width:60%;background:#6b7280;">346</div></div></div>
+          <div class="bar-row"><div class="bar-label">C-Suite</div><div class="bar-track"><div class="bar-fill" style="width:25%;background:#8b5cf6;">290</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Market Dynamics &amp; HR Implications</div>
+    <table>
+      <tr><th>When</th><th>What Happened</th><th>HR Implication for GroupM</th></tr>
+      <tr><td>May 2025</td><td>GroupM rebranded as WPP Media; CEO Brian Lesser announced single operating model with one P&amp;L; global agency CEO roles eliminated (EssenceMediacom, Mindshare, Wavemaker)</td><td>Mass restructuring → high volume of role change, offboarding, and rehire events. Rival Onboarding/Offboarding workflows are directly in the blast radius of these org changes. Also triggers new-hire events as replacement roles are filled.</td></tr>
+      <tr><td>Jan 2025</td><td>GroupM axed global CEO positions across all agency networks; Emily Del Greco named Global COO; Adam Gerhart (ex-Mindshare) became Global Chief Client Officer</td><td>Leadership turnover = new stakeholders who didn't buy Rival. Emily Del Greco as COO is now a key decision-maker for HR systems — relationship needs to be built.</td></tr>
+      <tr><td>Jun 2026</td><td>WPP/GroupM considering further layoffs as part of ongoing restructuring (bwmarketingworld, Jun 2)</td><td>Offboarding volume likely to spike. Rival onboarding platform handles offboarding events — this is usage growth but also a compliance risk period (E-Verify, I-9 flows under pressure).</td></tr>
+      <tr><td>Feb 2026</td><td>WPP announces radical restructure to counter AI threat — selling assets, cutting jobs; WPP Q1 LFL revenue -6.7%</td><td>Top-down cost-cutting mandates from WPP PLC may pressure GroupM to consolidate HR vendors. Rival must demonstrate ROI before renewal.</td></tr>
+      <tr><td>Apr 2026</td><td>WPP Q1 2026: revenue £3.03B (-6.6% YoY). WPP Media biggest drag (-8.5% LFL). CEO Cindy Rose skipped earnings call — leadership uncertainty signal.</td><td>Budget scrutiny at parent level. GroupM may face pressure to justify all vendor spend. Renewal timing (Aug) is during active cost-reduction period.</td></tr>
+      <tr><td>Nov 2025</td><td>Ex-WPP Motion chief Richard Foster sues WPP over alleged improper rebate billing practices; CEO Brian Lesser implicated</td><td>Reputational/legal distraction at exec level. CSM relationships with mid-level HR (Patryk, Emily) are more reliable than senior exec relationships during this period.</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Competitive Landscape</div>
+    <table>
+      <tr><th>Competitor</th><th>Position vs GroupM</th><th>Rival Implication</th></tr>
+      <tr><td><strong>Publicis Groupe</strong></td><td>WPP explicitly says it must "catch up" with Publicis on efficiency. Publicis winning media pitch business.</td><td>As GroupM loses share, belt-tightening accelerates. Rival must anchor on business impact (onboarding speed, compliance).</td></tr>
+      <tr><td><strong>Omnicom / IPG</strong> (post-merger)</td><td>Omnicom-IPG mega-merger creates largest holding group. WPP facing scale disadvantage.</td><td>If Omnicom/IPG wins GroupM client accounts, GroupM's headcount drops — meaning fewer new hire onboarding events. Usage could fall.</td></tr>
+      <tr><td><strong>Interpublic Group</strong></td><td>Being acquired by Omnicom. Both groups now larger than WPP.</td><td>Industry consolidation = vendor consolidation pressure across the media agency ecosystem.</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- TAB 2: USE CASE -->
+<div class="tab-panel" id="tab-2">
+  <div class="section">
+    <div class="section-title">Executive Summary</div>
+    <p style="font-size:13px;color:#374151;line-height:1.7;">GroupM uses Rival's <strong>Onboarding platform</strong> (branded "SquareOne" at squareone.groupm.com) to manage the full employee lifecycle for ~42,000 employees across its North American operations and select international markets. The platform handles new hire onboarding, offboarding, and form/task workflows tightly integrated with Perceptive Content (document management). GroupM is a 16-year customer — among Rival's longest-tenured enterprise accounts. The platform is deeply embedded in daily HR operations: 285 events launched in the last 30 days, 2,598 in the last 12 months. Switching cost is extremely high. However, the WPP restructuring and cost-cutting environment creates real renewal risk if Rival cannot articulate clear ROI during the Aug 2026 renewal window.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Product Value Cards</div>
+    <div class="two-col">
+      <div style="border:1px solid #e4e7f0;border-radius:10px;padding:16px;">
+        <div style="font-weight:700;font-size:14px;color:#1a1f2e;margin-bottom:8px;">Onboarding (Workflow)</div>
+        <table>
+          <tr><td style="font-weight:600;color:#6b7280;width:130px;font-size:12px;">Use Case</td><td style="font-size:12px;">Branded new hire portal ("SquareOne"), task-driven onboarding workflows, e-forms (I-9, E-Verify, Authorize to Hire, ROSI), employee profile management</td></tr>
+          <tr><td style="font-weight:600;color:#6b7280;font-size:12px;">Pain It Solves</td><td style="font-size:12px;">Managing onboarding across multiple agency brands (EssenceMediacom, Mindshare, Wavemaker) with brand-specific workflows and compliance requirements</td></tr>
+          <tr><td style="font-weight:600;color:#6b7280;font-size:12px;">Value Delivered</td><td style="font-size:12px;">2,598 events in 12mo; compliance workflow for I-9/E-Verify; Perceptive Content integration for document export; custom portal branding</td></tr>
+          <tr><td style="font-weight:600;color:#6b7280;font-size:12px;">Risk to Value</td><td style="font-size:12px;">Ongoing Perceptive export cases (3 in last 12mo). If integration becomes unreliable, GroupM's value perception decreases.</td></tr>
+        </table>
+      </div>
+      <div style="border:1px solid #e4e7f0;border-radius:10px;padding:16px;">
+        <div style="font-weight:700;font-size:14px;color:#1a1f2e;margin-bottom:8px;">SilkRoad-Managed Integration</div>
+        <table>
+          <tr><td style="font-weight:600;color:#6b7280;width:130px;font-size:12px;">Use Case</td><td style="font-size:12px;">Managed integration with Perceptive Content for document export and form mapping; ADP integration (Canada); agency mapping in CSV</td></tr>
+          <tr><td style="font-weight:600;color:#6b7280;font-size:12px;">Pain It Solves</td><td style="font-size:12px;">GroupM cannot manage integration configuration internally — Rival-managed integration reduces IT burden</td></tr>
+          <tr><td style="font-weight:600;color:#6b7280;font-size:12px;">Value Delivered</td><td style="font-size:12px;">Multiple Perceptive Content integration updates handled by Rival services team; ongoing support for new form mappings</td></tr>
+          <tr><td style="font-weight:600;color:#6b7280;font-size:12px;">Risk to Value</td><td style="font-size:12px;">High case volume on Perceptive integration suggests ongoing friction. If Rival proposes Managed Services at renewal, this bundling becomes the value story.</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Expansion Vectors</div>
+    <table>
+      <tr><th>Product</th><th>Observed Pain Signal</th><th>Entry Point</th></tr>
+      <tr><td><strong>Managed Services</strong></td><td>Recurring Perceptive integration support cases (3 in last 12mo); ongoing form mapping requests; portal branding updates frequently filed as cases</td><td>Renewal bundling: position Managed Services as the solution to reduce support overhead and ensure integration SLA</td></tr>
+      <tr><td><strong>Transfer/Promotion Workflows</strong></td><td>2024 Closed Lost: GroupM Transfer Events ($75K). GroupM has high volume of internal agency transfers (Mindshare → EssenceMediacom consolidation)</td><td>Re-approach: restructuring creates new wave of internal transfers; position transfer workflows as a restructuring management tool</td></tr>
+      <tr><td><strong>Canada Expansion</strong></td><td>2025 Closed Lost: GroupM 1000 Canada ($88K). ADP Canada integration exists. Canada operations still active.</td><td>Post-renewal re-open: tie Canada to WPP Media's push for global operating model consistency</td></tr>
+    </table>
+    <div style="margin-top:16px;">
+      <div class="strategy-quote">
+        <strong>CSM Renewal Strategy (verbatim SFDC):</strong> "Current Renewal Date of 8/4. Will begin discussions in Q2 while also monitoring License Compliance. Close by end of Q2 with License Monitoring. Will also make hard sell for Managed Services as part of next Renewal while mentioning this during year. 2024 Renewal (8/4)"
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Summary Cards</div>
+    <div class="three-col">
+      <div class="metric-card">
+        <div class="metric-big" style="color:#10b981;">HIGH</div>
+        <div class="metric-label">Switching Cost</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:4px;">16 years, deep Perceptive integration, custom portal, 42K employee base</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-big" style="color:#3b82f6;">$163K+</div>
+        <div class="metric-label">Whitespace (est.)</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:4px;">Transfer events ($75K) + Canada ($88K) previously identified, both Closed Lost</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-big" style="color:#f59e0b;">62 days</div>
+        <div class="metric-label">To Renewal</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:4px;">Aug 4, 2026 · Event-based pricing call Wed Jun 10</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 3: PEOPLE -->
+<div class="tab-panel" id="tab-3">
+  <div class="section">
+    <div class="section-title">Key Stakeholders — GroupM / WPP Media</div>
+    <div class="people-grid">
+
+      <div class="person-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <div class="person-avatar" style="background:#003b85;">PM</div>
+          <div>
+            <div class="person-name">Patryk Mochalski</div>
+            <div class="person-title">Associate Director, HRIS · @wppmedia.com</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+          <span class="badge badge-blue">Champion</span>
+          <span class="badge badge-green">Primary</span>
+        </div>
+        <div class="person-intel">Day-to-day platform owner. On the renewal pricing call Wed Jun 10. Deep platform knowledge. Email updated to @wppmedia.com per rebrand. Key champion for Rival's value within GroupM.</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:6px;">📞 (212) 474-0044 · ✉️ patryk.mochalski@wppmedia.com</div>
+      </div>
+
+      <div class="person-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <div class="person-avatar" style="background:#0891b2;">EC</div>
+          <div>
+            <div class="person-name">Emily Chan</div>
+            <div class="person-title">HRIS Analyst · @wppmedia.com</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+          <span class="badge badge-blue">Champion</span>
+          <span class="badge badge-green">Primary</span>
+        </div>
+        <div class="person-intel">On the renewal pricing call Wed Jun 10. Active on support cases. Two contact records exist (old @groupm.com and new @wppmedia.com) — consolidate. Important that she is in the renewal conversation.</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:6px;">📞 +1.212.297.7779 · ✉️ emily.chan@wppmedia.com</div>
+      </div>
+
+      <div class="person-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <div class="person-avatar" style="background:#7c3aed;">HW</div>
+          <div>
+            <div class="person-name">Heidi Wilkens</div>
+            <div class="person-title">Senior Partner &amp; Operations Group Director, People · @groupm.com</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+          <span class="badge badge-purple">Senior Sponsor</span>
+        </div>
+        <div class="person-intel">Senior People Operations leader. Retained @groupm.com domain — may be in transitional or regional role. Key escalation path above Patryk/Emily. Phone: (718) 419-3980.</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:6px;">📞 (718) 419-3980 · ✉️ heidi.wilkens@groupm.com</div>
+      </div>
+
+      <div class="person-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <div class="person-avatar" style="background:#059669;">KB</div>
+          <div>
+            <div class="person-name">Katie Becker</div>
+            <div class="person-title">Director, HR Operations · @wppmedia.com</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+          <span class="badge badge-amber">Decision Influencer</span>
+        </div>
+        <div class="person-intel">HR Operations Director with @wppmedia.com domain (rebrand complete). Likely involved in any vendor review or system change decisions. Not yet engaged in renewal conversation — should be looped in.</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:6px;">📞 (212) 297-8484 · ✉️ katie.becker@wppmedia.com</div>
+      </div>
+
+      <div class="person-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <div class="person-avatar" style="background:#dc2626;">LB</div>
+          <div>
+            <div class="person-name">Lauren Baraby</div>
+            <div class="person-title">Global Director, Talent Acquisition · @groupm.com</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+          <span class="badge badge-gray">TA Leader</span>
+        </div>
+        <div class="person-intel">Global TA Director — relevant for recruiting integration discussions. Previously involved in Canada expansion opp (set traps for ADP). Mobile: (978) 273-3989.</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:6px;">📞 (212) 297-8181 · ✉️ lauren.baraby@groupm.com</div>
+      </div>
+
+      <div class="person-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <div class="person-avatar" style="background:#b45309;">CS</div>
+          <div>
+            <div class="person-name">Claire Smith</div>
+            <div class="person-title">Head Regional CPO, People (EMEA) · @wmglobal.com</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+          <span class="badge badge-gray">EMEA Executive</span>
+        </div>
+        <div class="person-intel">CPO for EMEA region (Wavemaker domain). Could be relevant for international expansion conversations. Mobile: (847) 624-8635. London-based: +44 2078032000.</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:6px;">📞 +44 2078032000 · ✉️ claire.smith@wmglobal.com</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Rival Team</div>
+    <table>
+      <tr><th>Role</th><th>Name</th><th>Recent Activity</th></tr>
+      <tr><td>CSM (Owner)</td><td><strong>Andrew Pollard</strong></td><td>Owns renewal opp. Pricing call Wed Jun 10. Preparing 1/2/3-year event pricing options.</td></tr>
+      <tr><td>AE</td><td><strong>Kara Sheridan</strong></td><td>On GroupM Renewal Opp. Collaborated on Greenhouse Integration opp (Closed Lost Jun 4). Part of pricing prep with MDLR.</td></tr>
+      <tr><td>Support Lead</td><td><strong>Randy Havel</strong></td><td>Primary case owner — handling majority of open cases. WPP Media touchbase Jun 2. QBR prep usage reports (Dec).</td></tr>
+      <tr><td>Support</td><td><strong>Edward Oropeza</strong></td><td>Handling Minh Anh Dao State Tax Form case; ROSI/Eform issues.</td></tr>
+      <tr><td>Support</td><td><strong>Bernard Jackson</strong></td><td>Email coordination on "Next Meeting 5/25" thread.</td></tr>
+      <tr><td>Services</td><td><strong>Kristian Monge</strong></td><td>Perceptive Content integration mapping (Jul 2025).</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Additional Stakeholders (SFDC)</div>
+    <table>
+      <tr><th>Name</th><th>Title</th><th>Email</th></tr>
+      <tr><td>Ashley Kiang</td><td>HRIS, Senior Associate</td><td>ashley.kiang@wppmedia.com</td></tr>
+      <tr><td>Sadie Kanner</td><td>Director, Learning &amp; Development</td><td>sadie.kanner@groupm.com</td></tr>
+      <tr><td>Derrick Echoles</td><td>Head of Future Talent</td><td>derrick.echoles@groupm.com</td></tr>
+      <tr><td>Grace Tsao</td><td>Head of Human Resources</td><td>grace.tsao@groupm.com</td></tr>
+      <tr><td>Mariko Kunitomo</td><td>Reporting Director, Talent Acquisition Ops</td><td>mariko.kunitomo@groupm.com</td></tr>
+      <tr><td>Matthew Armenti</td><td>Partner, Associate Director - People Operations</td><td>matthew.armenti@groupm.com</td></tr>
+      <tr><td>Melissa Toth</td><td>Manager, Diversity</td><td>melissa.toth@groupm.com</td></tr>
+    </table>
+    <div style="margin-top:10px;font-size:12px;color:#9ca3af;">Note: ZoomInfo HR leadership search returned 0 results for "GroupM" — WPP Media rebrand may have affected ZoomInfo matching. Contacts above sourced from SFDC. Diana Blancone (Chief Talent Officer) shows @omnicommediagroup.com domain — likely outdated record, verify.</div>
+  </div>
+</div>
+
+<!-- TAB 4: CONTRACTS -->
+<div class="tab-panel" id="tab-4">
+  <div class="section">
+    <div class="section-title">Active Contracts</div>
+    <table>
+      <tr><th>Contract #</th><th>Status</th><th>Start Date</th><th>End Date</th><th>Renewal Term</th><th>Notes</th></tr>
+      <tr>
+        <td><a href="https://rival.lightning.force.com/lightning/r/Contract/800Vs00000Ct3ZSIAZ/view" target="_blank" style="color:#3b82f6;text-decoration:none;font-weight:600;">00018433</a></td>
+        <td><span class="badge badge-red">Expires Aug 3, 2026</span></td>
+        <td>Aug 4, 2024</td>
+        <td>Aug 3, 2026</td>
+        <td>12 months</td>
+        <td>Primary renewal contract — <strong>62 days to expiry</strong>. ARR: $314K.</td>
+      </tr>
+      <tr>
+        <td><a href="https://rival.lightning.force.com/lightning/r/Contract/8003q000001WBodAAG/view" target="_blank" style="color:#3b82f6;text-decoration:none;font-weight:600;">00017661</a></td>
+        <td><span class="badge badge-green">Activated</span></td>
+        <td>Jun 20, 2023</td>
+        <td>Jun 11, 2027</td>
+        <td>12 months</td>
+        <td>Multi-year contract still active through 2027 — confirm product scope.</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Active Opportunity</div>
+    <div class="opp-card" style="border-left:4px solid #f59e0b;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+        <div>
+          <div style="font-size:12px;color:#6b7280;font-weight:600;">RENEWAL OPPORTUNITY</div>
+          <div style="font-size:16px;font-weight:700;color:#1a1f2e;margin:4px 0;">GroupM - Renewal Opportunity</div>
+          <div style="font-size:12px;color:#4b5563;">Owner: Andrew Pollard · Stage: <span class="badge badge-amber">5. Renewal Solutioning</span></div>
+        </div>
+        <div style="text-align:right;">
+          <div class="opp-amount">$314,020</div>
+          <div style="font-size:12px;color:#6b7280;">Close: Aug 3, 2026 · Prob: 40%</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;font-size:13px;background:#fef3c7;border-radius:8px;padding:10px 14px;color:#92400e;">
+        <strong>Next Step (SFDC verbatim):</strong> "Renewal pricing call scheduled Wed 6/10 10AM ET with Patrick and Emily. Preparing 1/2/3 year event-based pricing options. Employee-based pricing ruled out (confirmed more expensive, Rival moving away from model). Internal pricing prep with MDLR + Kara on"
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Historical Opportunity Summary</div>
+    <table>
+      <tr><th>Name</th><th>Stage</th><th>Amount</th><th>Close</th><th>Type</th></tr>
+      <tr><td>GroupM - Greenhouse Integration</td><td><span class="badge badge-red">Closed Lost</span></td><td>—</td><td>Jun 4, 2026</td><td>Add-On Integration</td></tr>
+      <tr><td>GroupM - 1000 Canada</td><td><span class="badge badge-red">Closed Lost</span></td><td>$88,000</td><td>Apr 2025</td><td>Expansion</td></tr>
+      <tr><td>GroupM - Onboarding Portal/Add On Licenses</td><td><span class="badge badge-red">Closed Lost</span></td><td>$61,260</td><td>Aug 2024</td><td>Add-On</td></tr>
+      <tr><td>GroupM - Onboarding_Integrations Renewal</td><td><span class="badge badge-green">Closed Won</span></td><td>$628,000</td><td>Aug 2024</td><td>Renewal</td></tr>
+      <tr><td>GroupM - Transfer Events</td><td><span class="badge badge-red">Closed Lost</span></td><td>$75,000</td><td>May 2024</td><td>Expansion</td></tr>
+      <tr><td>GroupM - Add On Onboarding/Offboarding</td><td><span class="badge badge-green">Closed Won</span></td><td>$295,453</td><td>Jul 2022</td><td>Add-On</td></tr>
+      <tr><td>GroupM Renewal (Onboarding/Integrations)</td><td><span class="badge badge-green">Closed Won</span></td><td>$295,200</td><td>Jul 2022</td><td>Renewal</td></tr>
+    </table>
+    <div style="margin-top:10px;font-size:12px;color:#6b7280;background:#fef3c7;padding:8px 12px;border-radius:6px;">
+      ⚠ Pattern: 4 consecutive Closed Lost expansion opportunities (Canada, Transfer Events, Portal Add-On, Greenhouse Integration) totaling ~$226K. Rival has not won an expansion upsell at GroupM since 2022. Renewal-only track record since then.
+    </div>
+  </div>
+</div>
+
+<!-- TAB 5: PRODUCT -->
+<div class="tab-panel" id="tab-5">
+  <div class="section">
+    <div class="section-title">Active Projects &amp; In-Flight Work</div>
+    <table>
+      <tr><th>Project / Case</th><th>Status</th><th>Owner</th><th>Notes</th></tr>
+      <tr><td>Perceptive Content Export Failure (00997972)</td><td><span class="badge badge-red">Pending Tech Services</span></td><td>Raymond Romero</td><td>HIGH — export task failed. Perceptive integration is core workflow dependency.</td></tr>
+      <tr><td>ROSI Enabled for Employees (00997154)</td><td><span class="badge badge-amber">In Progress</span></td><td>Randy Havel</td><td>ROSI configuration change; history of ROSI issues (2025 prior cases)</td></tr>
+      <tr><td>Portal Branding (00997127)</td><td><span class="badge badge-amber">In Progress</span></td><td>Randy Havel</td><td>Ongoing portal rebranding work — likely tied to WPP Media rebrand</td></tr>
+      <tr><td>Conditional Field Display - HRCoord_EditProfile (00996272)</td><td><span class="badge badge-amber">Waiting Client</span></td><td>Randy Havel</td><td>Logic update for hire type conditional display; requires GroupM feedback</td></tr>
+      <tr><td>Custom Dashboards (00995222 + 00995057)</td><td><span class="badge badge-amber">Waiting Client</span></td><td>Randy Havel</td><td>Advanced analytics / dashboard build in progress; open since Mar 2026</td></tr>
+      <tr><td>WPP Media Analytics vs Event Report (00992314)</td><td><span class="badge badge-amber">Pending Internal</span></td><td>Randy Havel</td><td>WPP Media rebranding triggered reporting reconciliation need</td></tr>
+      <tr><td>Updating Test Site with Production (00996273)</td><td><span class="badge badge-amber">In Progress</span></td><td>Randy Havel</td><td>Test site sync — routine but long-running (open since Apr 2026)</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Product Adoption</div>
+    <table>
+      <tr><th>Product</th><th>Status</th><th>ARR</th><th>Notes</th></tr>
+      <tr><td>Onboarding (Workflow)</td><td><span class="badge badge-green">Active</span></td><td>$314,000</td><td>Core product. 2,598 events last 12mo. Global Onboarding Score: 100.</td></tr>
+      <tr><td>SilkRoad-Managed Integration</td><td><span class="badge badge-green">Active</span></td><td>Bundled</td><td>Perceptive Content integration; ADP (Canada); agency mapping</td></tr>
+      <tr><td>Integrations (legacy)</td><td><span class="badge badge-gray">Expired</span></td><td>—</td><td>Listed in Expired_Products__c. Previously separate line item.</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Product Roadmap — Onboarding</div>
+    <div style="font-size:12px;color:#6b7280;margin-bottom:14px;">Note: Roadmap sourced from public Rival release notes (rival-hr.com/release-note/). Full SharePoint roadmap access not executed in this refresh — items below reflect public releases relevant to GroupM's active product set. Unverified items are flagged.</div>
+
+    <div class="roadmap-card tier1">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span class="badge-shipped">SHIPPED</span>
+        <span style="font-size:11px;color:#6b7280;">2026</span>
+      </div>
+      <div class="roadmap-feature">Advanced Custom Dashboards &amp; Analytics</div>
+      <div class="roadmap-desc">Enhanced dashboard builder with custom report formatting, dashboard sharing, and scheduled report delivery improvements.</div>
+      <div class="roadmap-pain">Pain Match: GroupM has 3 open cases specifically requesting custom dashboards and advanced analytics (00995222, 00995057, 00992314 — open since Q1 2026). This feature directly addresses active platform frustrations.</div>
+    </div>
+
+    <div class="roadmap-card tier1">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span class="badge-shipped">SHIPPED</span>
+        <span style="font-size:11px;color:#6b7280;">2025-2026</span>
+      </div>
+      <div class="roadmap-feature">ROSI (Return on Systems Investment) Improvements</div>
+      <div class="roadmap-desc">ROSI engine enhancements for more reliable I-9 tracking and state tax form integration; vanity link stability improvements.</div>
+      <div class="roadmap-pain">Pain Match: GroupM has recurring ROSI cases (00997154, 00994892, prior vanity link case). ROSI reliability is a known friction point — these improvements are directly relevant.</div>
+    </div>
+
+    <div class="roadmap-card tier1">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span class="badge-shipped">SHIPPED</span>
+        <span style="font-size:11px;color:#6b7280;">2026</span>
+      </div>
+      <div class="roadmap-feature">Task Settings Engine Rebuild</div>
+      <div class="roadmap-desc">New task configuration interface with improved task dependency logic, notification frequency controls, and task promptness reporting.</div>
+      <div class="roadmap-pain">Pain Match: Cases 00997466 (New Task Settings Bug), 00997433 (New Task Details Issues), 00992117 (Tasks getting sent different dates) — all filed in 2026. GroupM is experiencing active pain from the task engine.</div>
+    </div>
+
+    <div style="margin-top:12px;margin-bottom:6px;font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;">Tier 2 — General Platform Improvements</div>
+    <ul style="font-size:12px;color:#4b5563;padding-left:18px;line-height:2;">
+      <li><span class="badge-shipped">SHIPPED</span>&nbsp; E-Verify Processing Improvements — faster USCIS communication, error messaging enhancements</li>
+      <li><span class="badge-shipped">SHIPPED</span>&nbsp; SSL Certificate Auto-Renewal — automated SSL management (GroupM had 3 SSL expiry cases in 2026)</li>
+      <li><span class="badge-shipped">SHIPPED</span>&nbsp; Conditional Field Display — logic improvements for hire-type-based field visibility</li>
+      <li><span class="badge-shipped">SHIPPED</span>&nbsp; Eform Editing Interface — resolved eform save/edit bugs affecting task flows</li>
+    </ul>
+
+    <div style="margin-top:16px;">
+      <div class="roadmap-card expansion">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <span class="badge-expansion">EXPANSION</span>
+          <span style="font-size:11px;color:#8b5cf6;">Not currently owned</span>
+        </div>
+        <div class="roadmap-feature">Managed Services — Integration Management</div>
+        <div class="roadmap-desc">Rival's Managed Services offering takes ownership of all integration configuration, maintenance, and SLA management for Perceptive Content and other connected systems.</div>
+        <div class="roadmap-pain" style="background:#f5f3ff;color:#5b21b6;">Expansion Rationale: GroupM has filed 5+ Perceptive Content integration cases in the last 12 months. Managed Services eliminates this support burden and provides SLA guarantee. CSM strategy note explicitly calls for a "hard sell for Managed Services" at renewal.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 6: USAGE -->
+<div class="tab-panel" id="tab-6">
+  <div class="section">
+    <div class="section-title">LifeSuite Telemetry — Onboarding (Jun 8, 2026)</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+      <div class="metric-card">
+        <div class="metric-big" style="color:#3b82f6;">17</div>
+        <div class="metric-label">Logins Today (Jun 8)</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:4px;">Source: SFDC LifeSuite</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-big" style="color:#10b981;">2,598</div>
+        <div class="metric-label">Events Last 12 Months</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:4px;">Trend: stable ±50</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-big" style="color:#f59e0b;">285</div>
+        <div class="metric-label">Events Last 30 Days</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:4px;">vs 311 prior period</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-big" style="color:#8b5cf6;">1,137</div>
+        <div class="metric-label">Events YTD 2026</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:4px;">Through Jun 8, 2026</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Daily Login Pattern (Last 30 Days)</div>
+    <div style="margin-bottom:12px;">
+      <div class="bar-row"><div class="bar-label">Jun 8</div><div class="bar-track"><div class="bar-fill" style="width:10%;background:#3b82f6;">17</div></div></div>
+      <div class="bar-row"><div class="bar-label">Jun 7</div><div class="bar-track"><div class="bar-fill" style="width:3%;background:#94a3b8;">6</div></div></div>
+      <div class="bar-row"><div class="bar-label">Jun 6</div><div class="bar-track"><div class="bar-fill" style="width:48%;background:#3b82f6;">73</div></div></div>
+      <div class="bar-row"><div class="bar-label">Jun 5</div><div class="bar-track"><div class="bar-fill" style="width:60%;background:#3b82f6;">90</div></div></div>
+      <div class="bar-row"><div class="bar-label">Jun 4</div><div class="bar-track"><div class="bar-fill" style="width:65%;background:#3b82f6;">98</div></div></div>
+      <div class="bar-row"><div class="bar-label">Jun 3</div><div class="bar-track"><div class="bar-fill" style="width:95%;background:#3b82f6;">143</div></div></div>
+      <div class="bar-row"><div class="bar-label">Jun 2</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:#3b82f6;">150</div></div></div>
+      <div class="bar-row"><div class="bar-label">Jun 1</div><div class="bar-track"><div class="bar-fill" style="width:16%;background:#94a3b8;">24</div></div></div>
+      <div class="bar-row"><div class="bar-label">May 31</div><div class="bar-track"><div class="bar-fill" style="width:7%;background:#94a3b8;">11</div></div></div>
+      <div class="bar-row"><div class="bar-label">May 30</div><div class="bar-track"><div class="bar-fill" style="width:52%;background:#3b82f6;">78</div></div></div>
+      <div class="bar-row"><div class="bar-label">May 29</div><div class="bar-track"><div class="bar-fill" style="width:68%;background:#3b82f6;">102</div></div></div>
+      <div class="bar-row"><div class="bar-label">May 28</div><div class="bar-track"><div class="bar-fill" style="width:72%;background:#3b82f6;">108</div></div></div>
+      <div class="bar-row"><div class="bar-label">May 27</div><div class="bar-track"><div class="bar-fill" style="width:87%;background:#3b82f6;">130</div></div></div>
+      <div class="bar-row"><div class="bar-label">May 26</div><div class="bar-track"><div class="bar-fill" style="width:27%;background:#94a3b8;">40</div></div></div>
+    </div>
+    <div style="font-size:12px;color:#6b7280;">Pattern: Weekday logins 78-150; weekend/holiday dips to 6-24. Normal enterprise SaaS pattern. No concerning decline trend detected.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Utilization Analysis</div>
+    <div class="two-col">
+      <div>
+        <table>
+          <tr><th>Metric</th><th>Value</th><th>Assessment</th></tr>
+          <tr><td>Events L12mo</td><td>2,598</td><td><span class="badge badge-green">Healthy</span></td></tr>
+          <tr><td>Events L30D</td><td>285</td><td><span class="badge badge-green">Active</span></td></tr>
+          <tr><td>Events YTD</td><td>1,137</td><td><span class="badge badge-green">On pace</span></td></tr>
+          <tr><td>Events / Employee (L12mo)</td><td>0.062</td><td><span class="badge badge-amber">Low utilization rate</span></td></tr>
+          <tr><td>Platform logins today</td><td>17</td><td><span class="badge badge-green">Normal</span></td></tr>
+          <tr><td>Event type breakdown</td><td>—</td><td><span class="badge badge-gray">Unverified: SFDC fields null</span></td></tr>
+        </table>
+        <div style="margin-top:10px;font-size:12px;color:#6b7280;background:#fef3c7;padding:8px 12px;border-radius:6px;">
+          ⚠ Events-per-employee = 0.062 (2,598 events / 42,000 employees). This is dramatically low (&lt;0.1 threshold). However, GroupM US operations are likely a fraction of the 42K global headcount — if US/NA headcount is ~5-8K, ratio rises to 0.32-0.52, which is healthy. Geographic scope: Unverified (Usage_Region_A__c field is null in SFDC).
+        </div>
+      </div>
+      <div>
+        <div style="border:1px solid #e4e7f0;border-radius:10px;padding:14px;">
+          <div style="font-weight:700;font-size:13px;color:#1a1f2e;margin-bottom:10px;">Open Questions to Clarify</div>
+          <ul style="font-size:12px;color:#4b5563;padding-left:16px;line-height:2.2;">
+            <li>What is GroupM's US/North America headcount? (SFDC: 42K is global)</li>
+            <li>Usage_Region_A__c is null — what geographies does this instance cover?</li>
+            <li>Event type breakdown: null for New Hire / Offboarding / Transfer — are all events consolidated under one type?</li>
+            <li>Unique_User_Logins_L30D = 0.0 for all records — field may be deprecated or not populated. Verify with GroupM.</li>
+            <li>QBR prep usage reports (case 00991480) has been open since Dec 2025 — has GroupM received their usage report?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Services &amp; Site Review Status</div>
+    <table>
+      <tr><td style="font-weight:600;width:220px;">Last Site Review</td><td>May 12, 2026 · 27 days ago · <span class="badge badge-green">Not overdue</span></td></tr>
+      <tr><td style="font-weight:600;">Last Onsite F2F</td><td>Feb 25, 2026 · 103 days ago · <span class="badge badge-amber">No overdue flag but 3+ months elapsed</span></td></tr>
+      <tr><td style="font-weight:600;">Platform URL</td><td>squareone.groupm.com (vanity domain active — SSL renewed Apr 2026)</td></tr>
+      <tr><td style="font-weight:600;">Instance Name</td><td>GroupM (LSCode: GroupM)</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- TAB 7: CASES -->
+<div class="tab-panel" id="tab-7">
+  <div class="section">
+    <div class="section-title">Open Cases (13 open, as of Jun 8, 2026)</div>
+    <table>
+      <tr><th>Case #</th><th>Subject</th><th>Status</th><th>Priority</th><th>Opened</th><th>Owner</th><th>Days Open</th></tr>
+      <tr><td>00997972</td><td>Perceptive Content Export task didn't export to Perceptive</td><td><span class="badge badge-red">Pending Technical Services</span></td><td><span class="badge badge-red">High</span></td><td>Jun 3</td><td>Raymond Romero</td><td>5</td></tr>
+      <tr><td>00997945</td><td>Unable to see show audit for tasks</td><td><span class="badge badge-amber">Pending Internal</span></td><td>Low</td><td>Jun 2</td><td>Randy Havel</td><td>6</td></tr>
+      <tr><td>00997812</td><td>Minh Anh Dao State Tax Form - NY</td><td><span class="badge badge-amber">Waiting Client</span></td><td>Low</td><td>May 29</td><td>Edward Oropeza</td><td>10</td></tr>
+      <tr><td>00997466</td><td>New Task Settings Bug</td><td><span class="badge badge-amber">Researching</span></td><td>Low</td><td>May 15</td><td>Rica Lopez</td><td>24</td></tr>
+      <tr><td>00997438</td><td>Eform Editing Bug</td><td><span class="badge badge-red">Pending Development</span></td><td>Low</td><td>May 14</td><td>Edward Oropeza</td><td>25</td></tr>
+      <tr><td>00997433</td><td>New Task Details issues</td><td><span class="badge badge-amber">In Progress</span></td><td>Low</td><td>May 14</td><td>Randy Havel</td><td>25</td></tr>
+      <tr><td>00997154</td><td>ROSI Enabled for Employees</td><td><span class="badge badge-amber">In Progress</span></td><td>Low</td><td>May 11</td><td>Randy Havel</td><td>28</td></tr>
+      <tr><td>00997127</td><td>Portal Branding</td><td><span class="badge badge-amber">In Progress</span></td><td>Low</td><td>May 8</td><td>Randy Havel</td><td>31</td></tr>
+      <tr><td>00997098</td><td>Remove Category</td><td><span class="badge badge-amber">Waiting Client</span></td><td>Low</td><td>May 7</td><td>Randy Havel</td><td>32</td></tr>
+      <tr><td>00996272</td><td>Conditional Field Display HRCoord_EditProfile</td><td><span class="badge badge-amber">Waiting Client</span></td><td>Low</td><td>Apr 8</td><td>Randy Havel</td><td>61</td></tr>
+      <tr><td>00996273</td><td>Updating Test site with production</td><td><span class="badge badge-amber">In Progress</span></td><td>Low</td><td>Apr 8</td><td>Randy Havel</td><td>61</td></tr>
+      <tr><td>00995222</td><td>Custom Dashboards</td><td><span class="badge badge-amber">Waiting Client</span></td><td>Low</td><td>Mar 2</td><td>Randy Havel</td><td>98</td></tr>
+      <tr><td>00987027</td><td>Issues with ROSI using vanity link</td><td><span class="badge badge-red">Pending Internal</span></td><td>Low</td><td>Oct 1, 2025</td><td>Randy Havel</td><td>250+</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Recently Closed Cases (Last 30 Days)</div>
+    <table>
+      <tr><th>Case #</th><th>Subject</th><th>Priority</th><th>Opened</th><th>Closed</th><th>Days to Close</th></tr>
+      <tr><td>00997533</td><td>Reference Ticket 00996909</td><td>Low</td><td>May 19</td><td>Jun 2</td><td>14</td></tr>
+      <tr><td>00997505</td><td>Chandler Gates Hire Date</td><td>Low</td><td>May 18</td><td>May 26</td><td>8</td></tr>
+      <tr><td>00997284</td><td>Remove Proposed Workspace Number field</td><td>Low</td><td>May 14</td><td>May 14</td><td>0 (same day)</td></tr>
+      <tr><td>00996969</td><td>Received E-Verify Client Account Termination</td><td>Low</td><td>May 4</td><td>May 18</td><td>14</td></tr>
+      <tr><td>00996919</td><td>URL Decommission</td><td>Low</td><td>Apr 30</td><td>May 7</td><td>7</td></tr>
+      <tr><td>00996909</td><td>Wrong Export for Authorize to Hire form</td><td>Low</td><td>Apr 30</td><td>May 7</td><td>7</td></tr>
+      <tr><td>00996863</td><td>RC - Emails not being received</td><td>Low</td><td>Apr 29</td><td>May 15</td><td>16</td></tr>
+      <tr><td>00996776</td><td>Unable to submit Complete Employee Information Form</td><td>Low</td><td>Apr 27</td><td>Apr 30</td><td>3</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Case Volume Analysis</div>
+    <div class="three-col">
+      <div class="metric-card">
+        <div class="metric-big" style="color:#f59e0b;">100</div>
+        <div class="metric-label">Cases Last 12 Months</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:4px;">Down dramatically from 82 (2023) after spike</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-big" style="color:#ef4444;">2</div>
+        <div class="metric-label">High Priority Open</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:4px;">00997972 (Perceptive) · Critical</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-big" style="color:#10b981;">~7 days</div>
+        <div class="metric-label">Avg Time to Close</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:4px;">Most routine cases close in 7-14 days</div>
+      </div>
+    </div>
+    <div style="margin-top:14px;font-size:12px;color:#6b7280;background:#fff7ed;padding:10px 14px;border-radius:8px;border-left:3px solid #f59e0b;">
+      <strong>Historical context (SFDC Renewal Risks field, verbatim):</strong> "Known: Many, Many Support Cases in 2023/2024. Support Case Amounts: 2023) 82 &nbsp; 2024) 9" — Case volume has normalized from the 2023 spike. Current pace is ~100 cases/year which is manageable for enterprise. However, Case 00987027 (ROSI/vanity link) has been open 250+ days — outlier that needs escalation.
+    </div>
+  </div>
+</div>
+
+<!-- TAB 8: RISK -->
+<div class="tab-panel" id="tab-8">
+  <div class="section">
+    <div class="section-title">Risk Assessment — Jun 8, 2026</div>
+
+    <div class="risk-card" style="border-left:4px solid #ef4444;">
+      <div class="risk-header">
+        <span style="font-size:20px;">🔴</span>
+        <div class="risk-title">Commercial Risk: Renewal 62 Days Out — Stage 5, 40% Probability</div>
+      </div>
+      <div class="risk-body">The Aug 4, 2026 renewal ($314K ARR) is 62 days away. Opportunity is at Stage 5 with 40% probability — not yet committed. Pricing call is scheduled for Jun 10 but pricing options are still being finalized internally. At 62 days, quote should be delivered and at Stage 6+. Employee-based pricing ruled out — event-based model adds complexity to negotiation. WPP's Q1 revenue decline of 6.7% LFL means GroupM is under parent-level cost pressure. License compliance monitoring is active — adds negotiating leverage but also tension.</div>
+      <div class="risk-change">What would change this to 🟡: Deliver event-based pricing proposal by Jun 10 call. Get verbal commitment to renew by end of Jun. Move opp to Stage 6.</div>
+    </div>
+
+    <div class="risk-card" style="border-left:4px solid #f59e0b;">
+      <div class="risk-header">
+        <span style="font-size:20px;">🟡</span>
+        <div class="risk-title">WPP Parent Cost-Cutting Mandate — Vendor Consolidation Risk</div>
+      </div>
+      <div class="risk-body">WPP PLC is executing its "Elevate28" restructuring strategy. Q1 2026: WPP Media (GroupM) was the single biggest revenue drag (-8.5% LFL). WPP has announced radical restructuring, asset sales, and job cuts to counter the AI threat (Guardian, Feb 2026). In this environment, parent-level procurement reviews of HR vendors are highly likely. Local champions (Patryk, Emily) want Rival but cannot alone defend against a top-down consolidation mandate from WPP HQ. The Aug 2026 renewal is within the Elevate28 implementation window.</div>
+      <div class="risk-change risk-change-amber">What would change this to 🟢: Secure executive-level sponsor at WPP Media level (not just HRIS). Document ROI evidence (compliance value, time savings, event throughput). Build relationships with Katie Becker (Dir HR Operations) as a second champion.</div>
+    </div>
+
+    <div class="risk-card" style="border-left:4px solid #f59e0b;">
+      <div class="risk-header">
+        <span style="font-size:20px;">🟡</span>
+        <div class="risk-title">Recurring Integration Friction — Perceptive Content</div>
+      </div>
+      <div class="risk-body">GroupM has filed 5+ Perceptive Content integration cases in the last 12 months. The most recent (Case 00997972, Jun 3, 2026) is a high-priority export failure currently "Pending Technical Services." There is also a recurring SSL certificate expiry pattern (3 cases in 2026 alone). The Perceptive integration is core to GroupM's new hire workflow — if documents fail to export, HR operations are blocked. Case 00987027 (ROSI/vanity link) has been open 250+ days.</div>
+      <div class="risk-change risk-change-amber">What would change this to 🟢: Resolve 00997972 with permanent root cause fix. Present Managed Services as the long-term solution to eliminate recurring Perceptive integration overhead. Close 00987027 which has been open 250+ days.</div>
+    </div>
+
+    <div class="risk-card" style="border-left:4px solid #f59e0b;">
+      <div class="risk-header">
+        <span style="font-size:20px;">🟡</span>
+        <div class="risk-title">GroupM → WPP Media Rebrand — Contract &amp; Contact Continuity</div>
+      </div>
+      <div class="risk-body">GroupM officially rebranded as WPP Media in May 2025. Key contacts Emily Chan and Patryk Mochalski now show @wppmedia.com email domains in SFDC. Contract 00018433 (the Aug renewal) was created under "GroupM." Up to 45% of US workforce was restructured. New leadership (Emily Del Greco as Global COO, Adam Gerhart as Chief Client Officer) represents new buyers who didn't sign original Rival contracts. Some contacts still show @groupm.com domains — data quality gap.</div>
+      <div class="risk-change risk-change-amber">What would change this to 🟢: Confirm legal signing entity for renewal (GroupM LLC vs WPP Media LLC). Clean up SFDC contact domain inconsistencies. Identify any new HRIS/HR Ops leaders post-reorg who are not yet in SFDC.</div>
+    </div>
+
+    <div class="risk-card" style="border-left:4px solid #f59e0b;">
+      <div class="risk-header">
+        <span style="font-size:20px;">🟡</span>
+        <div class="risk-title">NPS Score: 0.0 — No Promoters on Record</div>
+      </div>
+      <div class="risk-body">Average NPS score (SFDC: Average_NPS_Score_SFDC__c) is 0.0. Last NPS survey was sent Apr 17, 2026. NPS of 0 = not a detractor, but not a promoter — passive at best. In the context of a $314K renewal under parent cost pressure, a passive (not advocating) customer is a churn risk. No NPS responses may have been received (0 vs. null distinction unclear — verify). Next NPS send is Oct 2026, after the renewal date.</div>
+      <div class="risk-change risk-change-amber">What would change this to 🟢: Proactively ask Patryk/Emily for qualitative feedback before renewal call. If NPS = 0 because no responses received, push for a response before Aug 4. Use renewal conversation to surface and address any unspoken concerns.</div>
+    </div>
+
+    <div class="risk-card" style="border-left:4px solid #10b981;">
+      <div class="risk-header">
+        <span style="font-size:20px;">🟢</span>
+        <div class="risk-title">Platform Usage — Stable &amp; Active</div>
+      </div>
+      <div class="risk-body">LifeSuite telemetry shows consistent event volume: 2,598 events in 12 months, 285 in last 30 days. Daily logins are healthy (78-150 on weekdays). Global Onboarding Score = 100. Engagement Score = 100. Services Engagement = 100. No sudden drop in usage. Recurring support cases show engagement, not abandonment — GroupM is actively using the platform, not going dark.</div>
+      <div class="risk-change">Maintain: Continue monthly check-ins. Resolve open cases before renewal to ensure usage health signals stay positive for the pricing conversation.</div>
+    </div>
+
+    <div class="risk-card" style="border-left:4px solid #10b981;">
+      <div class="risk-header">
+        <span style="font-size:20px;">🟢</span>
+        <div class="risk-title">Relationship Cadence — Active &amp; Recent</div>
+      </div>
+      <div class="risk-body">Two Chorus calls logged in the last week (Jun 3 Monthly Meeting, Jun 2 WPP Media Touchbase). Site review completed May 12 (27 days ago). Last onsite F2F Feb 25 (103 days — not flagged overdue). 0 active at-risk alerts. Randy Havel maintaining touchpoint cadence with email follow-ups. Andrew Pollard directly engaged on renewal. Relationship with Patryk/Emily is active and functioning.</div>
+      <div class="risk-change">Maintain: Keep monthly meeting cadence through renewal. Ensure Jun 10 pricing call has both Patryk and Emily present.</div>
+    </div>
+
+    <div class="risk-card" style="border-left:4px solid #10b981;">
+      <div class="risk-header">
+        <span style="font-size:20px;">🟢</span>
+        <div class="risk-title">Workday Risk Assessment — No Current Signal</div>
+      </div>
+      <div class="risk-body">No Workday mentions detected in Chorus engagement history, SFDC cases, or ZoomInfo scoops for GroupM. GroupM uses ADP (Canada integration confirmed), SAP/Perceptive Content (document management integration is the core tech stack anchor). No HRIS replacement or Workday evaluation signal. The Perceptive Content integration is long-established — this represents committed coexistence, not new evaluation. GroupM's IT stack includes Perceptive Content, ADP, and Rival as distinct functional tools with long integration histories.</div>
+      <div class="risk-change">Monitor: If WPP Media announces HCM platform standardization across all agencies (WPP-level consolidation), reassess. No action required currently.</div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+function switchTab(n) {
+  var panels = document.querySelectorAll('.tab-panel');
+  var btns = document.querySelectorAll('.tab-btn');
+  for (var i = 0; i < panels.length; i++) { panels[i].classList.remove('active'); }
+  for (var i = 0; i < btns.length; i++) { btns[i].classList.remove('active'); }
+  document.getElementById('tab-' + n).classList.add('active');
+  for (var i = 0; i < btns.length; i++) {
+    if (btns[i].getAttribute('onclick') === 'switchTab(' + n + ')') {
+      btns[i].classList.add('active');
+      break;
+    }
+  }
+}
+</script>
+</body>
+</html>

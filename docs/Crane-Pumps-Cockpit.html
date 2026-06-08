@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light only">
+<title>Crane Pumps &amp; Systems — CSM Account Cockpit</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f7; color: #1a1f2e; font-size: 14px; line-height: 1.5; overflow-x: hidden; }
+.container { max-width: 100%; padding: 14px 16px; }
+
+/* HEADER */
+.header { background: #1a2744; color: #ffffff; border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+.header-left h1 { font-size: 20px; font-weight: 700; color: #ffffff; }
+.header-left .sub { font-size: 12px; color: #8fa3c8; margin-top: 2px; }
+.header-right { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.badge-blue { background: #1e3a6e; color: #7db3f5; }
+.badge-green { background: #0d3327; color: #34c97a; }
+.badge-amber { background: #3d2a00; color: #f0a500; }
+.badge-red { background: #3d0f0f; color: #f06060; }
+.badge-purple { background: #2a1a4a; color: #b07bfa; }
+.refresh-note { font-size: 11px; color: #8fa3c8; }
+
+/* KPI STRIP */
+.kpi-strip { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 12px; }
+.kpi { background: #ffffff; border-radius: 8px; padding: 12px 14px; border: 1px solid #e4e8f0; position: relative; }
+.kpi-label { font-size: 11px; color: #6b7494; font-weight: 500; display: flex; align-items: center; gap: 4px; }
+.kpi-value { font-size: 22px; font-weight: 700; color: #1a1f2e; margin-top: 4px; line-height: 1; }
+.kpi-value.green { color: #16a34a; }
+.kpi-value.amber { color: #d97706; }
+.kpi-value.red { color: #dc2626; }
+.kpi-sub { font-size: 11px; color: #9098b1; margin-top: 3px; }
+.kpi-bar { height: 3px; border-radius: 2px; margin-top: 8px; background: #e8eaf0; overflow: hidden; }
+.kpi-bar-fill { height: 100%; border-radius: 2px; }
+
+/* TAB BAR */
+.tab-bar { display: flex; gap: 2px; background: #dde2ef; border-radius: 10px; padding: 4px; overflow-x: auto; white-space: nowrap; position: sticky; top: 0; z-index: 100; margin-bottom: 12px; scrollbar-width: none; }
+.tab-bar::-webkit-scrollbar { display: none; }
+.tab-btn { padding: 8px 16px; border: none; background: transparent; color: #5a6178; font-size: 12px; font-weight: 600; border-radius: 7px; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+.tab-btn:hover { background: #f0f2f9; color: #1a1f2e; }
+.tab-btn.active { background: #ffffff; color: #1a1f2e; box-shadow: 0 1px 4px rgba(0,0,0,0.10); }
+
+/* PANELS */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* SECTIONS */
+.section { background: #ffffff; border-radius: 10px; padding: 16px 18px; margin-bottom: 10px; border: 1px solid #e4e8f0; overflow: visible; }
+.section-title { font-size: 13px; font-weight: 700; color: #1a1f2e; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #f0f2f7; padding-bottom: 8px; }
+.section-title span { font-size: 11px; font-weight: 500; color: #9098b1; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+/* ACTION CARDS */
+.action-card { border: 1px solid #e4e8f0; border-radius: 8px; padding: 13px 15px; margin-bottom: 8px; display: flex; gap: 12px; align-items: flex-start; }
+.action-card.p1 { border-left: 4px solid #dc2626; background: #fff8f8; }
+.action-card.p2 { border-left: 4px solid #d97706; background: #fffbf0; }
+.action-card.p3 { border-left: 4px solid #2563eb; background: #f8fbff; }
+.action-num { font-size: 13px; font-weight: 800; color: #c0c8de; min-width: 22px; }
+.action-body .action-title { font-size: 13px; font-weight: 700; color: #1a1f2e; margin-bottom: 3px; }
+.action-body .action-why { font-size: 12px; color: #5a6178; margin-bottom: 5px; }
+.action-body .action-step { font-size: 11px; color: #2563eb; font-weight: 600; background: #eff5ff; border-radius: 4px; padding: 3px 8px; display: inline-block; }
+
+/* HEALTH GRID */
+.health-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; overflow: visible; }
+.health-card { background: #f8f9fb; border-radius: 8px; padding: 12px; text-align: center; position: relative; overflow: visible; }
+.health-card .h-label { font-size: 11px; color: #6b7494; font-weight: 500; display: flex; justify-content: center; align-items: center; gap: 4px; overflow: visible; }
+.health-card .h-value { font-size: 26px; font-weight: 800; margin: 6px 0 2px; line-height: 1; }
+.health-card .h-sub { font-size: 11px; color: #9098b1; }
+.h-green { color: #16a34a; }
+.h-amber { color: #d97706; }
+.h-red { color: #dc2626; }
+.h-gray { color: #9098b1; }
+
+/* TOOLTIP */
+.metric-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; background: #e4e8f0; color: #7a82a0; font-size: 9px; font-weight: 700; cursor: help; position: relative; overflow: visible; }
+.metric-tip .tip-box { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); width: 240px; padding: 9px 11px; background: #1a1f2e; color: #e8ecf5; font-size: 11px; font-weight: 400; line-height: 1.5; border-radius: 7px; box-shadow: 0 4px 14px rgba(0,0,0,0.18); z-index: 9999; pointer-events: none; text-align: left; }
+.metric-tip:hover .tip-box { display: block; }
+
+/* TABLES */
+table { width: 100%; border-collapse: collapse; }
+th { background: #f4f6fb; color: #6b7494; font-size: 11px; font-weight: 600; text-align: left; padding: 8px 10px; border-bottom: 2px solid #e4e8f0; }
+td { padding: 8px 10px; font-size: 12px; border-bottom: 1px solid #f0f2f7; color: #1a1f2e; vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #f8f9fb; }
+
+/* STATUS BADGES */
+.sb { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; }
+.sb-green { background: #dcfce7; color: #15803d; }
+.sb-amber { background: #fef3c7; color: #92400e; }
+.sb-red { background: #fee2e2; color: #991b1b; }
+.sb-blue { background: #dbeafe; color: #1e40af; }
+.sb-gray { background: #f1f5f9; color: #475569; }
+.sb-purple { background: #ede9fe; color: #6d28d9; }
+
+/* CONTACT CARDS */
+.contact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.contact-card { border: 1px solid #e4e8f0; border-radius: 8px; padding: 12px; background: #fafbfd; }
+.contact-card .c-name { font-weight: 700; font-size: 13px; color: #1a1f2e; }
+.contact-card .c-title { font-size: 11px; color: #6b7494; margin: 2px 0 4px; }
+.contact-card .c-email { font-size: 11px; color: #2563eb; }
+.contact-card .c-intel { font-size: 11px; color: #5a6178; margin-top: 5px; padding-top: 5px; border-top: 1px dashed #e4e8f0; line-height: 1.4; }
+.role-tag { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 9px; font-weight: 700; margin-left: 5px; }
+.rt-champion { background: #dcfce7; color: #15803d; }
+.rt-sponsor { background: #dbeafe; color: #1e40af; }
+.rt-parent { background: #ede9fe; color: #6d28d9; }
+.rt-user { background: #fef3c7; color: #92400e; }
+.rt-exec { background: #ffe4e6; color: #9f1239; }
+
+/* RISK CARDS */
+.risk-card { border: 1px solid #e4e8f0; border-radius: 8px; padding: 14px 16px; margin-bottom: 8px; }
+.risk-card.risk-red { border-left: 4px solid #dc2626; background: #fff8f8; }
+.risk-card.risk-amber { border-left: 4px solid #d97706; background: #fffbf2; }
+.risk-card.risk-green { border-left: 4px solid #16a34a; background: #f0fdf4; }
+.risk-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.risk-icon { font-size: 16px; }
+.risk-title { font-size: 13px; font-weight: 700; color: #1a1f2e; }
+.risk-desc { font-size: 12px; color: #374151; line-height: 1.5; }
+.risk-fix { font-size: 11px; color: #16a34a; background: #f0fdf4; border-radius: 4px; padding: 5px 8px; margin-top: 7px; font-weight: 500; }
+.risk-fix.red { color: #dc2626; background: #fff8f8; }
+
+/* OPP CARDS */
+.opp-card { border: 1px solid #e4e8f0; border-radius: 8px; padding: 12px 14px; margin-bottom: 8px; }
+.opp-title { font-size: 13px; font-weight: 700; color: #2563eb; margin-bottom: 5px; }
+.opp-title a { color: #2563eb; text-decoration: none; }
+.opp-meta { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; font-size: 11px; color: #6b7494; margin-bottom: 5px; }
+.opp-meta strong { color: #1a1f2e; }
+.opp-nextstep { font-size: 11px; color: #6b7494; margin-top: 5px; }
+
+/* PRODUCT CARDS */
+.product-card { border: 1px solid #e4e8f0; border-radius: 8px; padding: 13px 15px; margin-bottom: 8px; }
+.product-card.tier1 { border-top: 3px solid #2563eb; }
+.product-card.expansion { border-top: 3px solid #7c3aed; background: #faf8ff; }
+.product-card .pc-header { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+.product-card .pc-badge { display: inline-flex; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+.pc-shipped { background: #dcfce7; color: #15803d; }
+.pc-coming { background: #dbeafe; color: #1e40af; }
+.pc-expansion { background: #ede9fe; color: #6d28d9; }
+.product-card .pc-name { font-weight: 700; font-size: 13px; color: #1a1f2e; }
+.product-card .pc-desc { font-size: 12px; color: #374151; margin-bottom: 5px; }
+.product-card .pc-pain { font-size: 11px; color: #6b7494; background: #f4f6fb; border-radius: 4px; padding: 5px 8px; font-style: italic; }
+
+/* INFO ROW */
+.info-row { display: flex; gap: 6px; margin-bottom: 5px; font-size: 12px; }
+.info-label { color: #6b7494; font-weight: 600; min-width: 150px; }
+.info-val { color: #1a1f2e; }
+
+/* MARKET TABLE */
+.market-row td:first-child { font-weight: 600; color: #374151; }
+.market-row td:last-child { color: #5a6178; }
+
+/* DIVIDERS */
+.divider { border: none; border-top: 1px solid #f0f2f7; margin: 12px 0; }
+.note { font-size: 11px; color: #9098b1; font-style: italic; margin-top: 6px; }
+.unverified { background: #fef9ec; border: 1px solid #f9d77e; border-radius: 4px; padding: 3px 7px; font-size: 10px; color: #92400e; font-weight: 600; display: inline-block; margin-left: 4px; }
+
+/* TIER 2 LIST */
+.tier2-list { list-style: none; padding: 0; }
+.tier2-list li { padding: 5px 0; border-bottom: 1px solid #f0f2f7; display: flex; align-items: center; gap: 8px; font-size: 12px; color: #374151; }
+.tier2-list li:last-child { border-bottom: none; }
+
+/* SUMMARY CARDS ROW */
+.summary-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.sum-card { background: #f8f9fb; border-radius: 8px; padding: 12px; border: 1px solid #e4e8f0; }
+.sum-card .sum-title { font-size: 11px; font-weight: 700; color: #6b7494; margin-bottom: 5px; }
+.sum-card .sum-body { font-size: 12px; color: #374151; line-height: 1.5; }
+
+/* RIVAL TEAM */
+.team-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.team-card { flex: 1; min-width: 180px; background: #f0f4ff; border-radius: 8px; padding: 10px 12px; border: 1px solid #c7d4f5; }
+.team-card .tc-name { font-weight: 700; font-size: 13px; color: #1a1f2e; }
+.team-card .tc-role { font-size: 11px; color: #3b5dbf; font-weight: 600; }
+.team-card .tc-note { font-size: 11px; color: #5a6178; margin-top: 4px; }
+
+/* EXPAND VECTORS */
+.ev-table td { font-size: 12px; }
+.ev-table td:first-child { font-weight: 600; color: #7c3aed; }
+
+/* RESPONSIVE */
+@media (max-width: 800px) {
+  .kpi-strip { grid-template-columns: repeat(3, 1fr); }
+  .health-grid { grid-template-columns: repeat(2, 1fr); }
+  .contact-grid { grid-template-columns: repeat(2, 1fr); }
+  .two-col, .three-col { grid-template-columns: 1fr; }
+  .summary-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <h1>Crane Pumps &amp; Systems</h1>
+    <div class="sub">Industrial Machinery &amp; Equipment &nbsp;|&nbsp; Piqua, OH &nbsp;|&nbsp; Subsidiary of Crane Holdings Co (NYSE: CR) &nbsp;|&nbsp; CSM: Andrew Pollard &nbsp;|&nbsp; Tier 6 Corporate</div>
+  </div>
+  <div class="header-right">
+    <span class="badge badge-green">● Active</span>
+    <span class="badge badge-blue">Recruiting + Other</span>
+    <span class="badge badge-amber">Renewal Jan 1, 2027</span>
+    <span class="refresh-note">Monday Full Refresh &nbsp;|&nbsp; Jun 8, 2026</span>
+  </div>
+</div>
+
+<!-- KPI STRIP -->
+<div class="kpi-strip">
+  <div class="kpi">
+    <div class="kpi-label">ARR <span class="metric-tip">?<span class="tip-box">Subscription_ARR_ALL_PRODUCTS__c. Source: SFDC Account object. All ARR is in Recruiting module.</span></span></div>
+    <div class="kpi-value">$18.5K</div>
+    <div class="kpi-sub">Recruiting only</div>
+    <div class="kpi-bar"><div class="kpi-bar-fill" style="width:2%;background:#2563eb;"></div></div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Engagement <span class="metric-tip">?<span class="tip-box">Customer_Engagement_Score__c. Source: SFDC Account object. 100% = fully engaged with Rival services.</span></span></div>
+    <div class="kpi-value green">100%</div>
+    <div class="kpi-sub">Services: 100%</div>
+    <div class="kpi-bar"><div class="kpi-bar-fill" style="width:100%;background:#16a34a;"></div></div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Renewal <span class="metric-tip">?<span class="tip-box">Next_Renewal_Date__c. Source: SFDC Account object. Days calculated from today Jun 8, 2026.</span></span></div>
+    <div class="kpi-value amber">212d</div>
+    <div class="kpi-sub">Jan 1, 2027</div>
+    <div class="kpi-bar"><div class="kpi-bar-fill" style="width:58%;background:#d97706;"></div></div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">NPS <span class="metric-tip">?<span class="tip-box">Average_NPS_Score_SFDC__c. Source: SFDC Account object. No NPS survey has been sent yet (Last_NPS_Sent__c = null). Score shows 0 which is default — not a detractor signal.</span></span></div>
+    <div class="kpi-value h-gray">—</div>
+    <div class="kpi-sub">Not sent yet</div>
+    <div class="kpi-bar"><div class="kpi-bar-fill" style="width:0%;background:#9098b1;"></div></div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Cases (12mo) <span class="metric-tip">?<span class="tip-box">Cases created in last 365 days. Source: SFDC Case object. All 3 are closed with fast resolution times.</span></span></div>
+    <div class="kpi-value green">3</div>
+    <div class="kpi-sub">All closed / low sev</div>
+    <div class="kpi-bar"><div class="kpi-bar-fill" style="width:15%;background:#16a34a;"></div></div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">At-Risk Alerts <span class="metric-tip">?<span class="tip-box">Count_of_Active_At_Risk_Alerts__c. Source: SFDC Account object. No active alerts as of refresh.</span></span></div>
+    <div class="kpi-value green">0</div>
+    <div class="kpi-sub">No active alerts</div>
+    <div class="kpi-bar"><div class="kpi-bar-fill" style="width:0%;background:#16a34a;"></div></div>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab(0)">Actions</button>
+  <button class="tab-btn" onclick="switchTab(1)">Account Intel</button>
+  <button class="tab-btn" onclick="switchTab(2)">Use Case</button>
+  <button class="tab-btn" onclick="switchTab(3)">People</button>
+  <button class="tab-btn" onclick="switchTab(4)">Contracts</button>
+  <button class="tab-btn" onclick="switchTab(5)">Product</button>
+  <button class="tab-btn" onclick="switchTab(6)">Usage</button>
+  <button class="tab-btn" onclick="switchTab(7)">Cases</button>
+  <button class="tab-btn" onclick="switchTab(8)">Risk</button>
+</div>
+
+<!-- TAB 0: ACTIONS -->
+<div class="tab-panel active" id="tab-0">
+  <div class="section">
+    <div class="section-title">Priority Actions <span>ranked by urgency + revenue impact</span></div>
+
+    <div class="action-card p1">
+      <div class="action-num">1</div>
+      <div class="action-body">
+        <div class="action-title">Close-date on Workflow expansion opp is stale — Jun 4 has passed</div>
+        <div class="action-why">Opp "SDR Booked Meeting — Workflow" was set to close Jun 4, 2026 and is still at Stage 3 Align. Next step is "Regroup w/ Katy." This opp is now past-due and risks aging out or triggering pipeline review flags. If Workflow expansion is still live, update close date and advance stage. If it stalled, update accordingly so pipeline is clean.</div>
+        <div class="action-step">Update opp close date + log conversation outcome with Katy Zimpfer this week</div>
+      </div>
+    </div>
+
+    <div class="action-card p1">
+      <div class="action-num">2</div>
+      <div class="action-body">
+        <div class="action-title">Send first NPS survey — account is 159 days old, no NPS has been sent</div>
+        <div class="action-why">No NPS has ever been sent to Crane Pumps (Last_NPS_Sent__c = null). At 5+ months post-implementation, this is the right window for a health check. They just completed a training session (Jun 5) and had two clean support interactions in May — good timing for a positive response. An NPS also surfaces any silent friction before renewal discussions begin.</div>
+        <div class="action-step">Trigger NPS send via SFDC &amp; schedule Next_NPS_Send_Date__c</div>
+      </div>
+    </div>
+
+    <div class="action-card p2">
+      <div class="action-num">3</div>
+      <div class="action-body">
+        <div class="action-title">Crane Co new CEO (Alex Alcala, Apr 27) — re-engage parent-level HR stakeholders</div>
+        <div class="action-why">Crane Holdings Co completed a planned CEO succession on Apr 27, 2026: Alex Alcala replaced Max Mitchell. New CEOs frequently trigger vendor portfolio reviews and cost consolidation mandates, especially for HR tech. Your contacts at parent-level (Tami Polmanteer — CHRO, Amy Holgerson — Dir. Talent Acquisition) are key defenders. Validate that Rival's position at the CP&amp;S level is understood and supported at corporate.</div>
+        <div class="action-step">Schedule touchpoint with Tami Polmanteer and/or Amy Holgerson at Crane Co HQ</div>
+      </div>
+    </div>
+
+    <div class="action-card p2">
+      <div class="action-num">4</div>
+      <div class="action-body">
+        <div class="action-title">Workday ATS used for recruiting job postings — confirm integration scope vs. displacement risk</div>
+        <div class="action-why">ZoomInfo scoops show CP&amp;S is posting VP Operations and Controller roles through Workday Careers (cranecompany.wd5.myworkdayjobs.com). Crane Co (parent) uses Workday enterprise-wide. The key question: is Rival Recruiting the ATS of record for CP&amp;S, with Workday as the careers site/front-end? Or is Workday gradually absorbing ATS functions? This needs to be confirmed before renewal.</div>
+        <div class="action-step">Ask Katy Zimpfer directly: "How does Rival Recruiting interact with Workday today? Is Workday managing any part of the applicant pipeline?"</div>
+      </div>
+    </div>
+
+    <div class="action-card p3">
+      <div class="action-num">5</div>
+      <div class="action-body">
+        <div class="action-title">Renewal opp close date is 2033 — stale placeholder, not a real close date</div>
+        <div class="action-why">The renewal opportunity shows a close date of May 17, 2033 — clearly a placeholder from contract end-date, not an actual renewal forecasting date. Renewal is Jan 1, 2027 (212 days). Standard pipeline management requires renewal opp close date within 90 days of actual renewal.</div>
+        <div class="action-step">Update renewal opp close date to Oct 1, 2026 (90 days before renewal)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Engagement Health <span>Source: SFDC Account object</span></div>
+    <div class="health-grid">
+      <div class="health-card">
+        <div class="h-label">Customer Engagement <span class="metric-tip">?<span class="tip-box">Customer_Engagement_Score__c. Measures overall engagement with Rival platform and services. 100% = fully engaged. Source: SFDC Account object.</span></span></div>
+        <div class="h-value h-green">100%</div>
+        <div class="h-sub">Fully engaged</div>
+      </div>
+      <div class="health-card">
+        <div class="h-label">Services Engagement <span class="metric-tip">?<span class="tip-box">Services_Engagement_Score_Percent__c. Measures utilization of contracted services hours. 100% = full utilization. Source: SFDC Account object.</span></span></div>
+        <div class="h-value h-green">100%</div>
+        <div class="h-sub">Full utilization</div>
+      </div>
+      <div class="health-card">
+        <div class="h-label">NPS Score <span class="metric-tip">?<span class="tip-box">Average_NPS_Score_SFDC__c. Scale: 0-10. 9-10 = promoter (green), 7-8 = passive (amber), 0-6 = detractor (red). Last_NPS_Sent__c = null — no survey sent. The 0 value is a default, not a detractor signal.</span></span></div>
+        <div class="h-value h-gray">—</div>
+        <div class="h-sub">No survey sent yet</div>
+      </div>
+      <div class="health-card">
+        <div class="h-label">Recent Activity <span class="metric-tip">?<span class="tip-box">Based on Task activity log from SFDC. Measures recency and depth of engagement over the past 30 days. Training + cases in May-June = active engagement signal.</span></span></div>
+        <div class="h-value h-green">Active</div>
+        <div class="h-sub">Training Jun 5</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 1: ACCOUNT INTEL -->
+<div class="tab-panel" id="tab-1">
+  <div class="section">
+    <div class="section-title">Company Overview <span>Source: ZoomInfo, web, SFDC</span></div>
+    <div class="two-col">
+      <div>
+        <div class="info-row"><span class="info-label">Legal Name</span><span class="info-val">Crane Pumps &amp; Systems, Inc.</span></div>
+        <div class="info-row"><span class="info-label">Parent</span><span class="info-val">Crane Holdings Co (NYSE: CR) — ultimate parent</span></div>
+        <div class="info-row"><span class="info-label">Relationship</span><span class="info-val">Subsidiary (direct)</span></div>
+        <div class="info-row"><span class="info-label">HQ</span><span class="info-val">Piqua, Ohio (manufacturing &amp; operations)</span></div>
+        <div class="info-row"><span class="info-label">Parent HQ</span><span class="info-val">Stamford, Connecticut</span></div>
+        <div class="info-row"><span class="info-label">Employees</span><span class="info-val">697 (ZoomInfo, validated Jun 2026)</span></div>
+        <div class="info-row"><span class="info-label">Revenue</span><span class="info-val">~$201.8M (ZoomInfo) &nbsp;<span class="unverified">Verify</span></span></div>
+        <div class="info-row"><span class="info-label">Industry</span><span class="info-val">Industrial Machinery &amp; Equipment / Manufacturing</span></div>
+        <div class="info-row"><span class="info-label">Founded</span><span class="info-val">1946 (CP&amp;S); 1855 (Crane Co origin)</span></div>
+        <div class="info-row"><span class="info-label">Website</span><span class="info-val">www.cranepumps.com</span></div>
+        <div class="info-row"><span class="info-label">Usage Region</span><span class="info-val">United States (SFDC Usage_Region_A__c)</span></div>
+        <div class="info-row"><span class="info-label">Locations</span><span class="info-val">5 (ZoomInfo)</span></div>
+      </div>
+      <div>
+        <p style="font-size:12px;color:#374151;line-height:1.6;margin-bottom:10px;">Crane Pumps &amp; Systems (CP&amp;S) is a wholly-owned subsidiary of Crane Holdings Co, a diversified industrial conglomerate listed on the NYSE. CP&amp;S designs and manufactures high-performance centrifugal pumps for municipal, commercial, industrial, and wastewater applications. Brands include Barnes, Burks, Crown, Deming, Prosser, and Weinman. All manufacturing is domestic — the Piqua, Ohio facility has been the production hub since 1965.</p>
+        <p style="font-size:12px;color:#374151;line-height:1.6;margin-bottom:10px;">In 2026, CP&amp;S launched the <strong>Atlas Series</strong> (Barnes sewage ejector/effluent pumps, shipping July 2026) and the <strong>SyFlo Series</strong> (2025, high-efficiency solids handling submersibles). The company has been posting record hiring volumes across Sales, IT, Engineering, and Operations in early 2026 — the highest in 12 months per ZoomInfo hiring signals.</p>
+        <p style="font-size:12px;color:#374151;line-height:1.6;">CP&amp;S is a lean manufacturing organization. HR team is small (~3-5 FTEs) but active: VP HR Katy Zimpfer leads, supported by HR Manager Hailey Mescher and two generalists.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Leadership <span>Source: SFDC Contacts + ZoomInfo</span></div>
+    <div class="two-col">
+      <div>
+        <div class="section-title" style="font-size:12px;color:#6b7494;border-bottom:none;margin-bottom:8px;">Crane Pumps &amp; Systems (Division)</div>
+        <table>
+          <tr><th>Name</th><th>Title</th></tr>
+          <tr><td>Katy Zimpfer</td><td>Vice President, Human Resources</td></tr>
+          <tr><td>Hailey Mescher</td><td>Manager, Human Resources</td></tr>
+          <tr><td>Matt Livingston</td><td>CFO</td></tr>
+          <tr><td>Monica Cane <span class="unverified">ZI</span></td><td>Talent Development Director, HR</td></tr>
+          <tr><td>Hannah McKee</td><td>HR Generalist</td></tr>
+          <tr><td>Samuel Callinan</td><td>Human Resource Generalist</td></tr>
+          <tr><td>Steven Vantoorenburg <span class="unverified">ZI</span></td><td>Speaker / Sales role (conf 2026)</td></tr>
+        </table>
+      </div>
+      <div>
+        <div class="section-title" style="font-size:12px;color:#6b7494;border-bottom:none;margin-bottom:8px;">Crane Holdings Co (Parent / Corporate)</div>
+        <table>
+          <tr><th>Name</th><th>Title</th></tr>
+          <tr><td><strong>Alex Alcala</strong> <span class="sb sb-red">NEW CEO</span></td><td>President &amp; CEO (eff. Apr 27, 2026)</td></tr>
+          <tr><td>Max Mitchell</td><td>Executive Chairman (prev. CEO)</td></tr>
+          <tr><td>Tami Polmanteer</td><td>CHRO (Crane Co)</td></tr>
+          <tr><td>Amy Holgerson</td><td>Director, Talent Acquisition (Crane Co)</td></tr>
+          <tr><td>Richard Maue</td><td>CFO, Crane Co</td></tr>
+        </table>
+        <p class="note" style="margin-top:8px;">⚠ Alex Alcala became CEO Apr 27, 2026 — new leadership at parent. CHRO Tami Polmanteer is key Rival defender at corporate level.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Market Dynamics <span>Source: web research, ZoomInfo scoops, Crane Co earnings</span></div>
+    <table class="market-row">
+      <tr><th>Date</th><th>Signal</th><th>HR Implication for CP&amp;S</th></tr>
+      <tr class="market-row">
+        <td>Apr 27, 2026</td>
+        <td>Alex Alcala becomes Crane Co CEO (replaces Max Mitchell who moves to Exec Chair)</td>
+        <td>New CEO = vendor portfolio review risk. Incoming executives often mandate cost consolidation. Tami Polmanteer (CHRO) is the key champion at corporate. Validate relationship.</td>
+      </tr>
+      <tr class="market-row">
+        <td>Jan–Apr 2026</td>
+        <td>Crane Co completes 4 acquisitions: Druck, Panametrics, Reuter-Stokes, optek-Danulat</td>
+        <td>M&amp;A activity = integration headcount, talent onboarding, and TA surge. Each acquisition brings new hiring pipelines — a tailwind for Rival Recruiting utilization at CP&amp;S if they absorb integration hiring.</td>
+      </tr>
+      <tr class="market-row">
+        <td>Q1 2026</td>
+        <td>Crane Co reports +25% total sales, +15% adjusted EPS; record backlog $1.79B</td>
+        <td>Strong financial performance = less budget pressure at renewal. CP&amp;S as a subsidiary should be insulated from cost-cutting in the near term. Revenue growth also supports headcount growth = higher TA volume.</td>
+      </tr>
+      <tr class="market-row">
+        <td>Apr–Jun 2026</td>
+        <td>CP&amp;S hits 12-month highs for open roles in Sales, IT, Engineering, Operations (ZoomInfo)</td>
+        <td>Record hiring activity is exactly the use case Rival Recruiting is designed for. This is peak value delivery period. Ensure Rival is running smoothly and capturing all req volume.</td>
+      </tr>
+      <tr class="market-row">
+        <td>May 2026</td>
+        <td>Atlas Series launch — next-gen Barnes pump platform; shipments start Jul 2026</td>
+        <td>New product commercialization = commercial headcount additions (sales reps, applications engineers). Rival Recruiting should be the system of record for these hires.</td>
+      </tr>
+      <tr class="market-row">
+        <td>Feb 2026</td>
+        <td>VP Operations open role posted via Workday Careers platform</td>
+        <td>Leadership gap in Operations creates organizational uncertainty. Also confirms Workday is used as careers site — relationship to Rival Recruiting ATS must be validated.</td>
+      </tr>
+      <tr class="market-row">
+        <td>May 2026</td>
+        <td>Navy contract awarded: ~$3.3M to CP&amp;S</td>
+        <td>Defense/government contracts require OFCCP compliance for hiring. Rival Recruiting must support EEO/OFCCP reporting workflows. Confirm compliance configuration is in place.</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Competitive Landscape <span>Source: ZoomInfo, web research</span></div>
+    <table>
+      <tr><th>Peer / Competitor</th><th>Revenue Range</th><th>Key Profile</th></tr>
+      <tr><td>Xylem Inc.</td><td>~$8B</td><td>Public, global water technology leader; competes directly in pump markets</td></tr>
+      <tr><td>Grundfos</td><td>~$4B</td><td>Danish private manufacturer; strong in commercial water &amp; wastewater</td></tr>
+      <tr><td>Pentair</td><td>~$2B</td><td>Public; water treatment &amp; flow control; competes in commercial segments</td></tr>
+      <tr><td>Gorman-Rupp</td><td>~$700M</td><td>Public; closest peer — similar size, pump-focused, Ohio-based</td></tr>
+      <tr><td>Zoeller</td><td>Priv./undisclosed</td><td>Residential/commercial sump &amp; sewage; overlaps Barnes brand market</td></tr>
+    </table>
+    <p class="note">CP&amp;S competes primarily in municipal, industrial, and residential wastewater segments. Parent Crane Co's recent aerospace/sensor acquisitions signal strategic diversification away from heavy industrial — monitor for any CP&amp;S divestiture signals.</p>
+  </div>
+</div>
+
+<!-- TAB 2: USE CASE -->
+<div class="tab-panel" id="tab-2">
+  <div class="section">
+    <div class="section-title">Executive Summary</div>
+    <p style="font-size:13px;color:#374151;line-height:1.7;">Crane Pumps &amp; Systems deployed Rival Recruiting in late 2025 to support a surging talent acquisition pipeline at their Piqua, Ohio manufacturing facility. With 697 employees and record open roles across Sales, IT, Engineering, and Operations, CP&amp;S needs a purpose-built ATS that handles high-volume technical hiring without the overhead of enterprise Workday ATS configuration. Rival Recruiting delivers structured job requisition management, candidate pipeline visibility, and job posting distribution — all at a price point appropriate for a subsidiary-level HR team operating with 3-5 FTEs.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Active Products Deep Dive <span>Source: SFDC Active_Products2__c</span></div>
+    <div class="two-col">
+      <div class="product-card tier1">
+        <div class="pc-header">
+          <span class="pc-badge pc-shipped">ACTIVE</span>
+          <span class="pc-name">Rival Recruiting</span>
+          <span class="sb sb-blue">$18,500 ARR</span>
+        </div>
+        <div class="pc-desc"><strong>Use Case:</strong> End-to-end applicant tracking for CP&amp;S's manufacturing and engineering hiring across Piqua, OH operations. Supports high-volume technical roles (Application Engineer, Manufacturing Engineer, Sales roles).</div>
+        <div class="pc-pain">Pain it solves: Parent company Crane Co uses Workday enterprise-wide, but Workday's native ATS is designed for enterprise-scale configuration and lacks the flexibility needed for a 697-person subsidiary running lean. Rival Recruiting provides the structured pipeline management and candidate tracking CP&amp;S's 3-5 person HR team can actually operate.</div>
+      </div>
+      <div class="product-card tier1">
+        <div class="pc-header">
+          <span class="pc-badge pc-shipped">ACTIVE</span>
+          <span class="pc-name">Other (Module)</span>
+          <span class="sb sb-gray">Included</span>
+        </div>
+        <div class="pc-desc"><strong>Use Case:</strong> Supporting configuration or platform access associated with the Recruiting deployment. Specific "Other" product scope not further defined in SFDC. <span class="unverified">Verify with Neda / delivery team</span></div>
+        <div class="pc-pain">Likely includes platform configuration, SSO setup, or admin tooling supporting the Recruiting implementation.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Value Delivered &amp; Risk to Value</div>
+    <table>
+      <tr><th>Dimension</th><th>Current State</th><th>Risk to Value</th></tr>
+      <tr>
+        <td style="font-weight:600;">Structured Hiring Pipeline</td>
+        <td>Rival provides requisition-to-offer workflow for all CP&amp;S roles</td>
+        <td>Workday Careers front-end posts jobs — if Workday scope expands to ATS, Rival is displaced</td>
+      </tr>
+      <tr>
+        <td style="font-weight:600;">Candidate Import</td>
+        <td>Active support cases in May resolved candidate import process</td>
+        <td>Import friction = adoption signal. If users can't import cleanly, they default to manual workarounds outside Rival</td>
+      </tr>
+      <tr>
+        <td style="font-weight:600;">Seat Management</td>
+        <td>Recruiter seat transfer resolved Jun 1 (Case #00997872)</td>
+        <td>Seat management complexity adds admin burden to a lean HR team</td>
+      </tr>
+      <tr>
+        <td style="font-weight:600;">Compliance Hiring</td>
+        <td>Navy contract won May 2026 — OFCCP hiring compliance required</td>
+        <td>If Rival doesn't support EEO/OFCCP reporting, CP&amp;S may be forced to add a separate compliance tool or switch to a compliant ATS</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Expansion Vectors</div>
+    <table class="ev-table">
+      <tr><th>Product</th><th>Observed Pain Signal</th><th>Entry Point</th></tr>
+      <tr>
+        <td>Workflow (Onboarding)</td>
+        <td>CP&amp;S is running record hiring volume. New hires need structured onboarding, especially for technical/manufacturing roles. Currently no Rival Onboarding in place.</td>
+        <td>Active opp exists (Stage 3 Align, "Regroup w/ Katy"). Resume Workflow conversation with concrete onboarding ROI: time-to-productivity for manufacturing hires.</td>
+      </tr>
+      <tr>
+        <td>Performance</td>
+        <td>VP Operations open role + Atlas product launch = new leadership transitions and performance review need for commercial team growth</td>
+        <td>After Workflow lands, position Performance as the next natural step in the employee lifecycle suite.</td>
+      </tr>
+      <tr>
+        <td>Learning</td>
+        <td>Atlas Series launch Jul 2026 requires product training for distributors, sales, and field reps</td>
+        <td>Product launch training use case — position Rival Learning as the delivery vehicle for Atlas Series enablement content.</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="summary-row">
+    <div class="sum-card">
+      <div class="sum-title">Switching Cost</div>
+      <div class="sum-body">Moderate. 5-month tenure with active candidate data, configured pipelines, and recent training. A switch would require data migration and retraining for a lean HR team. Not deeply embedded yet, but incumbent advantage grows with time.</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-title">Whitespace</div>
+      <div class="sum-body">Significant: Workflow (Onboarding) — active opp. Performance, Learning — 0 ARR currently. Full-suite potential given record hiring volume and Atlas product launch training need.</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-title">Renewal Confidence</div>
+      <div class="sum-body">Moderate-High. 100% engagement, 0 at-risk alerts, clean support history. Risk factor: Workday ATS integration scope unknown, new Crane Co CEO. Validate Workday relationship before Jan 2027 renewal.</div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 3: PEOPLE -->
+<div class="tab-panel" id="tab-3">
+  <div class="section">
+    <div class="section-title">Key Stakeholders — CP&amp;S Division <span>Source: SFDC Contacts + ZoomInfo enrichment</span></div>
+    <div class="contact-grid">
+      <div class="contact-card">
+        <div class="c-name">Katy Zimpfer <span class="role-tag rt-champion">Champion</span></div>
+        <div class="c-title">Vice President, Human Resources</div>
+        <div class="c-email">kzimpfer@cranepumps.com &nbsp;|&nbsp; (567) 712-1026</div>
+        <div class="c-intel">Primary decision maker for Rival at CP&amp;S. Owns the Recruiting deployment. "Regroup w/ Katy" is the noted next step on Workflow expansion opp. ZoomInfo accuracy score: 98 — contact validated Feb 2026. Last updated Jun 4, 2026. Most recently active contact in SFDC.</div>
+      </div>
+      <div class="contact-card">
+        <div class="c-name">Hailey Mescher <span class="role-tag rt-user">User</span></div>
+        <div class="c-title">Manager, Human Resources</div>
+        <div class="c-email">hmescher@cranepumps.com &nbsp;|&nbsp; (419) 953-5703</div>
+        <div class="c-intel">Day-to-day HR operations. Likely power user of Rival Recruiting — processes requisitions and manages candidate workflows. Key contact for product adoption health.</div>
+      </div>
+      <div class="contact-card">
+        <div class="c-name">Monica Cane <span class="role-tag rt-user">User</span></div>
+        <div class="c-title">Talent Development Director, HR</div>
+        <div class="c-email">ZoomInfo ID: 11320903446</div>
+        <div class="c-intel">ZoomInfo-sourced (not yet in SFDC as primary contact). Talent Development focus — relevant to future Learning expansion. Updated Jun 6, 2026 in ZoomInfo. <span class="unverified">Not in SFDC yet — add as contact</span></div>
+      </div>
+      <div class="contact-card">
+        <div class="c-name">Hannah McKee <span class="role-tag rt-user">User</span></div>
+        <div class="c-title">HR Generalist</div>
+        <div class="c-email">hmckee@cranepumps.com</div>
+        <div class="c-intel">Part of the HR generalist team supporting day-to-day hiring. Likely handles candidate import and recruiter seat management tasks (source of recent cases).</div>
+      </div>
+      <div class="contact-card">
+        <div class="c-name">Samuel Callinan <span class="role-tag rt-user">User</span></div>
+        <div class="c-title">Human Resource Generalist</div>
+        <div class="c-email">scallinan@cranepumps.com &nbsp;|&nbsp; (918) 510-2815</div>
+        <div class="c-intel">HR generalist — likely supports recruiting coordination. Active SFDC record. Good candidate for referral or NPS response.</div>
+      </div>
+      <div class="contact-card">
+        <div class="c-name">Matt Livingston</div>
+        <div class="c-title">CFO — Crane Pumps &amp; Systems</div>
+        <div class="c-email">mlivingston@cranepumps.com &nbsp;|&nbsp; (937) 214-3850</div>
+        <div class="c-intel">Division CFO. Budget authority for CP&amp;S tech spend. Likely signs off on renewal. Not typically involved in day-to-day unless renewal discussions escalate to finance.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Parent Company — Crane Holdings Co Stakeholders <span>Source: SFDC Contacts</span></div>
+    <div class="contact-grid">
+      <div class="contact-card" style="border: 1px solid #c7b6f5; background: #faf7ff;">
+        <div class="c-name">Tami Polmanteer <span class="role-tag rt-parent">Parent</span></div>
+        <div class="c-title">CHRO — Crane Co (Corporate)</div>
+        <div class="c-email">tpolmanteer@craneco.com &nbsp;|&nbsp; (203) 832-7611</div>
+        <div class="c-intel">Corporate CHRO at Stamford, CT HQ. Owns HR strategy across all Crane Co subsidiaries. With new CEO Alex Alcala in place since Apr 27, she is the most important person to cultivate at the parent level. If a vendor consolidation mandate comes down, it routes through her office.</div>
+      </div>
+      <div class="contact-card" style="border: 1px solid #c7b6f5; background: #faf7ff;">
+        <div class="c-name">Amy Holgerson <span class="role-tag rt-parent">Parent</span></div>
+        <div class="c-title">Director, Talent Acquisition — Crane Co</div>
+        <div class="c-email">aholgerson@craneco.com &nbsp;|&nbsp; (475) 333-9892</div>
+        <div class="c-intel">Corporate TA lead overseeing talent acquisition strategy enterprise-wide. Understands the ATS landscape at Crane Co. If Workday is being pushed down from parent for ATS consolidation, she would be driving that conversation. Critical to align with.</div>
+      </div>
+      <div class="contact-card" style="border: 1px solid #c7b6f5; background: #faf7ff;">
+        <div class="c-name">Richard Maue <span class="role-tag rt-parent">Parent</span></div>
+        <div class="c-title">CFO — Crane Co</div>
+        <div class="c-email">rmaue@craneco.com &nbsp;|&nbsp; (631) 375-4521</div>
+        <div class="c-intel">Corporate CFO. Involved in subsidiary cost oversight, especially after 4 acquisitions in Jan 2026. Low probability of direct Rival involvement unless renewal triggers a subsidiary tech audit.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Rival Team</div>
+    <div class="team-row">
+      <div class="team-card">
+        <div class="tc-name">Andrew Pollard</div>
+        <div class="tc-role">Customer Success Manager</div>
+        <div class="tc-note">Owns renewal opp + Workflow expansion opp. Last direct activity: May 18 (candidate import emails). Renewal in 212 days — time to increase cadence.</div>
+      </div>
+      <div class="team-card">
+        <div class="tc-name">Neda Aleksievska</div>
+        <div class="tc-role">Implementation / Services</div>
+        <div class="tc-note">Most active Rival-side contact in SFDC. Led Jun 5 training session + most candidate import email threads in May-Jun. Hands-on delivery lead.</div>
+      </div>
+      <div class="team-card">
+        <div class="tc-name">Hazel Laude</div>
+        <div class="tc-role">Support (Cases)</div>
+        <div class="tc-note">Handled Case #00997872 (Recruiter Seat Transfer, Jun 1-2). Fast resolution — 1 day.</div>
+      </div>
+      <div class="team-card">
+        <div class="tc-name">Raymond Romero / Edward Oropeza</div>
+        <div class="tc-role">Support (Cases)</div>
+        <div class="tc-note">Handled May candidate import cases (#00997202, #00997165). Same-day resolution on both.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 4: CONTRACTS -->
+<div class="tab-panel" id="tab-4">
+  <div class="section">
+    <div class="section-title">Active Contracts <span>Source: SFDC Contract object</span></div>
+    <table>
+      <tr><th>Contract #</th><th>Status</th><th>Start Date</th><th>End Date</th><th>Renewal Term</th><th>SFDC</th></tr>
+      <tr>
+        <td><strong>00018992</strong></td>
+        <td><span class="sb sb-green">Activated</span></td>
+        <td>Jan 2, 2026</td>
+        <td>May 17, 2033</td>
+        <td>12 months</td>
+        <td><a href="https://na1.salesforce.com/800Vs00000sXX80IAG" target="_blank" style="color:#2563eb;font-size:11px;">View</a></td>
+      </tr>
+    </table>
+    <p class="note">Contract end date 2033 appears to be a long-term placeholder from contract setup. The effective annual renewal date is Jan 1, 2027 per Next_Renewal_Date__c.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Active Opportunities <span>Source: SFDC Opportunity object</span></div>
+
+    <div class="opp-card">
+      <div class="opp-title"><a href="https://na1.salesforce.com/006Vs00000RwXQgIAN" target="_blank">Crane Pumps &amp; Systems — Renewal Opportunity</a></div>
+      <div class="opp-meta">
+        <span class="sb sb-blue">Stage 5: Renewal Solutioning</span>
+        <span><strong>ARR:</strong> $18,500</span>
+        <span><strong>Type:</strong> Renewal</span>
+        <span><strong>Owner:</strong> Andrew Pollard</span>
+        <span><strong>Probability:</strong> 40%</span>
+      </div>
+      <div class="opp-meta">
+        <span><strong>Created:</strong> Jan 2, 2026</span>
+        <span><strong>Close Date:</strong> May 17, 2033 <span class="sb sb-red">⚠ Stale — update to Oct 2026</span></span>
+        <span><strong>Potential Renewal ARR:</strong> $18,500</span>
+      </div>
+      <div class="opp-nextstep">Next Step: (none logged) — renewal is 212 days out</div>
+    </div>
+
+    <div class="opp-card">
+      <div class="opp-title"><a href="https://na1.salesforce.com/006Vs00000DV6EXIA1" target="_blank">Crane Pumps &amp; Systems — SDR Booked Meeting: Workflow</a></div>
+      <div class="opp-meta">
+        <span class="sb sb-amber">Stage 3: Align</span>
+        <span><strong>ARR:</strong> $18,500</span>
+        <span><strong>Type:</strong> New Business (Expansion)</span>
+        <span><strong>Owner:</strong> Andrew Pollard</span>
+        <span><strong>Probability:</strong> 40%</span>
+      </div>
+      <div class="opp-meta">
+        <span><strong>Created:</strong> Jan 21, 2025</span>
+        <span><strong>Close Date:</strong> Jun 4, 2026 <span class="sb sb-red">⚠ PAST — update immediately</span></span>
+        <span><strong>Stage Duration:</strong> 17+ months at Stage 3</span>
+      </div>
+      <div class="opp-nextstep">Next Step: <strong>Regroup w/ Katy</strong> — Workflow expansion has been stalled at Stage 3 for 17+ months. This is a critical action item.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Closed History <span>Source: SFDC Opportunity object</span></div>
+    <table>
+      <tr><th>Name</th><th>Stage</th><th>Amount</th><th>Close Date</th><th>Type</th></tr>
+      <tr>
+        <td>Crane Pumps &amp; Systems — Recruit Add-On</td>
+        <td><span class="sb sb-green">Closed Won</span></td>
+        <td>$18,500</td>
+        <td>Dec 31, 2025</td>
+        <td>New Business</td>
+      </tr>
+    </table>
+    <p class="note">The Recruit Add-On closed Dec 31, 2025 — this is the originating deal that established the current $18,500 Recruiting subscription. No competitive displacement history on record.</p>
+  </div>
+</div>
+
+<!-- TAB 5: PRODUCT -->
+<div class="tab-panel" id="tab-5">
+  <div class="section">
+    <div class="section-title">Active Projects &amp; Implementations <span>What's in flight NOW</span></div>
+    <table>
+      <tr><th>Initiative</th><th>Status</th><th>Owner</th><th>Notes</th></tr>
+      <tr>
+        <td><strong>Candidate Import Process</strong></td>
+        <td><span class="sb sb-green">Resolved</span></td>
+        <td>Neda Aleksievska</td>
+        <td>Active email thread + 2 cases (May 11-12). Import issues resolved same-day. Follow up to confirm workflow is stable post-fix.</td>
+      </tr>
+      <tr>
+        <td><strong>Recruit Training Session</strong></td>
+        <td><span class="sb sb-green">Completed</span></td>
+        <td>Neda Aleksievska</td>
+        <td>Chorus-recorded training session Jun 5, 2026. Likely post-implementation enablement for HR team. Good momentum signal.</td>
+      </tr>
+      <tr>
+        <td><strong>Recruiter Seat Transfer</strong></td>
+        <td><span class="sb sb-green">Resolved</span></td>
+        <td>Hazel Laude</td>
+        <td>Case #00997872. Seat transfer completed Jun 1-2. Fast turnaround. HR team managing active recruiter roster.</td>
+      </tr>
+      <tr>
+        <td><strong>Workflow (Onboarding) Expansion</strong></td>
+        <td><span class="sb sb-amber">Stalled — Stage 3</span></td>
+        <td>Andrew Pollard</td>
+        <td>Opp created Jan 2025, still at Stage 3 Align, close date expired Jun 4. Next step: Regroup w/ Katy. Needs immediate attention.</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Product Adoption &amp; Cross-Sell</div>
+    <div class="two-col">
+      <div>
+        <div class="section-title" style="font-size:12px;border-bottom:none;margin-bottom:8px;color:#6b7494;">Active Products</div>
+        <table>
+          <tr><th>Product</th><th>ARR</th><th>Status</th></tr>
+          <tr><td>Rival Recruiting</td><td>$18,500</td><td><span class="sb sb-green">Active</span></td></tr>
+          <tr><td>Other (platform)</td><td>Incl.</td><td><span class="sb sb-green">Active</span></td></tr>
+        </table>
+      </div>
+      <div>
+        <div class="section-title" style="font-size:12px;border-bottom:none;margin-bottom:8px;color:#6b7494;">Expansion Candidates</div>
+        <table>
+          <tr><th>Product</th><th>ARR $0</th><th>Signal</th></tr>
+          <tr><td>Workflow (Onboarding)</td><td>$0</td><td><span class="sb sb-amber">Active opp stalled</span></td></tr>
+          <tr><td>Performance</td><td>$0</td><td><span class="sb sb-gray">VP Ops hire pending</span></td></tr>
+          <tr><td>Learning</td><td>$0</td><td><span class="sb sb-gray">Atlas launch Jul 2026</span></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Product Roadmap — Tier 1 (Relevant to Crane Pumps) <span>Source: public release notes + market signals</span></div>
+
+    <div class="product-card tier1">
+      <div class="pc-header">
+        <span class="pc-badge pc-shipped">RELEVANT — RECRUITING</span>
+        <span class="pc-name">Candidate Import Workflow Improvements</span>
+      </div>
+      <div class="pc-desc">Any recent updates to bulk candidate import tools, CSV/API import formatting, or deduplication logic directly address the recurring candidate import issues CP&amp;S experienced in May 2026 (Cases #00997165 and #00997202).</div>
+      <div class="pc-pain">Pain Match: Two consecutive candidate import cases in May. Verify with Neda: are there product-side fixes for the specific error types encountered? If so, demo to Katy as evidence of platform responsiveness.</div>
+    </div>
+
+    <div class="product-card tier1">
+      <div class="pc-header">
+        <span class="pc-badge pc-expansion">EXPANSION — WORKFLOW</span>
+        <span class="pc-name">Workflow (Onboarding): Manufacturing &amp; Technical Role Onboarding Templates</span>
+      </div>
+      <div class="pc-desc">Rival Workflow supports structured, multi-step onboarding workflows with task assignments, document collection, and manager checklists. For a manufacturing company onboarding Application Engineers, Manufacturing Engineers, and Operations hires at volume — structured onboarding reduces time-to-productivity.</div>
+      <div class="pc-pain">Pain Match: CP&amp;S is at peak hiring volume with Atlas product launch driving commercial headcount growth. Every new hire without structured onboarding is lost productivity. Position Workflow as the natural extension of Recruiting already in place. Ask Katy: "What does day-1 look like for a new Manufacturing Engineer right now?"</div>
+    </div>
+
+    <div class="product-card tier1">
+      <div class="pc-header">
+        <span class="pc-badge pc-expansion">EXPANSION — LEARNING</span>
+        <span class="pc-name">Rival Learning: Product Launch Training Delivery</span>
+      </div>
+      <div class="pc-desc">Rival Learning supports content creation, course assignment, and completion tracking for internal and partner training. Atlas Series (Barnes pump platform) ships July 2026 — distributors, sales reps, and field technicians need product training.</div>
+      <div class="pc-pain">Pain Match: New product launch = immediate training need. CP&amp;S likely has no LMS infrastructure in place for this. Position Learning as the Atlas enablement platform: "You're launching Atlas in July. How are you training your distribution partners?"</div>
+    </div>
+
+    <div class="section-title" style="margin-top:16px;">Tier 2 Features (in active products — no direct pain signal)</div>
+    <ul class="tier2-list">
+      <li><span class="pc-badge pc-shipped" style="display:inline-flex;padding:2px 6px;border-radius:3px;font-size:9px;font-weight:700;background:#dcfce7;color:#15803d;min-width:60px;justify-content:center;">RECRUITING</span>Job board syndication &amp; multipost updates — expanded distribution channel coverage</li>
+      <li><span class="pc-badge pc-shipped" style="display:inline-flex;padding:2px 6px;border-radius:3px;font-size:9px;font-weight:700;background:#dcfce7;color:#15803d;min-width:60px;justify-content:center;">RECRUITING</span>Requisition approval workflow enhancements — streamlined manager approvals</li>
+      <li><span class="pc-badge pc-shipped" style="display:inline-flex;padding:2px 6px;border-radius:3px;font-size:9px;font-weight:700;background:#dcfce7;color:#15803d;min-width:60px;justify-content:center;">RECRUITING</span>OFCCP/EEO reporting improvements — compliance data collection &amp; export</li>
+      <li><span class="pc-badge pc-shipped" style="display:inline-flex;padding:2px 6px;border-radius:3px;font-size:9px;font-weight:700;background:#dbeafe;color:#1e40af;min-width:60px;justify-content:center;">PLATFORM</span>Seat management UX updates — recruiter license management improvements</li>
+    </ul>
+    <p class="note">Source: Rival public release notes (rival-hr.com/release-note/) + delivery team knowledge. Product roadmap details require SharePoint access for full roadmap deck verification. <span class="unverified">Verify specific feature dates with product team</span></p>
+  </div>
+</div>
+
+<!-- TAB 6: USAGE -->
+<div class="tab-panel" id="tab-6">
+  <div class="section">
+    <div class="section-title">LifeSuite Telemetry <span>Source: LifeSuite_Product_Usage__c — SFDC</span></div>
+    <div class="health-grid">
+      <div class="health-card">
+        <div class="h-label">Onboarding Records</div>
+        <div class="h-value h-gray">—</div>
+        <div class="h-sub">No LifeSuite data</div>
+      </div>
+      <div class="health-card">
+        <div class="h-label">Unique Logins</div>
+        <div class="h-value h-gray">—</div>
+        <div class="h-sub">No LifeSuite data</div>
+      </div>
+      <div class="health-card">
+        <div class="h-label">Events 12mo</div>
+        <div class="h-value h-gray">—</div>
+        <div class="h-sub">No LifeSuite data</div>
+      </div>
+      <div class="health-card">
+        <div class="h-label">Events 30d</div>
+        <div class="h-value h-gray">—</div>
+        <div class="h-sub">No LifeSuite data</div>
+      </div>
+    </div>
+    <div style="background:#fff8e6;border:1px solid #f9d77e;border-radius:7px;padding:12px 14px;margin-top:10px;">
+      <strong style="font-size:12px;color:#92400e;">No LifeSuite usage data available</strong>
+      <p style="font-size:12px;color:#78350f;margin-top:4px;line-height:1.5;">CP&amp;S has 0 LifeSuite_Product_Usage__c records in SFDC. This is expected — CP&amp;S is a <strong>Recruiting-only</strong> customer. LifeSuite telemetry tracks Onboarding/Workflow module usage (new hire events, logins, tasks completed). With no Workflow/Onboarding product, there is no LifeSuite data to report. This field remains empty until Workflow is deployed — another reason to advance the Workflow expansion conversation.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Recruiting Product Usage Signals <span>Source: SFDC Activity Log + Cases</span></div>
+    <table>
+      <tr><th>Signal</th><th>Date</th><th>Assessment</th></tr>
+      <tr>
+        <td>Rival Recruit Training Session (Chorus)</td>
+        <td>Jun 5, 2026</td>
+        <td><span class="sb sb-green">Positive</span> — Team is actively learning the platform 5 months post go-live. Training at this stage = adoption deepening, not remediation.</td>
+      </tr>
+      <tr>
+        <td>Candidate Import (3 email threads, 2 cases)</td>
+        <td>May 11-23, 2026</td>
+        <td><span class="sb sb-amber">Watch</span> — Recurring candidate import friction over 2 weeks. Both cases resolved same-day, but pattern suggests process or formatting issue. Confirm root cause was fixed, not just closed.</td>
+      </tr>
+      <tr>
+        <td>Recruiter Seat Transfer</td>
+        <td>Jun 1-2, 2026</td>
+        <td><span class="sb sb-green">Normal</span> — Seat management is routine HR admin. Fast resolution. Indicates active recruiter roster management = active hiring.</td>
+      </tr>
+      <tr>
+        <td>Record open roles (ZoomInfo)</td>
+        <td>Apr-Jun 2026</td>
+        <td><span class="sb sb-green">Positive</span> — CP&amp;S has the highest open role count in 12 months across Sales, IT, Engineering, Operations. Rival Recruiting should be processing peak req volume right now.</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Utilization Analysis</div>
+    <div class="two-col">
+      <div>
+        <div class="info-row"><span class="info-label">Platform type</span><span class="info-val">Recruiting ATS (not LifeSuite/Onboarding)</span></div>
+        <div class="info-row"><span class="info-label">Headcount</span><span class="info-val">697 employees</span></div>
+        <div class="info-row"><span class="info-label">LifeSuite Usage</span><span class="info-val">N/A — Recruiting module only</span></div>
+        <div class="info-row"><span class="info-label">Active Recruiters</span><span class="info-val">Verified by seat transfer activity — multiple active</span></div>
+        <div class="info-row"><span class="info-label">Usage Region</span><span class="info-val">United States (SFDC verified)</span></div>
+        <div class="info-row"><span class="info-label">Tenure</span><span class="info-val">159 days from earliest product date</span></div>
+      </div>
+      <div>
+        <p style="font-size:12px;color:#374151;line-height:1.6;">Recruiting usage is inferred from activity signals rather than telemetry metrics (LifeSuite tracks Onboarding, not ATS). Positive indicators: Jun 5 training session, active seat management, record external hiring volume per ZoomInfo. The candidate import issues in May are worth a root-cause confirmation to ensure no workflow breakage persists.</p>
+        <p style="font-size:12px;color:#374151;line-height:1.6;margin-top:8px;">The absence of LifeSuite metrics is structural (Recruiting-only), not a data quality issue. Deploying Workflow would immediately unlock usage telemetry visibility.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Open Questions</div>
+    <table>
+      <tr><th>Question</th><th>Why It Matters</th><th>Source</th></tr>
+      <tr>
+        <td>What volume of reqs is CP&amp;S running through Rival Recruiting per month?</td>
+        <td>High req volume = high value delivered. Low = risk that some hiring is bypassing Rival.</td>
+        <td>Ask Katy / Neda</td>
+      </tr>
+      <tr>
+        <td>Is the candidate import process stable post-May fix?</td>
+        <td>If imports are still failing, it's a silent adoption blocker.</td>
+        <td>Check with Neda post-training session</td>
+      </tr>
+      <tr>
+        <td>How does Rival Recruiting interface with Workday Careers?</td>
+        <td>Job postings appear on Workday portal — is Rival the ATS of record, or is Workday also tracking candidates?</td>
+        <td>Ask Katy directly</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- TAB 7: CASES -->
+<div class="tab-panel" id="tab-7">
+  <div class="section">
+    <div class="section-title">Open Cases <span>Source: SFDC Case object — last 365 days</span></div>
+    <p style="font-size:12px;color:#16a34a;font-weight:600;">✓ No open cases as of Jun 8, 2026</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Closed Cases — Last 12 Months</div>
+    <table>
+      <tr><th>Case #</th><th>Subject</th><th>Priority</th><th>Created</th><th>Closed</th><th>Days Open</th><th>Owner</th></tr>
+      <tr>
+        <td><a href="https://na1.salesforce.com/500Vs00001DmfTxIAJ" target="_blank" style="color:#2563eb;">00997872</a></td>
+        <td>Rival — Recruiter Seat Transfer</td>
+        <td><span class="sb sb-gray">3-Moderate</span></td>
+        <td>Jun 1, 2026</td>
+        <td>Jun 2, 2026</td>
+        <td><strong>1 day</strong></td>
+        <td>Hazel Laude</td>
+      </tr>
+      <tr>
+        <td><a href="https://na1.salesforce.com/500Vs00001AYsfjIAD" target="_blank" style="color:#2563eb;">00997202</a></td>
+        <td>Candidate Import</td>
+        <td><span class="sb sb-gray">3-Moderate</span></td>
+        <td>May 12, 2026</td>
+        <td>May 12, 2026</td>
+        <td><strong>&lt;1 day</strong></td>
+        <td>Raymond Romero</td>
+      </tr>
+      <tr>
+        <td><a href="https://na1.salesforce.com/500Vs00001ANkYbIAL" target="_blank" style="color:#2563eb;">00997165</a></td>
+        <td>Update on Candidate Import</td>
+        <td><span class="sb sb-gray">3-Moderate</span></td>
+        <td>May 11, 2026</td>
+        <td>May 11, 2026</td>
+        <td><strong>&lt;1 day</strong></td>
+        <td>Edward Oropeza</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Case Resolution Analysis</div>
+    <div class="three-col">
+      <div class="sum-card">
+        <div class="sum-title">Total Cases (12mo)</div>
+        <div class="sum-body" style="font-size:22px;font-weight:800;color:#1a1f2e;">3</div>
+        <div style="font-size:11px;color:#6b7494;">All Moderate priority. All closed.</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-title">Avg. Resolution Time</div>
+        <div class="sum-body" style="font-size:22px;font-weight:800;color:#16a34a;">&lt;1 day</div>
+        <div style="font-size:11px;color:#6b7494;">Fastest: same-day &nbsp;|&nbsp; Slowest: 1 day</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-title">Pattern</div>
+        <div class="sum-body">2 of 3 cases are Candidate Import related (May 11-12). Likely a one-time import process question or file formatting issue. All resolved quickly with no escalation.</div>
+      </div>
+    </div>
+    <p class="note" style="margin-top:10px;">Support health is excellent — no high severity cases, no escalations, fast resolution. The candidate import cluster in May should be confirmed stable post-Jun 5 training session.</p>
+  </div>
+</div>
+
+<!-- TAB 8: RISK -->
+<div class="tab-panel" id="tab-8">
+  <div class="section">
+    <div class="section-title">Risk Assessment <span>Composite scoring: SFDC + ZoomInfo + market intel + activity signals</span></div>
+
+    <div class="risk-card risk-amber">
+      <div class="risk-header">
+        <span class="risk-icon">🟡</span>
+        <span class="risk-title">Workday ATS Scope — Coexistence Unverified</span>
+        <span class="sb sb-amber" style="margin-left:auto;">Moderate</span>
+      </div>
+      <div class="risk-desc">Crane Co (parent) uses Workday enterprise-wide. Job postings for VP Operations and other senior roles appear on Workday Careers (cranecompany.wd5.myworkdayjobs.com). This could mean: (A) Rival Recruiting is the ATS of record with Workday Careers as the front-end careers portal only — a stable coexistence model; or (B) Workday's ATS functionality is gradually being extended to subsidiary level as Crane Co standardizes HR tech post-acquisitions. Evidence is ambiguous — Rival was deployed only 5 months ago and the Recruit Add-On was a new business close Dec 2025.</div>
+      <div class="risk-fix">What would move this to green: Direct confirmation from Katy Zimpfer that Rival Recruiting is the ATS of record and Workday is limited to career site/posting. Confirm the integration scope.</div>
+    </div>
+
+    <div class="risk-card risk-amber">
+      <div class="risk-header">
+        <span class="risk-icon">🟡</span>
+        <span class="risk-title">New Crane Co CEO — Parent-Level Vendor Review Risk</span>
+        <span class="sb sb-amber" style="margin-left:auto;">Moderate</span>
+      </div>
+      <div class="risk-desc">Alex Alcala became Crane Co President &amp; CEO on Apr 27, 2026, succeeding Max Mitchell (now Executive Chairman). New CEOs — especially at PE-backed or acquisitive industrial companies — typically mandate vendor portfolio rationalization within the first 12 months. Crane Co completed 4 acquisitions in Jan 2026 and is integrating those businesses. HR tech consolidation is a common synergy target. The risk is not from Katy Zimpfer (who has championed Rival) but from a top-down cost consolidation mandate from corporate.</div>
+      <div class="risk-fix">What would move this to green: Confirmed relationship with Tami Polmanteer (CHRO) or Amy Holgerson (Dir. TA) at corporate level. Rival value defended at Crane Co HQ before any vendor review is initiated.</div>
+    </div>
+
+    <div class="risk-card risk-amber">
+      <div class="risk-header">
+        <span class="risk-icon">🟡</span>
+        <span class="risk-title">Workflow Expansion Stalled — 17+ Months at Stage 3</span>
+        <span class="sb sb-amber" style="margin-left:auto;">Moderate — Revenue</span>
+      </div>
+      <div class="risk-desc">The Workflow (Onboarding) expansion opportunity was created January 21, 2025 and has been at Stage 3 Align for over 17 months. The close date expired Jun 4, 2026 without advancement. Next step is "Regroup w/ Katy." If this expansion doesn't convert, it signals CP&amp;S is satisfied as a Recruiting-only customer, reducing expansion ARR potential and potentially limiting long-term switching cost depth. A stalled expansion with a new CEO at parent is a compounding risk signal.</div>
+      <div class="risk-fix">What would move this to green: Regroup call with Katy Zimpfer this month. Either advance opp with concrete Workflow proposal (ROI on onboarding new manufacturing hires) or document customer preference to stay Recruiting-only and close opp.</div>
+    </div>
+
+    <div class="risk-card risk-amber">
+      <div class="risk-header">
+        <span class="risk-icon">🟡</span>
+        <span class="risk-title">No NPS Sent — 159 Days Post Go-Live</span>
+        <span class="sb sb-amber" style="margin-left:auto;">Moderate</span>
+      </div>
+      <div class="risk-desc">No NPS survey has been sent to CP&amp;S (Last_NPS_Sent__c = null). At 5+ months post-implementation, the absence of NPS means: (1) no formal voice-of-customer data, (2) no quantified advocacy to use in renewal discussions, and (3) no early warning system for silent detractor sentiment. The 100% engagement and clean support record suggest a positive experience — but positive experiences unreflected in NPS are invisible to Rival leadership and to future renewal conversations.</div>
+      <div class="risk-fix">What would move this to green: Send NPS survey this week via SFDC. Set Next_NPS_Send_Date__c. Target response from Katy Zimpfer or Hailey Mescher.</div>
+    </div>
+
+    <div class="risk-card risk-green">
+      <div class="risk-header">
+        <span class="risk-icon">🟢</span>
+        <span class="risk-title">Support Health — Excellent</span>
+        <span class="sb sb-green" style="margin-left:auto;">Low Risk</span>
+      </div>
+      <div class="risk-desc">3 cases in 12 months, all Moderate priority, all closed within 1 day. No P1/P2 incidents, no escalations, no repeat issues. The candidate import cases in May were quick to resolve. Support experience is not a detractor signal.</div>
+      <div class="risk-fix">Maintain: Keep same support routing. Confirm candidate import fix stability post Jun 5 training.</div>
+    </div>
+
+    <div class="risk-card risk-green">
+      <div class="risk-header">
+        <span class="risk-icon">🟢</span>
+        <span class="risk-title">Financial Health — Crane Co / CP&amp;S Strong</span>
+        <span class="sb sb-green" style="margin-left:auto;">Low Risk</span>
+      </div>
+      <div class="risk-desc">Crane Co reported record 2025 results (EPS +23%), strong Q1 2026 (+15% adjusted EPS, +25% total sales), and a $1.79B backlog. CP&amp;S won a $3.3M Navy contract in May 2026. No financial distress signals. Budget for Rival Recruiting ($18,500 ARR) is insignificant relative to CP&amp;S revenue ($201.8M) — pricing pressure at renewal is low risk.</div>
+      <div class="risk-fix">No action required. Budget is not a renewal risk at current ARR levels.</div>
+    </div>
+
+    <div class="risk-card risk-green">
+      <div class="risk-header">
+        <span class="risk-icon">🟢</span>
+        <span class="risk-title">Engagement — Active and Recent</span>
+        <span class="sb sb-green" style="margin-left:auto;">Low Risk</span>
+      </div>
+      <div class="risk-desc">100% Customer Engagement Score and 100% Services Engagement Score in SFDC. Training session Jun 5, active case volume in May-Jun, and "Regroup w/ Katy" as active next step all point to an engaged customer relationship. No lapsed engagement signals.</div>
+      <div class="risk-fix">Maintain cadence: NPS, Workflow conversation, and semi-annual strategic review before Q4 2026.</div>
+    </div>
+
+    <div class="risk-card risk-green">
+      <div class="risk-header">
+        <span class="risk-icon">🟢</span>
+        <span class="risk-title">Renewal Timeline — 212 Days, Sufficient Lead Time</span>
+        <span class="sb sb-green" style="margin-left:auto;">Low Risk — Monitor</span>
+      </div>
+      <div class="risk-desc">Jan 1, 2027 renewal is 212 days out. Renewal opp exists at Stage 5. 212 days is adequate for a $18.5K renewal — but the renewal opp close date needs to be updated from 2033 to Oct 2026 for accurate pipeline reporting. Begin formal renewal motion by Oct 2026 at latest.</div>
+      <div class="risk-fix">Action: Update renewal opp close date to Oct 1, 2026. Begin renewal conversation in Oct with contract sent by Nov 1.</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end container -->
+
+<script>
+function switchTab(n) {
+  var panels = document.querySelectorAll('.tab-panel');
+  var btns = document.querySelectorAll('.tab-btn');
+  for (var i = 0; i < panels.length; i++) { panels[i].classList.remove('active'); }
+  for (var i = 0; i < btns.length; i++) { btns[i].classList.remove('active'); }
+  document.getElementById('tab-' + n).classList.add('active');
+  for (var i = 0; i < btns.length; i++) {
+    if (btns[i].getAttribute('onclick') === 'switchTab(' + n + ')') {
+      btns[i].classList.add('active');
+      break;
+    }
+  }
+}
+</script>
+</body>
+</html>
