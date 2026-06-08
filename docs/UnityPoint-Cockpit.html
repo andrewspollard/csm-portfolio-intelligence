@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light only">
+<title>UnityPoint Health-Meriter — CSM Account Cockpit</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f6fa; color: #1a1f2e; font-size: 14px; overflow-x: hidden; }
+.container { max-width: 100%; padding: 16px; }
+
+/* HEADER */
+.header { background: #ffffff; border-radius: 12px; padding: 18px 22px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.08); display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+.header-left h1 { font-size: 20px; font-weight: 700; color: #1a1f2e; line-height: 1.2; }
+.header-left .sub { font-size: 12px; color: #6b7280; margin-top: 4px; }
+.header-right { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+.badge-red { background: #fee2e2; color: #dc2626; }
+.badge-amber { background: #fef3c7; color: #d97706; }
+.badge-green { background: #d1fae5; color: #059669; }
+.badge-blue { background: #dbeafe; color: #2563eb; }
+.badge-gray { background: #f3f4f6; color: #6b7280; }
+.badge-purple { background: #ede9fe; color: #7c3aed; }
+
+/* KPI STRIP */
+.kpi-strip { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 14px; }
+.kpi-card { background: #ffffff; border-radius: 10px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,.07); border-top: 3px solid #e5e7eb; }
+.kpi-card.red { border-top-color: #dc2626; }
+.kpi-card.amber { border-top-color: #f59e0b; }
+.kpi-card.green { border-top-color: #10b981; }
+.kpi-card.blue { border-top-color: #3b82f6; }
+.kpi-label { font-size: 11px; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; display: flex; align-items: center; gap: 4px; }
+.kpi-value { font-size: 22px; font-weight: 800; color: #1a1f2e; margin-top: 6px; line-height: 1; }
+.kpi-sub { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+
+/* TABS */
+.tab-bar { display: flex; gap: 2px; background: #e8eaf0; border-radius: 10px; padding: 4px; overflow-x: auto; white-space: nowrap; position: sticky; top: 0; z-index: 100; margin-bottom: 16px; }
+.tab-btn { padding: 9px 16px; border: none; background: transparent; color: #5a6178; font-size: 13px; font-weight: 600; border-radius: 7px; cursor: pointer; white-space: nowrap; transition: all .15s; }
+.tab-btn:hover { background: rgba(255,255,255,.6); color: #1a1f2e; }
+.tab-btn.active { background: #ffffff; color: #1a1f2e; box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+
+.tab-panel { display: none; overflow: visible; }
+.tab-panel.active { display: block; }
+
+/* SECTIONS */
+.section { background: #ffffff; border-radius: 12px; padding: 20px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.07); overflow: visible; }
+.section-title { font-size: 14px; font-weight: 700; color: #374151; margin-bottom: 14px; border-bottom: 1px solid #f3f4f6; padding-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+
+/* ACTION CARDS */
+.action-card { border-left: 4px solid #dc2626; background: #fff5f5; border-radius: 0 8px 8px 0; padding: 14px 16px; margin-bottom: 10px; }
+.action-card.amber { border-left-color: #f59e0b; background: #fffbeb; }
+.action-card.green { border-left-color: #10b981; background: #f0fdf4; }
+.action-title { font-weight: 700; font-size: 14px; color: #1a1f2e; margin-bottom: 4px; }
+.action-why { font-size: 12px; color: #6b7280; margin-bottom: 6px; }
+.action-next { font-size: 12px; color: #374151; background: rgba(0,0,0,.04); padding: 6px 10px; border-radius: 6px; display: inline-block; }
+
+/* HEALTH GRID */
+.health-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; overflow: visible; }
+.health-card { background: #f9fafb; border-radius: 10px; padding: 14px; text-align: center; border: 1px solid #e5e7eb; position: relative; overflow: visible; }
+.health-score { font-size: 28px; font-weight: 800; margin-top: 6px; }
+.health-score.red { color: #dc2626; }
+.health-score.amber { color: #d97706; }
+.health-score.green { color: #059669; }
+.health-label { font-size: 11px; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
+.health-sub { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+
+/* TOOLTIPS */
+.metric-tip { display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; border-radius: 50%; background: #e5e7eb; color: #9ca3af; font-size: 9px; font-weight: 700; cursor: help; position: relative; margin-left: 4px; vertical-align: middle; }
+.metric-tip .tip-box { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); width: 240px; padding: 10px 12px; background: #1a1f2e; color: #fff; font-size: 11px; font-weight: 400; line-height: 1.5; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.18); z-index: 1000; white-space: normal; }
+.metric-tip:hover .tip-box { display: block; }
+
+/* TABLES */
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { background: #f9fafb; padding: 9px 12px; text-align: left; font-weight: 600; color: #374151; font-size: 11px; text-transform: uppercase; letter-spacing: .4px; border-bottom: 1px solid #e5e7eb; }
+td { padding: 9px 12px; border-bottom: 1px solid #f3f4f6; color: #374151; vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #fafbfc; }
+
+/* PEOPLE CARDS */
+.people-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.person-card { background: #f9fafb; border-radius: 10px; padding: 14px; border: 1px solid #e5e7eb; }
+.person-avatar { width: 38px; height: 38px; border-radius: 50%; background: #dbeafe; color: #2563eb; font-weight: 700; font-size: 15px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+.person-name { font-weight: 700; font-size: 13px; color: #1a1f2e; }
+.person-title { font-size: 11px; color: #6b7280; margin-top: 2px; }
+.person-note { font-size: 11px; color: #374151; margin-top: 6px; background: white; border-radius: 6px; padding: 6px 8px; border: 1px solid #e5e7eb; }
+
+/* RISK CARDS */
+.risk-card { border-radius: 10px; padding: 16px; margin-bottom: 10px; border: 1px solid #e5e7eb; }
+.risk-card.red-risk { background: #fff5f5; border-color: #fecaca; }
+.risk-card.amber-risk { background: #fffbeb; border-color: #fde68a; }
+.risk-card.green-risk { background: #f0fdf4; border-color: #a7f3d0; }
+.risk-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.risk-icon { font-size: 18px; }
+.risk-title { font-weight: 700; font-size: 14px; }
+.risk-desc { font-size: 13px; color: #374151; line-height: 1.6; margin-bottom: 8px; }
+.risk-change { font-size: 12px; color: #6b7280; background: rgba(0,0,0,.04); padding: 6px 10px; border-radius: 6px; }
+
+/* PRODUCT ROADMAP */
+.roadmap-card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px; margin-bottom: 10px; }
+.roadmap-card.tier1 { border-left: 4px solid #2563eb; }
+.roadmap-card.expansion { border-left: 4px solid #7c3aed; background: #fdf4ff; }
+.rm-badges { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+.rm-title { font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+.rm-desc { font-size: 12px; color: #6b7280; margin-bottom: 6px; line-height: 1.5; }
+.rm-pain { font-size: 12px; color: #374151; background: #eff6ff; padding: 6px 10px; border-radius: 6px; border-left: 3px solid #3b82f6; }
+
+/* USAGE BARS */
+.usage-bar-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.usage-bar-label { font-size: 12px; color: #374151; width: 120px; flex-shrink: 0; }
+.usage-bar-track { flex: 1; background: #e5e7eb; border-radius: 4px; height: 8px; }
+.usage-bar-fill { background: #3b82f6; border-radius: 4px; height: 8px; }
+.usage-bar-fill.red { background: #dc2626; }
+.usage-bar-fill.amber { background: #f59e0b; }
+.usage-bar-fill.green { background: #10b981; }
+.usage-bar-val { font-size: 12px; color: #9ca3af; width: 40px; text-align: right; }
+
+/* CONTRACT CARD */
+.opp-card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px; margin-bottom: 10px; }
+.opp-name { font-weight: 700; font-size: 13px; color: #2563eb; text-decoration: none; }
+.opp-name:hover { text-decoration: underline; }
+
+/* STATS ROW */
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+.stat-box { background: #f9fafb; border-radius: 8px; padding: 12px; text-align: center; }
+.stat-val { font-size: 20px; font-weight: 800; color: #1a1f2e; }
+.stat-lbl { font-size: 11px; color: #6b7280; margin-top: 2px; }
+
+/* CASE STATUS BADGES */
+.status-open { background: #fee2e2; color: #dc2626; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+.status-closed { background: #d1fae5; color: #059669; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+.priority-high { background: #fee2e2; color: #dc2626; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+.priority-mod { background: #fef3c7; color: #d97706; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+.priority-low { background: #f3f4f6; color: #6b7280; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+
+/* INFOBOX */
+.infobox { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 14px; font-size: 12px; color: #1e40af; margin-bottom: 12px; line-height: 1.6; }
+.warnbox { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 14px; font-size: 12px; color: #92400e; margin-bottom: 12px; line-height: 1.6; }
+.dangerbox { background: #fff5f5; border: 1px solid #fecaca; border-radius: 8px; padding: 12px 14px; font-size: 12px; color: #991b1b; margin-bottom: 12px; line-height: 1.6; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.source-tag { font-size: 10px; color: #9ca3af; margin-top: 4px; }
+
+/* UPDATED STAMP */
+.updated { font-size: 10px; color: #9ca3af; text-align: right; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- UPDATED -->
+<div class="updated">&#128197; Refreshed: Monday, June 8, 2026 &nbsp;|&nbsp; Sources: SFDC + Chorus + ZoomInfo + Market Intel + Roadmap</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <h1>UnityPoint Health&#8209;Meriter</h1>
+    <div class="sub">Madison, WI &nbsp;|&nbsp; Hospitals &amp; Physicians Clinics &nbsp;|&nbsp; Tier 2 &nbsp;|&nbsp; AMAccountSegment: A &nbsp;|&nbsp; <a href="https://silkroad.my.salesforce.com/0016000000Iu34aAAB" target="_blank" style="color:#2563eb;">SFDC Record</a></div>
+  </div>
+  <div class="header-right">
+    <span class="badge badge-red">NPS 3.0 — Detractor</span>
+    <span class="badge badge-red">Engagement 40%</span>
+    <span class="badge badge-red">F2F Overdue</span>
+    <span class="badge badge-blue">ARR $108,605</span>
+    <span class="badge badge-amber">Renewal Jan 1, 2028</span>
+    <span class="badge badge-gray">Performance Only</span>
+  </div>
+</div>
+
+<!-- KPI STRIP -->
+<div class="kpi-strip">
+  <div class="kpi-card blue">
+    <div class="kpi-label">ARR</div>
+    <div class="kpi-value">$108,605</div>
+    <div class="kpi-sub">Performance (100%)</div>
+  </div>
+  <div class="kpi-card amber">
+    <div class="kpi-label">Renewal</div>
+    <div class="kpi-value">577d</div>
+    <div class="kpi-sub">Jan 1, 2028</div>
+  </div>
+  <div class="kpi-card red">
+    <div class="kpi-label">NPS Score</div>
+    <div class="kpi-value" style="color:#dc2626;">3.0</div>
+    <div class="kpi-sub">Detractor &bull; Apr 17, 2026</div>
+  </div>
+  <div class="kpi-card red">
+    <div class="kpi-label">Engagement</div>
+    <div class="kpi-value" style="color:#dc2626;">40%</div>
+    <div class="kpi-sub">CustomerEngagementScore</div>
+  </div>
+  <div class="kpi-card amber">
+    <div class="kpi-label">Onboarding Score</div>
+    <div class="kpi-value">44</div>
+    <div class="kpi-sub">GlobalOnboarding (no Onboard product)</div>
+  </div>
+  <div class="kpi-card green">
+    <div class="kpi-label">At-Risk Alerts</div>
+    <div class="kpi-value" style="color:#059669;">0</div>
+    <div class="kpi-sub">No active alerts</div>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab(0)">Actions</button>
+  <button class="tab-btn" onclick="switchTab(1)">Account Intel</button>
+  <button class="tab-btn" onclick="switchTab(2)">Use Case</button>
+  <button class="tab-btn" onclick="switchTab(3)">People</button>
+  <button class="tab-btn" onclick="switchTab(4)">Contracts</button>
+  <button class="tab-btn" onclick="switchTab(5)">Product</button>
+  <button class="tab-btn" onclick="switchTab(6)">Usage</button>
+  <button class="tab-btn" onclick="switchTab(7)">Cases</button>
+  <button class="tab-btn" onclick="switchTab(8)">Risk</button>
+</div>
+
+<!-- ============ TAB 0: ACTIONS ============ -->
+<div class="tab-panel active" id="tab-0">
+  <div class="section">
+    <div class="section-title">Priority Actions — Week of June 8, 2026</div>
+    
+    <div class="action-card">
+      <div class="action-title">1. Introduce yourself to Kiah Calmese Walker &amp; establish regular cadence</div>
+      <div class="action-why">Bernard Jackson left Rival; you (Andrew) were introduced on the June 3 call as the new CSM. Action item #4 from that meeting: reach out to Laken Gelhar and establish regular cadence. Kiah Calmese Walker (Director, HR Operations) is the identified decision-maker for renewal — prior strategy says "make sure I get on Kiah&#39;s calendar." NPS is 3.0 (detractor) and F2F has never occurred.</div>
+      <div class="action-next">&#8594; Email Kiah (kiah.calmesewalker@unitypoint.org) this week to introduce yourself and propose a monthly cadence. Cc Laken (laken.gelhar@unitypoint.org) and Randy Havel. Surface the 60/40 eval weighting question as a reason for the first working session.</div>
+    </div>
+
+    <div class="action-card">
+      <div class="action-title">2. Close the 60/40 evaluation form weighting issue from the June 3 meeting</div>
+      <div class="action-why">Laken Gelhar raised an unresolved request to apply 60/40 section weighting to the 2026–2027 evaluation form. Michael de los Reyes committed to confirming capability. This is a merit-increase-blocking issue — Carrie Grulke had a similar urgent issue in March. No follow-up case created yet for this 2026–27 cycle.</div>
+      <div class="action-next">&#8594; Confirm with Randy Havel whether 60/40 weighting at subsidiary level is supported. Schedule a working session with Laken + Randy to configure forms before the next review cycle launches. Owner: Andrew + Randy.</div>
+    </div>
+
+    <div class="action-card amber">
+      <div class="action-title">3. Address NPS 3.0 detractor signal — probe root cause proactively</div>
+      <div class="action-why">NPS score of 3.0 (last sent April 17, 2026) is a detractor. The relationship has had a CSM transition (Bernard &#8594; Andrew), a performance load-failure in March, and an evaluation reporting gap. These are likely contributors. Next NPS send date is Oct 14, 2026. Window to improve before then is now.</div>
+      <div class="action-next">&#8594; Ask Sarah Conklin directly: "We saw a low NPS — I&#39;d like to understand what wasn&#39;t working so I can fix it." Frame as a relationship reset. Document feedback in SFDC activity.</div>
+    </div>
+
+    <div class="action-card amber">
+      <div class="action-title">4. Assess Lawson (HRIS) risk given UPH cost-cutting posture</div>
+      <div class="action-why">SFDC renewal risk states: "Only risk is if the organization decides to move everything over to Lawson which is their current HRIS." UnityPoint cut 207 IT jobs in April 2026 and is outsourcing IT &amp; Revenue Cycle. This is a cost-consolidation signal. Lawson vendor consolidation conversations may now be more likely at the enterprise level.</div>
+      <div class="action-next">&#8594; On your intro call with Kiah, ask: "Has there been any discussion at the system level about HCM vendor consolidation or changes to your current Lawson setup?" Listen carefully. If yes — escalate to Andrew&#39;s AE + management immediately.</div>
+    </div>
+
+    <div class="action-card green">
+      <div class="action-title">5. Introduce Rosi AI Review Writer &amp; Performance Analytics to Laken/Sarah</div>
+      <div class="action-why">Bernard sent a Rosi Review Writer intro email on March 11 — positive signal that the feature was shared. No confirmation of adoption. Active performance review cycle underway (merit increases in progress per March case). These capabilities directly address the complexity they&#39;re experiencing with evaluation forms.</div>
+      <div class="action-next">&#8594; In your first working session, demo Rosi and Perform Analytics to Sarah Conklin and Laken Gelhar. Anchor on the value they missed in the March form-issue scenario.</div>
+    </div>
+  </div>
+
+  <!-- ENGAGEMENT HEALTH -->
+  <div class="section">
+    <div class="section-title">Engagement Health</div>
+    <div class="health-grid">
+      <div class="health-card">
+        <div class="health-label">Customer Engagement<span class="metric-tip">?<span class="tip-box">Source: Customer_Engagement_Score__c = 40.0 (CustomerEngagementScoreNUMBER__c = 0.4). Composite score based on login frequency, feature usage, meeting cadence, and support volume. Scale 0–100.</span></span></div>
+        <div class="health-score red">40%</div>
+        <div class="health-sub">Below threshold (60%+)</div>
+      </div>
+      <div class="health-card">
+        <div class="health-label">NPS Score<span class="metric-tip">?<span class="tip-box">Source: Average_NPS_Score_SFDC__c = 3.0. Last sent: April 17, 2026. Next send: Oct 14, 2026. Scale 0–10. 0–6 = Detractor, 7–8 = Passive, 9–10 = Promoter.</span></span></div>
+        <div class="health-score red">3.0</div>
+        <div class="health-sub">Detractor (0–6)</div>
+      </div>
+      <div class="health-card">
+        <div class="health-label">Services Engagement<span class="metric-tip">?<span class="tip-box">Source: Services_Engagement_Score_Percent__c = 50.0%. Measures engagement with Rival managed services / implementation resources. Scale 0–100%.</span></span></div>
+        <div class="health-score amber">50%</div>
+        <div class="health-sub">Moderate</div>
+      </div>
+      <div class="health-card">
+        <div class="health-label">Onsite F2F<span class="metric-tip">?<span class="tip-box">Source: Onsite_F2F_Overdue__c = true, Last_Onsite_F2F_Date__c = null. No onsite face-to-face meeting has ever been recorded in SFDC. Site Review was completed March 18, 2026 (82 days ago).</span></span></div>
+        <div class="health-score red">NONE</div>
+        <div class="health-sub">Never recorded — Overdue</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TAB 1: ACCOUNT INTEL ============ -->
+<div class="tab-panel" id="tab-1">
+  <div class="two-col">
+    <div>
+      <div class="section">
+        <div class="section-title">Company Overview</div>
+        <p style="font-size:13px;line-height:1.7;color:#374151;">
+          UnityPoint Health–Meriter is a not-for-profit regional hospital and clinic system serving Madison, WI and Dane County. It is a subsidiary location within the broader <strong>UnityPoint Health</strong> system (HQ: West Des Moines, IA), which operates across Iowa, western Illinois, and southern Wisconsin with ~248 locations and 33,000 employees system-wide.
+        </p>
+        <br>
+        <p style="font-size:13px;line-height:1.7;color:#374151;">
+          Meriter is recognized as a <strong>Five-Star CMS-rated hospital</strong> (May 2026) and operates the busiest birthing center in Wisconsin (record births in 2025). It has a UW Health partnership and serves as a flagship clinical hub for the Madison market.
+        </p>
+        <br>
+        <table>
+          <tr><th>Field</th><th>Value</th></tr>
+          <tr><td>SFDC Employees</td><td>975 (Meriter entity)</td></tr>
+          <tr><td>Parent System</td><td>UnityPoint Health (33,000 EEs, $4.8B revenue)</td></tr>
+          <tr><td>Industry</td><td>Hospitals &amp; Physicians Clinics</td></tr>
+          <tr><td>Type</td><td>Non-profit (Private)</td></tr>
+          <tr><td>Headquarters</td><td>2180 W Beltline Hwy, Madison, WI 53713</td></tr>
+          <tr><td>HRIS</td><td>Lawson (current)</td></tr>
+          <tr><td>Usage Region</td><td>United States</td></tr>
+          <tr><td>Tenure (Earliest Product)</td><td>~13.1 years</td></tr>
+          <tr><td>SDA Client</td><td>No</td></tr>
+        </table>
+        <div class="source-tag">Sources: SFDC Account record, ZoomInfo enrichment, unitypoint.org</div>
+      </div>
+      <div class="section">
+        <div class="section-title">Recent Leadership Context (Meriter)</div>
+        <table>
+          <tr><th>Role</th><th>Name</th><th>Notes</th></tr>
+          <tr><td>Dir, HR Operations</td><td>Kiah Calmese Walker</td><td>Primary UPH-Meriter HR contact for renewal</td></tr>
+          <tr><td>Mgr, HR Systems Alignment</td><td>Sarah Conklin</td><td>Rival Performance admin, active in cases</td></tr>
+          <tr><td>HRIS Business Analyst Sr</td><td>Carrie Grulke</td><td>Opens support cases, merit-cycle dependency</td></tr>
+          <tr><td>Interim Dir HR Ops</td><td>David Witkowski</td><td>Attends monthly calls</td></tr>
+          <tr><td>HR Generalist</td><td>Laken Gelhar</td><td>Active on calls, raised weighting question</td></tr>
+        </table>
+        <div class="source-tag">Sources: SFDC Contacts</div>
+      </div>
+    </div>
+    <div>
+      <div class="section">
+        <div class="section-title">Market Dynamics</div>
+        <table>
+          <tr><th>When</th><th>What</th><th>HR Implication</th></tr>
+          <tr>
+            <td>May 2026</td>
+            <td>UPH receives CMS Five-Star Rating</td>
+            <td>Positive for brand; expect continued hiring pressure to maintain staffing quality</td>
+          </tr>
+          <tr>
+            <td>Apr 2026</td>
+            <td>UPH eliminates 207 IT jobs; outsources IT &amp; Revenue Cycle to third-party vendors</td>
+            <td>System-wide cost reduction posture. Vendor consolidation decisions may follow. Lawson consolidation risk elevated. HR budgets under scrutiny.</td>
+          </tr>
+          <tr>
+            <td>Jan 2026</td>
+            <td>Record births in 2025 — busiest year for Meriter maternity</td>
+            <td>High clinical volume = high performance cycle complexity. More leaders + union employees to manage in Rival Perform.</td>
+          </tr>
+          <tr>
+            <td>May–Jun 2025</td>
+            <td>SEIU Wisconsin nurse strike (934 nurses, 5 days)</td>
+            <td>Post-strike: 10% wage increase, new staffing language, security improvements. Increased HR admin burden for contract compliance tracking. Merit-increase accuracy critical (Rival Perform role).</td>
+          </tr>
+          <tr>
+            <td>May 2026</td>
+            <td>Medicaid cuts / "Big Beautiful Bill" — 200+ job cuts at UPH statewide</td>
+            <td>Financial pressure from federal reimbursement cuts flows down. Vendor relationships at risk if cost-cutting intensifies. Budget defense for Rival Performance required.</td>
+          </tr>
+        </table>
+        <div class="source-tag">Sources: web search, ZoomInfo scoops (published 2025–2026)</div>
+      </div>
+      <div class="section">
+        <div class="section-title">Competitive Position</div>
+        <table>
+          <tr><th>System</th><th>Employees</th><th>Revenue</th><th>Key Dynamic</th></tr>
+          <tr><td><strong>UnityPoint Health</strong> (parent)</td><td>33,000</td><td>$4.8B</td><td>Not-for-profit, Iowa/IL/WI footprint; outsourcing IT 2026</td></tr>
+          <tr><td>UW Health (partner)</td><td>~20,000</td><td>Est. $3B+</td><td>Strategic partner of Meriter; shared services model</td></tr>
+          <tr><td>SSM Health</td><td>~40,000</td><td>~$5B</td><td>Regional competitor; Catholic not-for-profit</td></tr>
+          <tr><td>Ascension Wisconsin</td><td>~9,000 WI</td><td>N/A</td><td>Competing for nurses in Milwaukee/Madison market</td></tr>
+        </table>
+        <div class="source-tag">Source: ZoomInfo, public records</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TAB 2: USE CASE ============ -->
+<div class="tab-panel" id="tab-2">
+  <div class="section">
+    <div class="section-title">Executive Summary</div>
+    <p style="font-size:13px;line-height:1.8;color:#374151;">
+      UnityPoint Health–Meriter uses <strong>Rival Performance (Agile)</strong> as the single platform to manage performance reviews across ~975 employees including union nurses (SEIU-represented RNs, Service Union employees) and non-union leaders. Rival is integrated with Lawson (HRIS). The platform is used in an operationally critical, merit-increase-gating workflow — failing to extract correct ratings from Perform directly blocked merit processing in March 2026. The organization has <strong>high complexity</strong> (multiple union contract forms, weighted scoring, division-level configuration) but a <strong>lean admin team</strong> (2–3 HRIS staff). Their dependency on Rival is real, but their advocacy for it is low (NPS 3.0).
+    </p>
+  </div>
+  <div class="two-col">
+    <div class="section">
+      <div class="section-title">Per-Product Value Cards</div>
+      <div style="border:1px solid #e5e7eb;border-radius:10px;padding:14px;margin-bottom:10px;border-left:4px solid #2563eb;">
+        <div style="font-weight:700;font-size:13px;margin-bottom:4px;">Rival Performance (Agile)</div>
+        <table style="font-size:12px;">
+          <tr><td style="font-weight:600;padding:3px 6px 3px 0;color:#6b7280;">Use Case</td><td>Annual &amp; mid-year performance reviews for 975 employees; union (RN, Service) and non-union leadership</td></tr>
+          <tr><td style="font-weight:600;padding:3px 6px 3px 0;color:#6b7280;">Pain Solved</td><td>Multi-form complexity for union contracts; merit-increase data extraction; 60/40 weighting by role type</td></tr>
+          <tr><td style="font-weight:600;padding:3px 6px 3px 0;color:#6b7280;">Value Delivered</td><td>Structured review workflow for 3 union/leader form variants; integration with Lawson for merit processing</td></tr>
+          <tr><td style="font-weight:600;padding:3px 6px 3px 0;color:#6b7280;">Risk to Value</td><td>Form misconfiguration (Mar 2026 incident) blocked merit. Low admin capacity = training/config gaps.</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">Expansion Vectors</div>
+      <table>
+        <tr><th>Product</th><th>Observed Pain Signal</th><th>Entry Point</th></tr>
+        <tr>
+          <td><span class="badge badge-purple">Rival Onboarding</span></td>
+          <td>Record births = high clinical hiring volume. Post-strike contract: attract &amp; retain nurses. Onboarding gaps = compliance risk. Laura Weisman running expansion outreach to Casey Collins (Process Improvement).</td>
+          <td>Connect with Casey Collins or new CHRO conversation about preboarding readiness for clinical hires</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-purple">Rival Learning</span></td>
+          <td>Expired WingSpan product (Learning expired). Post-strike agreement includes nurse development language.</td>
+          <td>Ask Kiah/Sarah if nurse professional development is now a priority per union contract terms</td>
+        </tr>
+      </table>
+      <div class="warnbox" style="margin-top:10px;">&#9888; Managed Services renewal was lost in Oct 2024. WingSpan extension lost Apr 2024. Pattern of product contraction over 2022–2024. Current contract is Performance-only.</div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title">Renewal Summary Cards</div>
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-val" style="color:#2563eb;">$108,605</div>
+        <div class="stat-lbl">Renewal ARR at Risk</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val">577</div>
+        <div class="stat-lbl">Days to Renewal (Jan 1, 2028)</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" style="color:#d97706;">40%</div>
+        <div class="stat-lbl">Renewal Opp Probability (Stage 5)</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" style="color:#7c3aed;">$0</div>
+        <div class="stat-lbl">Whitespace Identified</div>
+      </div>
+    </div>
+    <div class="infobox"><strong>Switching Cost Assessment:</strong> Moderate-high. Rival Perform is integrated with Lawson for merit processing. Multiple union evaluation form configurations built over years. Re-implementing in Lawson native performance would require significant admin effort. However, if Lawson is upgraded or consolidated at the UPH system level, native performance could be bundled.</div>
+  </div>
+</div>
+
+<!-- ============ TAB 3: PEOPLE ============ -->
+<div class="tab-panel" id="tab-3">
+  <div class="section">
+    <div class="section-title">Key Stakeholders — UPH Meriter</div>
+    <div class="people-grid">
+      <div class="person-card">
+        <div class="person-avatar">KC</div>
+        <div class="person-name">Kiah Calmese Walker</div>
+        <div class="person-title">Director, Human Resources Operations</div>
+        <div><span class="badge badge-red" style="margin-top:6px;display:inline-block;">Renewal Decision-Maker</span></div>
+        <div class="person-note">Prior CSM strategy: "Get on Kiah&#39;s calendar — she has expressed desire to meet." Has not yet been directly engaged by Andrew. Critical first contact for renewal cycle.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar">SC</div>
+        <div class="person-name">Sarah Conklin</div>
+        <div class="person-title">Manager, HR Systems Alignment</div>
+        <div><span class="badge badge-blue" style="margin-top:6px;display:inline-block;">Platform Admin</span></div>
+        <div class="person-note">Primary technical contact. Reports performance load failures, attends monthly calls. Active in SFDC email threads. Cc&#39;d on all cases.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar">LG</div>
+        <div class="person-name">Laken Gelhar</div>
+        <div class="person-title">HR Generalist</div>
+        <div><span class="badge badge-amber" style="margin-top:6px;display:inline-block;">Active User</span></div>
+        <div class="person-note">Raised the 60/40 evaluation weighting issue on June 3 call. Attends monthly meetings. Action item: Andrew to coordinate calendar invites with Laken and Randy Havel.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar">CG</div>
+        <div class="person-name">Carrie Grulke</div>
+        <div class="person-title">HRIS Business System Analyst Sr</div>
+        <div><span class="badge badge-amber" style="margin-top:6px;display:inline-block;">Support Contact</span></div>
+        <div class="person-note">Opens support cases. March 2026: merit-blocking Agile report issue. Escalated to Sarah Hill (legacy SilkRoad). Depends on Rival accuracy for merit-increase uploads.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar">DW</div>
+        <div class="person-name">David Witkowski</div>
+        <div class="person-title">Interim Director, HR Operations / Proj Mgr, Strategy &amp; Innovation</div>
+        <div><span class="badge badge-gray" style="margin-top:6px;display:inline-block;">Monthly Attendee</span></div>
+        <div class="person-note">Attends all monthly calls. Interim HR Ops title suggests organizational flux. May transition before renewal.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar">JL</div>
+        <div class="person-name">Joy Ledbetter</div>
+        <div class="person-title">Vice President, Chief Human Resource Officer</div>
+        <div><span class="badge badge-purple" style="margin-top:6px;display:inline-block;">Executive</span></div>
+        <div class="person-note">System-level CHRO. Not currently engaged on Rival relationship. Key escalation path if Lawson consolidation discussions emerge at the system level.</div>
+      </div>
+    </div>
+  </div>
+  <div class="two-col">
+    <div class="section">
+      <div class="section-title">Rival Team</div>
+      <table>
+        <tr><th>Role</th><th>Name</th><th>Focus</th></tr>
+        <tr><td>CSM (New)</td><td>Andrew Pollard</td><td>Relationship rebuilding, renewal ownership, evaluation form config</td></tr>
+        <tr><td>Sr Consultant, Managed Services</td><td>Randy Havel</td><td>Primary SME for evaluation form configuration; attends all calls</td></tr>
+        <tr><td>Dir, Customer Success</td><td>Michael de los Reyes</td><td>Introduced on June 3 call; committed to joining future calls</td></tr>
+        <tr><td>Dir, Customer Success</td><td>Shelly Price</td><td>Listed on call attendees</td></tr>
+        <tr><td>RVP, Sales</td><td>Laura Weisman</td><td>Running expansion outreach (Onboarding) to Casey Collins</td></tr>
+        <tr><td>Former CSM</td><td>Bernard Jackson</td><td>Left Rival — introduced Andrew on June 3 call</td></tr>
+      </table>
+    </div>
+    <div class="section">
+      <div class="section-title">UPH System HR Leadership (ZoomInfo)</div>
+      <table>
+        <tr><th>Name</th><th>Title</th><th>Relevance</th></tr>
+        <tr><td>Joy Ledbetter</td><td>VP / CHRO, UnityPoint Health</td><td>System-level HR ownership</td></tr>
+        <tr><td>Kurt Olson</td><td>VP, Talent &amp; Culture</td><td>Talent strategy, potential Onboarding champion</td></tr>
+        <tr><td>Katie Ceolla</td><td>Executive Director, HRBP</td><td>Operations VP-level, manages regional HRBPs</td></tr>
+        <tr><td>Jessica Meisner</td><td>VP, Human Resources</td><td>UPH-level HR leadership</td></tr>
+        <tr><td>Daniel Joiner</td><td>SVP, Chief Diversity Officer</td><td>DEI lens; could expand into OD/Learning</td></tr>
+      </table>
+      <div class="source-tag">Sources: SFDC Contacts + ZoomInfo search</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TAB 4: CONTRACTS ============ -->
+<div class="tab-panel" id="tab-4">
+  <div class="section">
+    <div class="section-title">Active Contracts</div>
+    <table>
+      <tr><th>Contract #</th><th>Status</th><th>Start</th><th>End</th><th>Term</th><th>SFDC</th></tr>
+      <tr>
+        <td>00018974</td>
+        <td><span class="badge badge-green">Activated</span></td>
+        <td>Dec 12, 2025</td>
+        <td>Dec 31, 2027</td>
+        <td>12 months</td>
+        <td><a href="https://silkroad.my.salesforce.com/800Vs00000pnAkDIAU" target="_blank" style="color:#2563eb;font-size:12px;">View</a></td>
+      </tr>
+    </table>
+    <div class="infobox" style="margin-top:12px;">&#128197; Renewal opportunity created Dec 12, 2025. Close date: Dec 31, 2027. Amount: $108,605. Stage: 5. Renewal Solutioning. Probability: 40%. Owner: Andrew Pollard.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Active Renewal Opportunity</div>
+    <div class="opp-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+        <div>
+          <a class="opp-name" href="https://silkroad.my.salesforce.com/006Vs00000QxVLlIAN" target="_blank">UnityPoint Health-Meriter - Renewal Opportunity</a>
+          <div style="font-size:12px;color:#6b7280;margin-top:3px;">Created Dec 12, 2025 &bull; Last updated June 3, 2026</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <span class="badge badge-blue">Stage 5 — Renewal Solutioning</span>
+          <span class="badge badge-amber">40% Probability</span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;">
+        <div class="stat-box"><div class="stat-val">$108,605</div><div class="stat-lbl">Amount</div></div>
+        <div class="stat-box"><div class="stat-val">Dec 31, 2027</div><div class="stat-lbl">Close Date</div></div>
+        <div class="stat-box"><div class="stat-val">577 days</div><div class="stat-lbl">Days to Close</div></div>
+      </div>
+      <div class="warnbox" style="margin-top:12px;">No NextStep recorded on this opportunity. Andrew should add a next step (e.g., "Schedule intro call with Kiah by June 15") to document renewal motion in SFDC.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">CSM Renewal Strategy (Verbatim from SFDC)</div>
+    <div style="background:#f9fafb;border-left:4px solid #6b7280;border-radius:0 8px 8px 0;padding:14px 16px;font-size:13px;color:#374151;line-height:1.7;">
+      <strong>CSM_Renewal_Strategy__c — quoted verbatim:</strong><br><br>
+      &#8220;They are contracted w Performance through end of 2025. Will make sure I get on Kiah&#39;s calendar and have already expressed the importance of having her attend our regular cadence calls. She has expressed her desire to meet so will hold her to that. Create consistent relationship and show value by providing support and communication regularly.&#8221;
+    </div>
+    <div class="source-tag">Source: SFDC Account field CSM_Renewal_Strategy__c — verbatim, not paraphrased</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Historical Opportunity Context</div>
+    <table>
+      <tr><th>Opportunity</th><th>Stage</th><th>Amount</th><th>Close Date</th><th>Notes</th></tr>
+      <tr><td>Performance Renewal</td><td><span class="badge badge-green" style="font-size:10px;">Closed Won</span></td><td>$217,210</td><td>Dec 12, 2025</td><td>Last renewal closed by Bernard Jackson</td></tr>
+      <tr><td>Managed Services Renewal</td><td><span class="badge badge-red" style="font-size:10px;">Closed Lost</span></td><td>$27,500</td><td>Oct 22, 2024</td><td>Managed Services dropped at renewal</td></tr>
+      <tr><td>WingSpan Extension License</td><td><span class="badge badge-red" style="font-size:10px;">Closed Lost</span></td><td>$2,500</td><td>Apr 24, 2024</td><td>Learning extension not renewed</td></tr>
+      <tr><td>WingSpan to Agile (Conversion)</td><td><span class="badge badge-green" style="font-size:10px;">Closed Won</span></td><td>$63,902</td><td>Apr 19, 2023</td><td>Key migration — shifted from WingSpan to Agile Performance</td></tr>
+      <tr><td>Managed Services Renewal</td><td><span class="badge badge-green" style="font-size:10px;">Closed Won</span></td><td>$27,500</td><td>Dec 15, 2023</td><td>Last time MS was renewed before loss</td></tr>
+    </table>
+    <div class="source-tag">Source: SFDC Opportunities</div>
+    <div class="dangerbox" style="margin-top:10px;">Pattern: Two consecutive products dropped (Managed Services 2024, WingSpan extension 2024). Current footprint is Performance-only. Contraction trend must be reversed at Jan 2028 renewal.</div>
+  </div>
+</div>
+
+<!-- ============ TAB 5: PRODUCT ============ -->
+<div class="tab-panel" id="tab-5">
+  <div class="section">
+    <div class="section-title">Active Products</div>
+    <table>
+      <tr><th>Product</th><th>Status</th><th>ARR</th><th>Notes</th></tr>
+      <tr><td>Rival Performance (Agile)</td><td><span class="badge badge-green">Active</span></td><td>$108,605</td><td>Transitioned from WingSpan (Perform) in Apr 2023. 2 union form types + leader form.</td></tr>
+      <tr><td>Rival Onboarding</td><td><span class="badge badge-gray">Not Active</span></td><td>—</td><td>Expansion target. Laura Weisman running outreach. Clinical hiring volume = strong use case.</td></tr>
+      <tr><td>Rival Learning (WingSpan)</td><td><span class="badge badge-red">Expired</span></td><td>—</td><td>WingSpan expired; Learning expired. Extension opportunity lost Apr 2024.</td></tr>
+      <tr><td>Managed Services</td><td><span class="badge badge-red">Expired</span></td><td>—</td><td>Lost Oct 2024. Randy Havel still provides implementation support under current contract.</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Active Configuration &amp; In-Flight Work</div>
+    <div class="action-card amber">
+      <div class="action-title">2026–2027 Evaluation Form — 60/40 Weighting Configuration</div>
+      <div class="action-why">Raised by Laken Gelhar on June 3 call. Client wants to apply 60/40 weighting to subsidiary sections of the evaluation form. Michael de los Reyes committed to verifying capability. Andrew + Randy Havel to configure before 2026–2027 review cycle launches.</div>
+      <div class="action-next">Owner: Andrew + Randy Havel &bull; Status: Confirmed capability, pending working session &bull; Deadline: Before next cycle launch</div>
+    </div>
+    <div class="action-card green">
+      <div class="action-title">Rosi AI Review Writer — Introduced, Adoption Unconfirmed</div>
+      <div class="action-why">Bernard Jackson sent Rosi intro on March 11, 2026. No case or confirmation of user-facing adoption. Active review cycle is underway — prime opportunity to enable.</div>
+      <div class="action-next">Owner: Andrew &bull; Next Step: Demo in first working session with Sarah/Laken</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Product Roadmap — Performance (Active Product)</div>
+    <div class="infobox">Roadmap items below are based on public Rival release notes and active features confirmed for Agile Performance. Verify latest deck against SharePoint for most current items.</div>
+
+    <div class="roadmap-card tier1">
+      <div class="rm-badges"><span class="badge badge-green">SHIPPED</span><span class="badge badge-blue">Tier 1</span></div>
+      <div class="rm-title">Rosi AI Review Writer</div>
+      <div class="rm-desc">AI-assisted review writing for employees and managers. Surfaces suggested language based on goals and performance data to accelerate the review-writing experience.</div>
+      <div class="rm-pain">Pain: Meriter has complex union + leader review forms. Manager burden is high with 3 form variants. Rosi reduces time-to-complete and improves review quality. Bernard introduced March 2026 — confirm adoption status.</div>
+    </div>
+
+    <div class="roadmap-card tier1">
+      <div class="rm-badges"><span class="badge badge-green">SHIPPED</span><span class="badge badge-blue">Tier 1</span></div>
+      <div class="rm-title">Perform Analytics Dashboard</div>
+      <div class="rm-desc">Visual reporting and trend analysis for performance cycle data — completion rates, score distributions, calibration views, manager analytics.</div>
+      <div class="rm-pain">Pain: March 2026 case showed that Carrie Grulke needed to manually extract ratings for merit upload. Perform Analytics could reduce this manual step and provide audit-ready exports for Lawson integration.</div>
+    </div>
+
+    <div class="roadmap-card tier1">
+      <div class="rm-badges"><span class="badge badge-green">SHIPPED</span><span class="badge badge-blue">Tier 1</span></div>
+      <div class="rm-title">Weighted Scoring &amp; Rating Scale Configuration</div>
+      <div class="rm-desc">Administrators can assign weighted scoring at the individual question and section level via Rating Scale configuration. Section and question weighting applied pre-launch.</div>
+      <div class="rm-pain">Pain: Laken Gelhar's 60/40 weighting request on June 3 call. This is a configuration capability — must be set up correctly before the 2026–27 cycle launches. Critical use case for Meriter's union + leader differentiation.</div>
+    </div>
+
+    <div class="roadmap-card tier1">
+      <div class="rm-badges"><span class="badge badge-green">SHIPPED</span><span class="badge badge-blue">Tier 1</span></div>
+      <div class="rm-title">Connect (SilkRoad Connect) — Admin Console</div>
+      <div class="rm-desc">Central admin interface for user management, integrations, and data governance across the Rival platform.</div>
+      <div class="rm-pain">Pain: Oct 2025 case "Meriter SilkRoad Connect Admin Console" — open for 7 days. User management across 975 employees + union categories requires robust admin tooling.</div>
+    </div>
+
+    <div class="roadmap-card expansion">
+      <div class="rm-badges"><span class="badge badge-purple">Expansion</span><span class="badge badge-amber">Not Owned</span></div>
+      <div class="rm-title">Rival Onboarding — Clinical Workflow Orchestration</div>
+      <div class="rm-desc">Role-aware, location-aware preboarding workflows across disconnected HR, TA, credentialing, LMS, and IT systems. Real-time readiness dashboards for hiring managers.</div>
+      <div class="rm-pain">Pain Signal: Record births in 2025, post-strike nurse retention pressure, clinical onboarding compliance risk. Laura Weisman is actively prospecting Casey Collins for this. Consider integrating CSM + AE motion.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TAB 6: USAGE ============ -->
+<div class="tab-panel" id="tab-6">
+  <div class="dangerbox">&#9888; <strong>Usage data note:</strong> LifeSuite telemetry fields (Active_Users_Onboard__c, event breakdowns) are null across all 30 records. Only Unique_User_Logins_Onboard__c and L30D/12-month event totals are populated — and all event counts = 0. This is expected for Performance-only clients; LifeSuite tracks Onboarding module activity. Rival Performance usage is not reflected in this telemetry object. The 0-event readings do not indicate Performance non-use.</div>
+
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="stat-val">0</div>
+      <div class="stat-lbl">Events (12mo) — Onboarding module only</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val">0</div>
+      <div class="stat-lbl">Events (30 days)</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val">~1/day</div>
+      <div class="stat-lbl">Unique Logins (days with activity)</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val">Meriter</div>
+      <div class="stat-lbl">LSCode (Instance)</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Login Pattern (Last 30 Days)</div>
+    <p style="font-size:12px;color:#6b7280;margin-bottom:12px;">Daily unique logins extracted from LifeSuite telemetry (Unique_User_Logins_Onboard__c). Note: 1 login/day observed on active days — this likely reflects an admin/sync user, not end-user Performance activity.</p>
+    <div class="usage-bar-wrap"><div class="usage-bar-label">Jun 1–8 (7 days)</div><div class="usage-bar-track"><div class="usage-bar-fill amber" style="width:30%;"></div></div><div class="usage-bar-val">~3 days</div></div>
+    <div class="usage-bar-wrap"><div class="usage-bar-label">May 26–31</div><div class="usage-bar-track"><div class="usage-bar-fill amber" style="width:50%;"></div></div><div class="usage-bar-val">3/6 days</div></div>
+    <div class="usage-bar-wrap"><div class="usage-bar-label">May 19–25</div><div class="usage-bar-track"><div class="usage-bar-fill amber" style="width:60%;"></div></div><div class="usage-bar-val">4/7 days</div></div>
+    <div class="usage-bar-wrap"><div class="usage-bar-label">May 12–18</div><div class="usage-bar-track"><div class="usage-bar-fill amber" style="width:40%;"></div></div><div class="usage-bar-val">3/7 days</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Utilization Analysis</div>
+    <table>
+      <tr><th>Metric</th><th>Value</th><th>Interpretation</th></tr>
+      <tr><td>Events / Employee (12mo)</td><td>0 (Onboarding) / Unverified (Perform)</td><td>Onboard events = 0 expected (no Onboarding product). Perform cycle activity not tracked in this object.</td></tr>
+      <tr><td>Login activity</td><td>Sporadic 1-login/day pattern</td><td>Likely admin/integration user. Does not reflect end-user Performance review activity.</td></tr>
+      <tr><td>Active Users</td><td>Null (field not populated)</td><td>Unverified — confirm via Perform admin console</td></tr>
+      <tr><td>Services Engagement</td><td>50%</td><td>Moderate; reflects ongoing managed services support from Randy Havel</td></tr>
+    </table>
+    <div class="infobox" style="margin-top:10px;">&#128270; Open Question: What is actual Performance module utilization? How many of 975 employees completed reviews in the 2025–26 cycle? Request this data from Carrie Grulke or Sarah Conklin during the next working session to establish a utilization baseline.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Instance Details</div>
+    <table>
+      <tr><td>LSCode</td><td>Meriter</td></tr>
+      <tr><td>Customer Name (LifeSuite)</td><td>UnityPoint Health-Meriter</td></tr>
+      <tr><td>Site Review Date</td><td>March 18, 2026 (82 days ago)</td></tr>
+      <tr><td>Site Review Status</td><td><span class="badge badge-green">Not Overdue</span> (Days_since_last_Site_Review__c = 82)</td></tr>
+      <tr><td>F2F Status</td><td><span class="badge badge-red">Overdue</span> — No F2F on record</td></tr>
+      <tr><td>Usage Region</td><td>United States</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ============ TAB 7: CASES ============ -->
+<div class="tab-panel" id="tab-7">
+  <div class="stats-row">
+    <div class="stat-box"><div class="stat-val">12</div><div class="stat-lbl">Cases (12 months)</div></div>
+    <div class="stat-box"><div class="stat-val">0</div><div class="stat-lbl">Open Cases</div></div>
+    <div class="stat-box"><div class="stat-val">~3 days</div><div class="stat-lbl">Avg Resolution Time</div></div>
+    <div class="stat-box"><div class="stat-val">42 days</div><div class="stat-lbl">Slowest Resolution (Case 00992154)</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Cases — Last 12 Months (All Closed)</div>
+    <table>
+      <tr><th>Case #</th><th>Subject</th><th>Priority</th><th>Created</th><th>Closed</th><th>Days</th><th>Owner</th></tr>
+      <tr><td>00995579</td><td>Agile Report - Not pulling a Rating</td><td><span class="priority-mod">Moderate</span></td><td>Mar 16, 2026</td><td>Mar 17, 2026</td><td>1</td><td>Rica Lopez</td></tr>
+      <tr><td>00995465</td><td>Access for meeting</td><td><span class="priority-low">Low</span></td><td>Mar 11, 2026</td><td>Mar 13, 2026</td><td>2</td><td>Randy Havel</td></tr>
+      <tr><td>00993245</td><td>PL - revisiting circular reporting logic</td><td><span class="priority-mod">Moderate</span></td><td>Jan 23, 2026</td><td>Jan 23, 2026</td><td>&lt;1</td><td>Kristian Monge</td></tr>
+      <tr><td>00992691</td><td>PL - Unable to see Users within Perform</td><td><span class="priority-high">High</span></td><td>Jan 6, 2026</td><td>Jan 13, 2026</td><td>7</td><td>Rica Lopez</td></tr>
+      <tr><td>00992690</td><td>PL - user info not consistent across platform</td><td><span class="priority-high">High</span></td><td>Jan 6, 2026</td><td>Jan 7, 2026</td><td>1</td><td>Rica Lopez</td></tr>
+      <tr><td>00992683</td><td>UnityPoint missing users</td><td><span class="priority-low">Low</span></td><td>Jan 6, 2026</td><td>Jan 6, 2026</td><td>&lt;1</td><td>Randy Havel</td></tr>
+      <tr><td>00992154</td><td>UnityPoint Health Perform issue</td><td><span class="priority-low">Low</span></td><td>Dec 11, 2025</td><td>Jan 22, 2026</td><td>42</td><td>Rica Lopez</td></tr>
+      <tr><td>00989987</td><td>UnityPoint Health users showing active</td><td><span class="priority-low">Low</span></td><td>Oct 16, 2025</td><td>Oct 16, 2025</td><td>&lt;1</td><td>Randy Havel</td></tr>
+      <tr><td>00989572</td><td>Meriter SilkRoad Connect Admin Console</td><td><span class="priority-mod">Moderate</span></td><td>Oct 7, 2025</td><td>Oct 14, 2025</td><td>7</td><td>Rica Lopez</td></tr>
+      <tr><td>00986609</td><td>UnityPoint Health Site Review Perform</td><td><span class="priority-low">Low</span></td><td>Sep 18, 2025</td><td>Dec 17, 2025</td><td>90</td><td>Randy Havel</td></tr>
+      <tr><td>00986602</td><td>UnityPoint Meriter Renewal</td><td><span class="priority-mod">Moderate</span></td><td>Sep 18, 2025</td><td>Sep 18, 2025</td><td>&lt;1</td><td>Rica Lopez</td></tr>
+      <tr><td>00983898</td><td>account contacts</td><td><span class="priority-mod">Moderate</span></td><td>Jun 30, 2025</td><td>Jun 30, 2025</td><td>&lt;1</td><td>Raymond Romero</td></tr>
+    </table>
+    <div class="source-tag">Source: SFDC Cases — last 12 months</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Case Pattern Analysis</div>
+    <table>
+      <tr><th>Pattern</th><th>Detail</th><th>Implication</th></tr>
+      <tr><td>User management issues</td><td>3 cases in Jan 2026 alone (users missing, inconsistent data, visibility)</td><td>Integration / sync issue between Lawson and Rival Perform. Root cause may not be fully resolved.</td></tr>
+      <tr><td>Merit-blocking issue</td><td>Mar 2026 report not pulling ratings correctly</td><td>Form configuration dependency for merit uploads = high-consequence support scenario. NPS impact.</td></tr>
+      <tr><td>Site Review → slow close</td><td>00986609 open 90 days (Sep–Dec 2025)</td><td>Site review process unclear — may have been delayed by Bernard transition.</td></tr>
+      <tr><td>All cases closed</td><td>0 open cases as of June 8, 2026</td><td>Support health is stable. Next NPS cycle is Oct 14, 2026 — 4 months to show improvement.</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ============ TAB 8: RISK ============ -->
+<div class="tab-panel" id="tab-8">
+  <div class="section">
+    <div class="section-title">Risk Assessment — June 8, 2026</div>
+
+    <div class="risk-card red-risk">
+      <div class="risk-header">
+        <span class="risk-icon">&#128308;</span>
+        <span class="risk-title">NPS 3.0 Detractor — Relationship at Risk</span>
+      </div>
+      <div class="risk-desc">Average NPS Score = 3.0 (last sent Apr 17, 2026). This is a detractor score (0–6 range). Compounded by CSM transition (Bernard &#8594; Andrew), a performance load failure in March, and an evaluation report blocking merit increases. No face-to-face meeting has ever been recorded. The account has been operationally managed but not strategically nurtured.</div>
+      <div class="risk-change">What moves this to green: Andrew establishes consistent monthly cadence with Kiah + Sarah within 30 days. Rosi and Perform Analytics adoption demonstrated before Oct NPS. Evaluation form weighting issue resolved cleanly before next cycle.</div>
+    </div>
+
+    <div class="risk-card red-risk">
+      <div class="risk-header">
+        <span class="risk-icon">&#128308;</span>
+        <span class="risk-title">Engagement Score 40% — Below Threshold</span>
+      </div>
+      <div class="risk-desc">Customer_Engagement_Score__c = 40 (0.4 on 0–1 scale). Below 60% threshold. Contributing factors: login pattern is minimal (1 login/day likely admin-only), call cadence recently disrupted (May 6 call declined), no strategic conversation on record — meetings are operational only.</div>
+      <div class="risk-change">What moves this to green: Documented strategic call on roadmap/value (not just support issues), confirmed end-user Perform login activity increase, and Kiah engaged in regular cadence.</div>
+    </div>
+
+    <div class="risk-card red-risk">
+      <div class="risk-header">
+        <span class="risk-icon">&#128308;</span>
+        <span class="risk-title">Lawson (HRIS) Consolidation Risk — Elevated by UPH Cost-Cutting</span>
+      </div>
+      <div class="risk-desc">SFDC Renewal Risk (verbatim): <em>"Only risk is if the organization as a whole decides to move everything over to Lawson which is their current HRIS."</em> As of April 2026, UnityPoint Health announced 207+ IT job cuts and full outsourcing of IT &amp; Revenue Cycle functions — a clear cost-consolidation signal at the system level. Financial pressure from Medicaid cuts is documented. When enterprise systems consolidate, HCM point solutions like Rival Performance are at risk unless value is clearly articulated and the Rival-Lawson integration is positioned as intentional coexistence.</div>
+      <div class="risk-change">What moves this to green: Kiah confirms no system-level Lawson expansion discussion. Rival-Lawson integration established as differentiated (Lawson cannot replicate union form complexity, merit-gating accuracy, or Rosi AI capability). Executive-level buy-in from Joy Ledbetter or Kurt Olson.</div>
+    </div>
+
+    <div class="risk-card amber-risk">
+      <div class="risk-header">
+        <span class="risk-icon">&#127937;</span>
+        <span class="risk-title">Product Contraction Trend — 2 Products Lost in 2024</span>
+      </div>
+      <div class="risk-desc">Managed Services dropped Oct 2024 ($27,500). WingSpan extension lost Apr 2024. Current footprint: Performance-only ($108,605). In 2022 the total contract was $264K+ (Performance + Learning + Managed Services). The account has contracted 59% from its high-water mark. No expansion wins since the WingSpan-to-Agile conversion in April 2023.</div>
+      <div class="risk-change">What moves this to green: Onboarding expansion closed (Laura Weisman outreach to Casey Collins in progress — CSM should align with AE). Demonstrate value of current Performance to prevent further contraction at renewal.</div>
+    </div>
+
+    <div class="risk-card amber-risk">
+      <div class="risk-header">
+        <span class="risk-icon">&#127937;</span>
+        <span class="risk-title">CSM Transition — Relationship Reset in Progress</span>
+      </div>
+      <div class="risk-desc">Bernard Jackson departed Rival. Andrew Pollard introduced June 3, 2026. Kiah Calmese Walker (renewal decision-maker) has not yet been directly engaged by Andrew. Prior CSM strategy note specifically calls out establishing relationship with Kiah as priority. The prior CSM also had zero F2F meetings on record.</div>
+      <div class="risk-change">What moves this to green: First direct engagement with Kiah within 2 weeks (by June 22). F2F or video call with Kiah scheduled within 60 days. Prior CSM&#39;s strategy executed by Andrew before the renewal opp advances to Stage 6+.</div>
+    </div>
+
+    <div class="risk-card amber-risk">
+      <div class="risk-header">
+        <span class="risk-icon">&#127937;</span>
+        <span class="risk-title">Nurse Strike Aftermath — Labor Compliance Complexity Increased</span>
+      </div>
+      <div class="risk-desc">May–June 2025 SEIU nurse strike resulted in a 2-year contract with 10% wage increase, new staffing language, and security requirements. This increases HR admin complexity: merit-cycle accuracy is more critical (merit tied to new union contract terms), performance evaluation for RNs has new contractual language to track. Rival Perform&#39;s union form accuracy is now higher-stakes.</div>
+      <div class="risk-change">What moves this to amber/green: Confirm that 2026 RN Union Performance Evaluation form reflects new contract terms. Proactively offer a form review session with Carrie/Sarah before cycle launch.</div>
+    </div>
+
+    <div class="risk-card green-risk">
+      <div class="risk-header">
+        <span class="risk-icon">&#128994;</span>
+        <span class="risk-title">Renewal Timeline — 577 Days, Stage 5 — Adequate Runway</span>
+      </div>
+      <div class="risk-desc">Renewal is January 1, 2028 — 577 days away. Opportunity created Dec 12, 2025 at Stage 5 (Renewal Solutioning). Contract runs through Dec 31, 2027. Adequate runway exists to establish relationship, demonstrate value, and advance opp through remaining stages. No quote pressure yet.</div>
+      <div class="risk-change">Continue monitoring: If opp has not advanced to Stage 6 by Q4 2026, escalate. Probability is 40% — should increase as relationship strengthens.</div>
+    </div>
+
+    <div class="risk-card green-risk">
+      <div class="risk-header">
+        <span class="risk-icon">&#128994;</span>
+        <span class="risk-title">Lawson is Established Coexistence — Not a New Deployment</span>
+      </div>
+      <div class="risk-desc">Lawson has been the HRIS at Meriter for the duration of the Rival relationship (~13 years). Rival Perform is integrated with Lawson for merit data export. This is established coexistence — not a new threat. The risk is system-level top-down consolidation decisions, not a local displacement. Local champions (Sarah, Laken, Kiah) are familiar with Rival and use it for specific workflows Lawson cannot handle (union form complexity, weighted scoring, AI-assisted reviews).</div>
+      <div class="risk-change">Maintain by: Reinforcing that Rival&#39;s union form configuration depth and merit-gating accuracy are use cases Lawson cannot match natively. Keep Rival positioned as the specialized layer above HRIS, not competing with it.</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+<script>
+function switchTab(n) {
+  var panels = document.querySelectorAll('.tab-panel');
+  var btns = document.querySelectorAll('.tab-btn');
+  for (var i = 0; i < panels.length; i++) { panels[i].classList.remove('active'); }
+  for (var i = 0; i < btns.length; i++) { btns[i].classList.remove('active'); }
+  document.getElementById('tab-' + n).classList.add('active');
+  for (var i = 0; i < btns.length; i++) {
+    if (btns[i].getAttribute('onclick') === 'switchTab(' + n + ')') {
+      btns[i].classList.add('active'); break;
+    }
+  }
+}
+</script>
+</body>
+</html>

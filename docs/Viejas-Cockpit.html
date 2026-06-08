@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light only">
+<title>Viejas Casino &amp; Resort — CSM Account Cockpit</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;background:#f5f6fa;color:#1a1f2e;overflow-x:hidden}
+a{color:#2563eb;text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* HEADER */
+.header{background:#1a1f2e;color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.header-left{display:flex;align-items:center;gap:14px}
+.header-logo{width:36px;height:36px;background:#c84b31;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:#fff;flex-shrink:0}
+.header-name{font-size:18px;font-weight:700;letter-spacing:-.3px}
+.header-sub{font-size:12px;color:#8b91a5;margin-top:2px}
+.header-badges{display:flex;gap:6px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.3px}
+.badge-red{background:#fee2e2;color:#b91c1c}
+.badge-amber{background:#fef3c7;color:#92400e}
+.badge-green{background:#dcfce7;color:#166534}
+.badge-blue{background:#dbeafe;color:#1e40af}
+.badge-purple{background:#ede9fe;color:#6b21a8}
+.badge-gray{background:#f1f5f9;color:#475569}
+
+/* KPI STRIP */
+.kpi-strip{background:#fff;border-bottom:1px solid #e8eaf0;padding:12px 20px;display:flex;gap:0;overflow-x:auto}
+.kpi-card{flex:1;min-width:110px;padding:10px 14px;border-right:1px solid #f0f1f5;text-align:center}
+.kpi-card:last-child{border-right:none}
+.kpi-val{font-size:22px;font-weight:800;letter-spacing:-.5px;line-height:1}
+.kpi-lbl{font-size:11px;color:#6b7280;margin-top:4px;font-weight:500}
+.kpi-sub{font-size:10px;margin-top:2px}
+.kpi-red{color:#dc2626}
+.kpi-amber{color:#d97706}
+.kpi-green{color:#16a34a}
+.kpi-blue{color:#2563eb}
+
+/* TABS */
+.tab-bar{display:flex;gap:2px;background:#e8eaf0;border-radius:10px;padding:4px;overflow-x:auto;white-space:nowrap;position:sticky;top:0;z-index:100;margin:12px 12px 0}
+.tab-btn{padding:9px 16px;border:none;background:transparent;color:#5a6178;font-size:12px;font-weight:600;border-radius:7px;cursor:pointer;white-space:nowrap;transition:all .15s}
+.tab-btn.active{background:#ffffff;color:#1a1f2e;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.tab-btn:hover:not(.active){background:rgba(255,255,255,.6)}
+
+/* PANELS */
+.tab-panel{display:none;padding:16px 12px 24px;overflow:visible}
+.tab-panel.active{display:block}
+
+/* SECTIONS */
+.section{background:#fff;border-radius:10px;padding:18px;margin-bottom:14px;border:1px solid #e8eaf0}
+.section-title{font-size:13px;font-weight:700;color:#1a1f2e;margin-bottom:12px;letter-spacing:-.2px;display:flex;align-items:center;gap:8px}
+.section-title-sm{font-size:12px;font-weight:700;color:#374151;margin-bottom:10px}
+
+/* GRIDS */
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+
+/* ACTION CARDS */
+.action-card{background:#fffbf0;border:1px solid #fcd34d;border-radius:10px;padding:14px;margin-bottom:10px}
+.action-card.action-red{background:#fff5f5;border-color:#fca5a5}
+.action-card.action-green{background:#f0fdf4;border-color:#86efac}
+.action-num{font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.action-title{font-size:13px;font-weight:700;color:#1a1f2e;margin-bottom:4px}
+.action-why{font-size:12px;color:#6b7280;margin-bottom:8px;line-height:1.5}
+.action-step{font-size:12px;font-weight:600;color:#1a1f2e;background:#f8f9fb;padding:6px 10px;border-radius:6px;display:inline-block}
+
+/* HEALTH CARDS */
+.health-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;overflow:visible}
+.health-card{background:#f8f9fb;border-radius:8px;padding:12px;position:relative;overflow:visible}
+.health-val{font-size:24px;font-weight:800;letter-spacing:-.5px}
+.health-lbl{font-size:11px;color:#6b7280;margin-top:2px;font-weight:500;display:flex;align-items:center;gap:4px}
+.metric-tip{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:#e2e8f0;color:#64748b;font-size:9px;font-weight:700;cursor:help;position:relative;flex-shrink:0}
+.metric-tip .tip-box{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:240px;padding:10px 12px;background:#1a1f2e;color:#fff;font-size:11px;font-weight:400;line-height:1.5;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:2000;white-space:normal}
+.metric-tip:hover .tip-box{display:block}
+
+/* TABLES */
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{text-align:left;padding:8px 10px;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.3px;border-bottom:2px solid #f0f1f5;background:#f8f9fb}
+.tbl td{padding:9px 10px;border-bottom:1px solid #f5f6fa;vertical-align:top;line-height:1.4}
+.tbl tr:hover td{background:#fafbff}
+.tbl tr:last-child td{border-bottom:none}
+
+/* RISK CARDS */
+.risk-card{border-radius:10px;padding:14px;margin-bottom:10px;border:1px solid}
+.risk-card.risk-red{background:#fff5f5;border-color:#fca5a5}
+.risk-card.risk-amber{background:#fffbf0;border-color:#fcd34d}
+.risk-card.risk-green{background:#f0fdf4;border-color:#86efac}
+.risk-title{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.risk-body{font-size:12px;color:#374151;line-height:1.6;margin-bottom:8px}
+.risk-fix{font-size:11px;font-style:italic;color:#6b7280;padding:6px 10px;background:rgba(255,255,255,.7);border-radius:6px}
+
+/* PRODUCT CARDS */
+.roadmap-card{border-radius:8px;padding:12px;margin-bottom:8px;border-left:3px solid}
+.roadmap-t1{background:#f0f9ff;border-color:#0ea5e9}
+.roadmap-t2{background:#fafafa;border-color:#d1d5db;font-size:12px;padding:8px 12px}
+.roadmap-exp{background:#fdf4ff;border-color:#d946ef}
+.roadmap-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:.3px}
+.badge-shipped{background:#dcfce7;color:#166534}
+.badge-coming{background:#dbeafe;color:#1e40af}
+.roadmap-title{font-size:13px;font-weight:700;margin:4px 0}
+.roadmap-desc{font-size:12px;color:#374151;line-height:1.5;margin-bottom:6px}
+.roadmap-pain{font-size:11px;font-style:italic;color:#6b7280;padding:5px 9px;background:rgba(255,255,255,.8);border-radius:5px}
+
+/* PEOPLE CARDS */
+.people-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.person-card{background:#f8f9fb;border-radius:8px;padding:12px;border:1px solid #e8eaf0}
+.person-avatar{width:34px;height:34px;border-radius:50%;background:#2563eb;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;flex-shrink:0}
+.person-name{font-size:13px;font-weight:700;color:#1a1f2e}
+.person-title{font-size:11px;color:#6b7280;margin-top:1px}
+.person-intel{font-size:11px;color:#374151;margin-top:6px;line-height:1.5;padding-top:6px;border-top:1px solid #e8eaf0}
+.person-header{display:flex;align-items:center;gap:10px}
+
+/* USAGE METRICS */
+.usage-kpi{background:#f8f9fb;border-radius:8px;padding:14px;text-align:center}
+.usage-val{font-size:28px;font-weight:800;letter-spacing:-.8px}
+.usage-lbl{font-size:11px;color:#6b7280;margin-top:3px}
+
+/* STATUS TAGS */
+.status-open{background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.status-closed{background:#dcfce7;color:#166534;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.status-inprog{background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.stage-badge{background:#ede9fe;color:#6b21a8;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.priority-high{color:#dc2626;font-weight:700}
+.priority-med{color:#d97706;font-weight:600}
+
+/* DIVIDERS */
+.divider{height:1px;background:#f0f1f5;margin:14px 0}
+
+/* KEY-VALUE */
+.kv-row{display:flex;padding:7px 0;border-bottom:1px solid #f5f6fa;font-size:12px}
+.kv-key{color:#6b7280;font-weight:500;min-width:160px;flex-shrink:0}
+.kv-val{color:#1a1f2e;font-weight:600}
+
+/* ALERT BANNER */
+.alert-banner{border-radius:8px;padding:12px 16px;margin-bottom:14px;display:flex;gap:12px;align-items:flex-start}
+.alert-red{background:#fee2e2;border:1px solid #fca5a5}
+.alert-amber{background:#fef3c7;border:1px solid #fcd34d}
+.alert-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.alert-body h4{font-size:13px;font-weight:700;color:#1a1f2e;margin-bottom:3px}
+.alert-body p{font-size:12px;color:#374151;line-height:1.5}
+
+/* MISC */
+.text-sm{font-size:12px;line-height:1.6;color:#374151}
+.text-muted{color:#6b7280;font-size:11px}
+.text-bold{font-weight:700}
+.mt-8{margin-top:8px}
+.mt-12{margin-top:12px}
+.quote-box{background:#f8f9fb;border-left:3px solid #2563eb;padding:10px 14px;border-radius:0 6px 6px 0;font-size:12px;font-style:italic;color:#374151;margin:8px 0}
+.opp-card{background:#f8f9fb;border-radius:8px;padding:14px;margin-bottom:10px;border:1px solid #e8eaf0}
+.opp-name{font-size:13px;font-weight:700;margin-bottom:6px}
+.opp-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:6px}
+.tag{font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600}
+.tag-renewal{background:#ede9fe;color:#6b21a8}
+.tag-addon{background:#d1fae5;color:#065f46}
+.timeline-dot{width:8px;height:8px;border-radius:50%;background:#2563eb;flex-shrink:0;margin-top:4px}
+.proj-card{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:12px;margin-bottom:8px}
+.proj-title{font-size:13px;font-weight:700;color:#0c4a6e;margin-bottom:4px}
+.proj-desc{font-size:12px;color:#374151;line-height:1.5}
+.sfdc-link{font-size:11px;color:#2563eb}
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-logo">VC</div>
+    <div>
+      <div class="header-name">Viejas Casino &amp; Resort</div>
+      <div class="header-sub">Alpine, CA &nbsp;·&nbsp; Gambling &amp; Gaming &nbsp;·&nbsp; 1,962 employees &nbsp;·&nbsp; Tier 3 &nbsp;·&nbsp; CSM: Andrew Pollard</div>
+    </div>
+  </div>
+  <div class="header-badges">
+    <span class="badge badge-red">⚠ CHURN CONFIRMED</span>
+    <span class="badge badge-amber">Renewal Sep 1, 2026</span>
+    <span class="badge badge-gray">ARR $77,335</span>
+    <span class="badge badge-gray">Cross-Sell 96</span>
+  </div>
+</div>
+
+<!-- ===== KPI STRIP ===== -->
+<div class="kpi-strip">
+  <div class="kpi-card">
+    <div class="kpi-val kpi-amber">$77,335</div>
+    <div class="kpi-lbl">ARR (All Products)</div>
+    <div class="kpi-sub text-muted">Recruit $50,930 · OB $23,623 · Other $2,782</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-val kpi-red">75%</div>
+    <div class="kpi-lbl">Engagement Score</div>
+    <div class="kpi-sub text-muted">Customer_Engagement_Score__c</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-val kpi-red">Sep 1, 2026</div>
+    <div class="kpi-lbl">Renewal Date</div>
+    <div class="kpi-sub text-muted">85 days · NEAR TERM</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-val kpi-green">99</div>
+    <div class="kpi-lbl">Onboarding Score</div>
+    <div class="kpi-sub text-muted">Global_Onboarding_Score__c</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-val kpi-red">0</div>
+    <div class="kpi-lbl">NPS Score</div>
+    <div class="kpi-sub text-muted">Last sent Apr 21, 2026</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-val kpi-amber">756</div>
+    <div class="kpi-lbl">Events (12mo)</div>
+    <div class="kpi-sub text-muted">1 event last 30 days</div>
+  </div>
+</div>
+
+<!-- ===== TAB BAR ===== -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab(0)">Actions</button>
+  <button class="tab-btn" onclick="switchTab(1)">Account Intel</button>
+  <button class="tab-btn" onclick="switchTab(2)">Use Case</button>
+  <button class="tab-btn" onclick="switchTab(3)">People</button>
+  <button class="tab-btn" onclick="switchTab(4)">Contracts</button>
+  <button class="tab-btn" onclick="switchTab(5)">Product</button>
+  <button class="tab-btn" onclick="switchTab(6)">Usage</button>
+  <button class="tab-btn" onclick="switchTab(7)">Cases</button>
+  <button class="tab-btn" onclick="switchTab(8)">Risk</button>
+</div>
+
+<!-- ================================================================ -->
+<!-- TAB 0: ACTIONS -->
+<!-- ================================================================ -->
+<div class="tab-panel active" id="tab-0">
+
+  <div class="alert-banner alert-red">
+    <div class="alert-icon">🚨</div>
+    <div class="alert-body">
+      <h4>CONFIRMED CHURN — Immediate Escalation Required</h4>
+      <p>On Apr 29, 2026, Viejas confirmed they have moved Recruit &amp; Workflow to a new vendor. Bernard Jackson's May 8 email acknowledged their departure ("we're sorry to see you go"). Crystal Randall is now coordinating data extraction for contract expiry Sep 1, 2026. The renewal opp (Stage 5) is effectively a wind-down vehicle. <strong>Action window: 85 days.</strong></p>
+    </div>
+  </div>
+
+  <div class="action-card action-red">
+    <div class="action-num">Action 1 — Critical / This Week</div>
+    <div class="action-title">Escalate: Executive Save Attempt Before Data Extraction Proceeds</div>
+    <div class="action-why">Viejas is in the data extraction phase — this is the last window before operational momentum locks in their departure. The prior CSM (pre-Bernard) may have missed early signals. An executive-level outreach from Rival leadership to Freddie Harmon (VP HR) — not the operational team — could surface whether this was a pricing/fit/service issue that can be addressed, or a truly irreversible decision.</div>
+    <div class="action-step">→ Owner: Andrew Pollard. Escalate to VP CSM. Engage Freddie Harmon (VP HR) at (619) 659-1915 or fharmon@viejas.com. Do NOT let this remain a Crystal/Bernard operational handoff.</div>
+  </div>
+
+  <div class="action-card action-red">
+    <div class="action-num">Action 2 — Critical / This Week</div>
+    <div class="action-title">Understand the Competitive Displacement — Identify the New Vendor</div>
+    <div class="action-why">Bernard's Apr 14 email noted they "moved Workflow and Recruit operations to another vendor" — but the new vendor is not identified in any SFDC field. Knowing who replaced Rival (Workday? iCIMS? Greenhouse? ADP?) is critical for: (a) competitive intelligence, (b) understanding why they left, (c) knowing if there is any residual foothold (Onboarding standalone?) worth defending.</div>
+    <div class="action-step">→ Ask during data extraction call. Also check ZoomInfo scoops — Viejas is on Workday Jobs (viejas.wd108.myworkdayjobs.com) suggesting Workday ATS was adopted. Confirm with Crystal/Bernard.</div>
+  </div>
+
+  <div class="action-card">
+    <div class="action-num">Action 3 — High / This Month</div>
+    <div class="action-title">Onboarding/E-Verify Integration: Confirm What Stays vs. Goes at Sep 1</div>
+    <div class="action-why">Viejas confirmed departure on Recruit + Workflow. However, Onboarding ($23,623 ARR) and the SilkRoad-Managed Integration are still active. Cases through May 2026 show ongoing E-Verify support. It is unclear whether they intend to cancel EVERYTHING at Sep 1 or retain Onboarding only. The current opp is for the full $77,335 stack. Clarifying scope of cancellation protects partial ARR.</div>
+    <div class="action-step">→ During data extraction call, ask Crystal to confirm: "Is the Sep 1 cancellation all products, or only Recruit/Workflow? Are you retaining Onboarding?" Log outcome in SFDC opp NextStep.</div>
+  </div>
+
+  <div class="action-card">
+    <div class="action-num">Action 4 — High / This Month</div>
+    <div class="action-title">Root Cause Analysis: Why Did Viejas Switch?</div>
+    <div class="action-why">The departure decision appears to predate Bernard's CSM assignment (he joined Apr 14 as new CSM and discovered they'd already switched). No CSM_Renewal_Strategy__c was ever populated. No renewal risk fields were flagged. This was a silent churn — the account went dark and moved without a retention attempt. Understanding the root cause is critical for competitive intelligence and preventing recurrence at similar accounts (tribal gaming, hospitality, Tier 3 mid-market).</div>
+    <div class="action-step">→ Bernard to conduct a post-mortem interview with Sophia Linde and/or Amy Laughner: "What drove the decision? Was it product, service, pricing, or the competitive offer?" Document in SFDC.</div>
+  </div>
+
+  <div class="action-card action-green">
+    <div class="action-num">Action 5 — Medium / Before Sep 1</div>
+    <div class="action-title">Ensure Clean Data Extraction — Protect Brand for Future Re-engagement</div>
+    <div class="action-why">ZoomInfo scoops show Viejas won "Top Workplaces USA 2025" and "Professional Development Top Workplaces 2025" — they are a high-profile tribal employer. How Rival handles the offboarding directly affects re-engagement potential. They are still actively using silkroad.com jobs (jobs.silkroad.com/Viejas/Careers) suggesting the ATS/onboarding platform is still referenced. A smooth exit preserves goodwill.</div>
+    <div class="action-step">→ Crystal to complete data extraction per SLA. Send exit survey. Andrew to send personal note to Freddie Harmon thanking for the relationship. Mark for re-engagement at 12 months.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Engagement Health</div>
+    <div class="health-grid">
+      <div class="health-card">
+        <div class="health-val kpi-amber">75%</div>
+        <div class="health-lbl">Customer Engagement
+          <span class="metric-tip">?<span class="tip-box">Customer_Engagement_Score__c = 75.0 (CustomerEngagementScoreNUMBER__c = 0.75). Composite of product adoption, support interactions, and CSM cadence. Source: SFDC Account.</span></span>
+        </div>
+      </div>
+      <div class="health-card">
+        <div class="health-val kpi-amber">50%</div>
+        <div class="health-lbl">Services Engagement
+          <span class="metric-tip">?<span class="tip-box">Services_Engagement_Score_Percent__c = 50.0. Reflects engagement with services/implementation team. Source: SFDC Account.</span></span>
+        </div>
+      </div>
+      <div class="health-card">
+        <div class="health-val kpi-red">0</div>
+        <div class="health-lbl">NPS Score
+          <span class="metric-tip">?<span class="tip-box">Average_NPS_Score_SFDC__c = 0.0. Last NPS sent Apr 21, 2026. Next send: Oct 18, 2026. Score of 0 = Detractor zone. Source: SFDC Account.</span></span>
+        </div>
+      </div>
+      <div class="health-card">
+        <div class="health-val kpi-red">151</div>
+        <div class="health-lbl">Days Since Site Review
+          <span class="metric-tip">?<span class="tip-box">Days_since_last_Site_Review__c = 151. Last Site Review: Jan 8, 2026. Site_Review_Overdue__c = false (threshold not exceeded per system). Source: SFDC Account.</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ================================================================ -->
+<!-- TAB 1: ACCOUNT INTEL -->
+<!-- ================================================================ -->
+<div class="tab-panel" id="tab-1">
+
+  <div class="section">
+    <div class="section-title">Company Overview</div>
+    <div class="text-sm">
+      Viejas Casino &amp; Resort is a luxury casino-resort owned and operated by the <strong>Viejas Band of Kumeyaay Indians</strong>, a sovereign tribal nation, located in Alpine, California (east of San Diego). The property encompasses over 2,000 slot machines, full table games (blackjack, baccarat, craps, roulette, pai gow), a bingo room, off-track betting, the Willows Hotel &amp; Spa (397 rooms), multiple dining venues including the AAA Four Diamond Grove Steakhouse, a shopping outlet center (Viejas Outlets), and live entertainment venues.
+    </div>
+    <div class="mt-12">
+      <div class="kv-row"><span class="kv-key">Legal Structure</span><span class="kv-val">Tribal Enterprise — Viejas Band of Kumeyaay Indians (sovereign tribal nation)</span></div>
+      <div class="kv-row"><span class="kv-key">Headquarters</span><span class="kv-val">5000 Willows Rd, Alpine, CA 91901</span></div>
+      <div class="kv-row"><span class="kv-key">Founded</span><span class="kv-val">2000 (casino est. 1991, resort expanded to current scale)</span></div>
+      <div class="kv-row"><span class="kv-key">Employees</span><span class="kv-val">1,962 (ZoomInfo verified, May 2026) &nbsp;·&nbsp; 50 in HR &nbsp;·&nbsp; 581 in Operations</span></div>
+      <div class="kv-row"><span class="kv-key">Annual Revenue</span><span class="kv-val">~$532M (ZoomInfo estimate) &nbsp;·&nbsp; Revenue Range: $500M–$1B</span></div>
+      <div class="kv-row"><span class="kv-key">Industry</span><span class="kv-val">Gambling &amp; Gaming, Hospitality, Lodging &amp; Resorts, Restaurants</span></div>
+      <div class="kv-row"><span class="kv-key">Parent Entity</span><span class="kv-val">None — standalone tribal enterprise (no corporate parent, ZoomInfo ultimateParentId = 0)</span></div>
+      <div class="kv-row"><span class="kv-key">Website</span><span class="kv-val"><a href="https://viejas.com" target="_blank">viejas.com</a></span></div>
+      <div class="kv-row"><span class="kv-key">Workday Jobs</span><span class="kv-val">viejas.wd108.myworkdayjobs.com — Workday ATS confirmed active (ZoomInfo scoop: VP Facilities posted May 2026)</span></div>
+      <div class="kv-row"><span class="kv-key">SDA Client</span><span class="kv-val">No</span></div>
+      <div class="kv-row"><span class="kv-key">Tenure with Rival</span><span class="kv-val">~13 years (Tenure_Earliest_product__c = 4,738 days, ~Sep 2013)</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Competitive Position — Regional Casino Peers</div>
+    <table class="tbl">
+      <thead><tr><th>Property</th><th>Location</th><th>Revenue Est.</th><th>Key Differentiator</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Viejas Casino &amp; Resort</strong></td><td>Alpine, CA</td><td>~$532M</td><td>Outlet center + boutique hotel; strong loyalty program</td></tr>
+        <tr><td>Pechanga Resort Casino</td><td>Temecula, CA</td><td>~$1B+</td><td>Largest SoCal tribal casino; 1,090 rooms; entertainment venue</td></tr>
+        <tr><td>Sycuan Casino Resort</td><td>El Cajon, CA</td><td>~$300M</td><td>Direct San Diego county competitor; golf resort</td></tr>
+        <tr><td>Barona Resort &amp; Casino</td><td>Lakeside, CA</td><td>~$250M</td><td>San Diego county; known for table games</td></tr>
+        <tr><td>Harrah's Resort SoCal</td><td>Valley Center, CA</td><td>~$400M</td><td>Caesars brand affiliation; 500-room tower</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Market Dynamics</div>
+    <table class="tbl">
+      <thead><tr><th>Signal</th><th>What</th><th>HR Implication</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>2026-05</strong></td>
+          <td>Launched VIP Mobility (Global Payments Gaming Solutions) — first in SoCal</td>
+          <td>Tech innovation appetite is present; suggests IT-forward leadership. If HR is being left behind technologically, it may explain the ATS/Workflow migration.</td>
+        </tr>
+        <tr>
+          <td><strong>2026-04</strong></td>
+          <td>More open Sales roles than any time in past 12 months (ZoomInfo scoop)</td>
+          <td>Revenue expansion mode. High frontline hiring volume = continued demand for an efficient ATS and onboarding tool — but they're routing this through Workday now.</td>
+        </tr>
+        <tr>
+          <td><strong>2026-03</strong></td>
+          <td>More open Operations and Marketing roles than any time in past 12 months</td>
+          <td>Across-the-board hiring surge. Onboarding event volume should be RISING — but Rival shows only 1 event in last 30 days. Platform effectively disengaged.</td>
+        </tr>
+        <tr>
+          <td><strong>2026-01</strong></td>
+          <td>More open HR roles than any time in past 12 months</td>
+          <td>HR team itself is expanding. New HR hires may have influenced platform re-evaluation and vendor switch decisions.</td>
+        </tr>
+        <tr>
+          <td><strong>2025-10</strong></td>
+          <td>TopWorkplaces.com 2025 Professional Development Award (1,000–2,499 EE category)</td>
+          <td>HR culture is strong; they invest in employee development. Rival never positioned learning/perform tools — missed an opportunity.</td>
+        </tr>
+        <tr>
+          <td><strong>2025-03</strong></td>
+          <td>USA TODAY Top Workplaces 2025 (1,000–2,499 EE category)</td>
+          <td>Nationally recognized employer brand. Viejas is a visible, referenceable employer in tribal gaming — losing them has brand implications beyond ARR.</td>
+        </tr>
+        <tr>
+          <td><strong>2026</strong></td>
+          <td>Tribal gaming industry: record $43.9B revenue FY2024; staffing &amp; retention top challenge</td>
+          <td>Sector-wide: recruiting is hard, retention is the real issue. Tribal properties building from within. Technology plays a supporting role — but only when integrated into culture.</td>
+        </tr>
+        <tr>
+          <td><strong>2026</strong></td>
+          <td>Workday jobs portal active (viejas.wd108.myworkdayjobs.com) with open VP Facilities, Director Table Games, Director Housekeeping roles posted</td>
+          <td>Workday ATS is confirmed live. Rival Recruit has been displaced. The question is whether Workflow (Onboarding) was also replaced or is still in consideration.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- ================================================================ -->
+<!-- TAB 2: USE CASE -->
+<!-- ================================================================ -->
+<div class="tab-panel" id="tab-2">
+
+  <div class="section">
+    <div class="section-title">Use Case Summary</div>
+    <div class="text-sm">
+      Viejas Casino &amp; Resort has been a Rival customer for ~13 years, using Rival Recruit (ATS), Rival Workflow (Onboarding / "RedCarpet"), and a SilkRoad-Managed Integration. The core use case was managing a high-volume, frontline hospitality and gaming workforce — sourcing, screening, and onboarding new hires across casino floor, F&amp;B, hotel, retail, and security functions. E-Verify integration was a critical compliance component given their workforce scale. As of April 2026, Viejas has confirmed migration of their ATS and Workflow to a new vendor (likely Workday, per job portal evidence), with the Sep 1, 2026 contract expiry serving as the exit date.
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="section">
+      <div class="section-title-sm">Rival Recruit — ATS</div>
+      <div class="kv-row"><span class="kv-key">Use Case</span><span class="kv-val">High-volume frontline recruiting across gaming, hospitality, F&amp;B, security, retail</span></div>
+      <div class="kv-row"><span class="kv-key">ARR</span><span class="kv-val">$50,930</span></div>
+      <div class="kv-row"><span class="kv-key">Status</span><span class="kv-val"><span class="badge badge-red">MIGRATED AWAY</span> — Workday ATS confirmed live as of Mar 2026</span></div>
+      <div class="kv-row"><span class="kv-key">Evidence</span><span class="kv-val">Mar 26, 2026 case: Sophia Linde requested to "freeze job applications" — moving to new ATS "today"</span></div>
+    </div>
+    <div class="section">
+      <div class="section-title-sm">Rival Workflow — Onboarding</div>
+      <div class="kv-row"><span class="kv-key">Use Case</span><span class="kv-val">New hire onboarding, E-Verify I-9 compliance, employee lifecycle events</span></div>
+      <div class="kv-row"><span class="kv-key">ARR</span><span class="kv-val">$23,623</span></div>
+      <div class="kv-row"><span class="kv-key">Status</span><span class="kv-val"><span class="badge badge-amber">UNCLEAR</span> — May still be in use; E-Verify cases active through May 2026</span></div>
+      <div class="kv-row"><span class="kv-key">Evidence</span><span class="kv-val">756 onboarding events (12mo), but only 1 event last 30 days — rapid wind-down in progress</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Switching Cost Assessment</div>
+    <table class="tbl">
+      <thead><tr><th>Factor</th><th>Assessment</th><th>Implication</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Data Portability</strong></td><td>Active data extraction in progress (Crystal Randall coordinating)</td><td>Low friction exit — Rival is supporting clean data handoff</td></tr>
+        <tr><td><strong>Integration Complexity</strong></td><td>SilkRoad-Managed Integration active; E-Verify via SFTP</td><td>Workday has native E-Verify integration — switching cost was minimal</td></tr>
+        <tr><td><strong>User Training</strong></td><td>13-year tenure = deeply familiar with Rival UI</td><td>Re-training cost absorbed; decision was made anyway</td></tr>
+        <tr><td><strong>Compliance Risk</strong></td><td>E-Verify workflow in transition during high-hiring period</td><td>Risky timing — if Workday's E-Verify integration has gaps, re-engagement opportunity exists</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Expansion Vectors (Missed / Future Re-engage)</div>
+    <table class="tbl">
+      <thead><tr><th>Product</th><th>Observed Pain Signal</th><th>Entry Point</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Rival Learn</strong></td>
+          <td>TopWorkplaces 2025 Professional Development award — culture of learning investment</td>
+          <td>Re-engage at 12 months post-departure: "How is Workday serving your L&amp;D needs? We now have Rival Learn."</td>
+        </tr>
+        <tr>
+          <td><strong>Rival Perform</strong></td>
+          <td>Tribal gaming HR roundtable themes: leadership development gaps, manager communication coaching, engagement declining</td>
+          <td>Performance management is a tribal gaming pain point — Workday Perform is often underutilized vs. standalone solutions</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- ================================================================ -->
+<!-- TAB 3: PEOPLE -->
+<!-- ================================================================ -->
+<div class="tab-panel" id="tab-3">
+
+  <div class="section">
+    <div class="section-title">Key Stakeholders — Viejas</div>
+    <div class="people-grid">
+
+      <div class="person-card">
+        <div class="person-header">
+          <div class="person-avatar" style="background:#7c3aed">FH</div>
+          <div>
+            <div class="person-name">Freddie Harmon</div>
+            <div class="person-title">Vice President, Human Resources</div>
+            <div class="text-muted mt-8">(619) 659-1915 &nbsp;·&nbsp; fharmon@viejas.com</div>
+          </div>
+        </div>
+        <div class="person-intel">
+          <span class="badge badge-red" style="font-size:10px">Decision Maker</span>
+          &nbsp;<span class="badge badge-amber" style="font-size:10px">Executive Target</span>
+          <br><br>VP of HR — the likely decision-maker on vendor selection. Confirmed by ZoomInfo (accuracy 98%, validated Feb 2026). Has not appeared in any Rival support cases or Chorus calls — never engaged at executive level. This is the person to call for a save attempt.
+        </div>
+      </div>
+
+      <div class="person-card">
+        <div class="person-header">
+          <div class="person-avatar" style="background:#0ea5e9">SL</div>
+          <div>
+            <div class="person-name">Sophia Linde</div>
+            <div class="person-title">HR Information System Analyst</div>
+            <div class="text-muted mt-8">slinde@viejas.com</div>
+          </div>
+        </div>
+        <div class="person-intel">
+          <span class="badge badge-blue" style="font-size:10px">Primary Contact</span>
+          &nbsp;<span class="badge badge-red" style="font-size:10px">Led Migration</span>
+          <br><br>Chorus Apr 29 call participant. Sent the email initiating cancellation ("Do you have openings for a meeting on Apr 29?"). Managed the HRIS/ATS migration to Workday. Key contact for data extraction. Departure confirmed in Bernard's "sorry to see you go" email (CC'd Andrew Rodriguez + Amy Laughner).
+        </div>
+      </div>
+
+      <div class="person-card">
+        <div class="person-header">
+          <div class="person-avatar" style="background:#16a34a">AL</div>
+          <div>
+            <div class="person-name">Amy Laughner</div>
+            <div class="person-title">Talent Acquisition Manager</div>
+            <div class="text-muted mt-8">+1.619.569.5400 &nbsp;·&nbsp; alaughner@viejas.com</div>
+          </div>
+        </div>
+        <div class="person-intel">
+          <span class="badge badge-blue" style="font-size:10px">Primary Contact</span>
+          <br><br>Talent Acquisition lead. Main recipient on E-Verify status reports and Rival support cases. Participated in Apr 29 cancellation call. Copied on departure confirmation email. Manages the recruiting team (Jessica Gerber, Sheila Harris, Liz Hernandez).
+        </div>
+      </div>
+
+      <div class="person-card">
+        <div class="person-header">
+          <div class="person-avatar" style="background:#d97706">AR</div>
+          <div>
+            <div class="person-name">Andrew Rodriguez</div>
+            <div class="person-title">Manager of Total Rewards / HRIS Manager</div>
+            <div class="text-muted mt-8">(619) 659-2521 &nbsp;·&nbsp; arodriguez@viejas.com</div>
+          </div>
+        </div>
+        <div class="person-intel">
+          <span class="badge badge-blue" style="font-size:10px">HRIS Champion</span>
+          <br><br>Manages Total Rewards and HRIS. Copied on departure confirmation. Likely influenced or approved the Workday decision given HRIS ownership. Direct line to technical requirements. Mobile number not on file.
+        </div>
+      </div>
+
+      <div class="person-card">
+        <div class="person-header">
+          <div class="person-avatar" style="background:#475569">FT</div>
+          <div>
+            <div class="person-name">Frank Thompson</div>
+            <div class="person-title">Manager, Compensation Benefits &amp; HRIS</div>
+            <div class="text-muted mt-8">(619) 659-1943 &nbsp;·&nbsp; fthompson@viejas.com</div>
+          </div>
+        </div>
+        <div class="person-intel">
+          <span class="badge badge-gray" style="font-size:10px">HRIS Team</span>
+          <br><br>Compensation, Benefits, and HRIS Manager. Most recently modified contact in SFDC (Jun 5, 2026). Potentially the new HRIS point of contact now that Sophia Linde is managing the migration.
+        </div>
+      </div>
+
+      <div class="person-card">
+        <div class="person-header">
+          <div class="person-avatar" style="background:#dc2626">JB</div>
+          <div>
+            <div class="person-name">Joshua Benitez</div>
+            <div class="person-title">Unknown Title</div>
+            <div class="text-muted mt-8">jbenitez@viejas.com</div>
+          </div>
+        </div>
+        <div class="person-intel">
+          <span class="badge badge-gray" style="font-size:10px">Onboarding Admin</span>
+          <br><br>Filed multiple E-Verify and Onboarding support cases (Feb–Mar 2026). Identified as an Onboarding admin ("RedCarpet administrator") in support tickets. Operational user of the platform — still actively using Onboarding as of Mar 2026.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Rival Team</div>
+    <table class="tbl">
+      <thead><tr><th>Name</th><th>Role</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Andrew Pollard</strong></td><td>CSM (Owner)</td><td>Renewal opp owner. Account owner in SFDC.</td></tr>
+        <tr><td><strong>Bernard Jackson</strong></td><td>Senior CSM</td><td>Engaged Apr 14, 2026 as new CSM; discovered migration already completed; led Apr 29 cancellation call.</td></tr>
+        <tr><td><strong>Crystal Randall</strong></td><td>Program / Data Extraction</td><td>Coordinating data extraction per May 8 email thread.</td></tr>
+        <tr><td><strong>Rica Lopez</strong></td><td>Technical Support Specialist</td><td>Primary case handler for E-Verify status reports.</td></tr>
+        <tr><td><strong>Michael de los Reyes</strong></td><td>Participant (Chorus)</td><td>Attended Apr 29 call per Chorus transcript metadata.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">ZoomInfo Executive Targets (for re-engagement)</div>
+    <table class="tbl">
+      <thead><tr><th>Name</th><th>Title</th><th>Confidence</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Freddie Harmon</strong></td>
+          <td>Vice President, Human Resources</td>
+          <td><span class="badge badge-green">98/100</span> Validated Feb 2026</td>
+          <td>Executive save call. Do not route through Sophia/Amy.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="text-muted mt-8">Note: Only 1 HR director-level contact returned by ZoomInfo search. Viejas HR org is lean (50 HR staff per ZoomInfo dept data). Freddie Harmon is the top of the HR pyramid.</div>
+  </div>
+
+</div>
+
+<!-- ================================================================ -->
+<!-- TAB 4: CONTRACTS -->
+<!-- ================================================================ -->
+<div class="tab-panel" id="tab-4">
+
+  <div class="section">
+    <div class="section-title">Active Opportunity</div>
+    <div class="opp-card" style="border-color:#fca5a5;background:#fff5f5">
+      <div class="opp-name">
+        <a href="https://silkroadtech.my.salesforce.com/006Vs00000SZ1dpIAD" target="_blank">Viejas Casino &amp; Resort — Recruiting_Onboarding_Integration Renewal Opportunity</a>
+      </div>
+      <div class="opp-meta">
+        <span class="tag tag-renewal">Renewal</span>
+        <span class="stage-badge">Stage 5: Renewal Solutioning</span>
+        <span class="badge badge-red">40% Probability</span>
+      </div>
+      <div class="kv-row"><span class="kv-key">Amount</span><span class="kv-val">$77,330.19</span></div>
+      <div class="kv-row"><span class="kv-key">Potential Renewal ARR</span><span class="kv-val">$77,334.85</span></div>
+      <div class="kv-row"><span class="kv-key">Close Date</span><span class="kv-val kpi-red">Aug 31, 2026 (contract expires Sep 1, 2026)</span></div>
+      <div class="kv-row"><span class="kv-key">Owner</span><span class="kv-val">Andrew Pollard</span></div>
+      <div class="kv-row"><span class="kv-key">Created</span><span class="kv-val">Jan 14, 2026</span></div>
+      <div class="kv-row"><span class="kv-key">Next Step</span><span class="kv-val kpi-red">"Crystal working with client on data extraction"</span></div>
+      <div class="kv-row"><span class="kv-key">CSM Renewal Strategy</span><span class="kv-val">None (CSM_Renewal_Strategy__c = null)</span></div>
+      <div style="background:#fee2e2;border-radius:6px;padding:8px 12px;margin-top:10px;font-size:12px;color:#991b1b">
+        ⚠ This opportunity reflects a wind-down, not a renewal. Client has confirmed departure. Stage 5 probability (40%) does not reflect actual likelihood of renewal — should be updated to reflect churn scenario.
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Contract History</div>
+    <table class="tbl">
+      <thead><tr><th>Contract #</th><th>Status</th><th>Start Date</th><th>End Date</th><th>Term (mo)</th></tr></thead>
+      <tbody>
+        <tr><td>00017797</td><td><span class="status-closed">Expired</span></td><td>Jul 31, 2023</td><td>Aug 31, 2024</td><td>12</td></tr>
+        <tr><td>00017504</td><td><span class="status-closed">Expired</span></td><td>Apr 1, 2023</td><td>Aug 31, 2023</td><td>12</td></tr>
+        <tr><td>00016712</td><td><span class="status-closed">Expired</span></td><td>Sep 1, 2022</td><td>Aug 31, 2023</td><td>12</td></tr>
+        <tr><td>00015016</td><td><span class="status-closed">Expired</span></td><td>Sep 1, 2020</td><td>Aug 31, 2022</td><td>12</td></tr>
+        <tr><td>00013890</td><td><span class="status-closed">Expired</span></td><td>Sep 1, 2019</td><td>Aug 31, 2020</td><td>12</td></tr>
+        <tr><td>00012344</td><td><span class="status-closed">Expired</span></td><td>Sep 1, 2018</td><td>Aug 31, 2019</td><td>12</td></tr>
+        <tr><td>00008557</td><td><span class="status-closed">Expired</span></td><td>Sep 1, 2016</td><td>Aug 31, 2018</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <div class="text-muted mt-8">Note: 0 active contracts currently in SFDC. All 10 contracts returned by query show Expired status. Current subscription runs to Sep 1, 2026 per renewal opportunity — no active contract record found (may be gap in SFDC data). Number_of_Active_Contracts__c = 2 per Account record — Verify: contracts may exist under a different SFDC object or filter.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Historical Opportunity Summary</div>
+    <table class="tbl">
+      <thead><tr><th>Name</th><th>Stage</th><th>Amount</th><th>Close Date</th><th>Type</th></tr></thead>
+      <tbody>
+        <tr><td>Renewal Opp (current)</td><td><span class="stage-badge">5. Renewal Solutioning</span></td><td>$77,330</td><td>Aug 31, 2026</td><td>Renewal</td></tr>
+        <tr><td>Viejas additional event/licenses</td><td><span class="badge badge-green">Closed Won</span></td><td>$5,512</td><td>May 31, 2024</td><td>Add On</td></tr>
+        <tr><td>Recruiting_OB_Integration Renewal</td><td><span class="badge badge-green">Closed Won</span></td><td>$149,157</td><td>May 31, 2024</td><td>Renewal</td></tr>
+        <tr><td>Integrations;OB;Recruiting (2023)</td><td><span class="badge badge-green">Closed Won</span></td><td>$74,579</td><td>Aug 7, 2023</td><td>Renewal</td></tr>
+      </tbody>
+    </table>
+    <div class="text-muted mt-8">Historical renewals show consistent Sep renewal cycle since ~2016. Last successful renewal (May 2024): $149,157 — 2x current ARR suggests prior year included a buy-forward or expanded scope.</div>
+  </div>
+
+</div>
+
+<!-- ================================================================ -->
+<!-- TAB 5: PRODUCT -->
+<!-- ================================================================ -->
+<div class="tab-panel" id="tab-5">
+
+  <div class="section">
+    <div class="section-title">Active Projects &amp; Implementation Status</div>
+    <div class="proj-card" style="background:#fff5f5;border-color:#fca5a5">
+      <div class="proj-title" style="color:#991b1b">⚠ Wind-Down in Progress — Not Active Implementation</div>
+      <div class="proj-desc">As of May 2026, the active "project" is data extraction coordination. Crystal Randall is managing the data repository call and extraction process. Rival Recruit (ATS) was frozen Mar 26, 2026 when Sophia Linde requested to stop job applications — Viejas had moved to Workday ATS that day. Rival Workflow (Onboarding) appears to still be processing E-Verify events through May 2026, but with only 1 event in the last 30 days, usage has nearly stopped.</div>
+    </div>
+    <div class="proj-card">
+      <div class="proj-title">E-Verify Compliance — Still Active</div>
+      <div class="proj-desc">E-Verify "Status Change Reports" are still being delivered to Amy Laughner and Liz Hernandez via SFTP (cases in Apr &amp; May 2026). This is the last active touchpoint. If Workday's E-Verify integration is not yet fully configured, this creates a potential re-entry point — but likely temporary.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Product Portfolio — Current vs. Departed</div>
+    <table class="tbl">
+      <thead><tr><th>Product</th><th>ARR</th><th>Status</th><th>Products Field</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Rival Recruit</strong></td><td>$50,930</td><td><span class="badge badge-red">Migrated to Workday</span></td><td>Active_Products2__c, SilkRoad_Products__c</td></tr>
+        <tr><td><strong>Rival Workflow (Onboarding)</strong></td><td>$23,623</td><td><span class="badge badge-amber">Wind-down (E-Verify active)</span></td><td>Active_Products2__c, SilkRoad_Products__c</td></tr>
+        <tr><td><strong>SilkRoad-Managed Integration</strong></td><td>$2,782</td><td><span class="badge badge-amber">Active through Sep 1</span></td><td>SilkRoad_Products__c</td></tr>
+        <tr><td>Rival Perform</td><td>$0</td><td><span class="badge badge-gray">Not purchased</span></td><td>Subscription_ARR_Performance__c = $0</td></tr>
+        <tr><td>Rival Learn</td><td>$0</td><td><span class="badge badge-gray">Not purchased</span></td><td>Subscription_ARR_Learning__c = $0</td></tr>
+      </tbody>
+    </table>
+    <div class="text-muted mt-8">Expired_Products__c = "Recruiting, Onboarding, Integrations" — these show as expired in SFDC, consistent with departure status.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Product Roadmap — What's New Since They Left</div>
+    <div class="text-sm" style="margin-bottom:12px;color:#6b7280;">For reference and re-engagement context. Viejas left before these features shipped.</div>
+
+    <div class="section-title-sm" style="margin-top:4px">Rival Recruit — Recent Releases (what they're missing)</div>
+
+    <div class="roadmap-card roadmap-t1">
+      <span class="roadmap-badge badge-shipped">SHIPPED 2026.9</span>
+      <div class="roadmap-title">AI-Powered Candidate Outreach (ROSI) — 10x Faster Sourcing</div>
+      <div class="roadmap-desc">ROSI sourcing now returns results in 10–17 seconds (vs. 40–60+ second timeouts). AI outreach analytics, automated email on candidate import/upload, and PII anonymization for GDPR compliance.</div>
+      <div class="roadmap-pain">Pain Relevance: Viejas is a high-volume frontline employer — faster sourcing directly addresses their staffing challenge. If Workday's sourcing speed is a pain point, this is a differentiator.</div>
+    </div>
+
+    <div class="roadmap-card roadmap-t1">
+      <span class="roadmap-badge badge-coming">COMING SOON</span>
+      <div class="roadmap-title">Sequential Interviewing</div>
+      <div class="roadmap-desc">Back-to-back interviews with multiple interviewers in defined order — including time blocks, breaks, and sequencing controls.</div>
+      <div class="roadmap-pain">Pain Relevance: Multi-department hiring (gaming + hospitality + food service) often requires sequential interview panels — casino operations, HR, and department heads all involved.</div>
+    </div>
+
+    <div class="roadmap-card roadmap-t2">
+      <span class="roadmap-badge badge-shipped">SHIPPED 2026.10</span> <strong>Recycle Bin Auto-Purge</strong> — Automated data retention / GDPR compliance without manual intervention.
+    </div>
+    <div class="roadmap-card roadmap-t2">
+      <span class="roadmap-badge badge-shipped">SHIPPED 2026.5</span> <strong>Veteran Hiring Filter</strong> — Native American preference hiring + veteran hiring in Candidate Pool. Directly relevant to tribal employer.
+    </div>
+    <div class="roadmap-card roadmap-t2">
+      <span class="roadmap-badge badge-shipped">SHIPPED 2026.4</span> <strong>SMS Opt-In for Candidates</strong> — Text notifications for high-volume frontline applicants.
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-title-sm">Rival Workflow — Recent Releases</div>
+
+    <div class="roadmap-card roadmap-t1">
+      <span class="roadmap-badge badge-shipped">SHIPPED 2026.1.04</span>
+      <div class="roadmap-title">ROSI Employee Agent — AI-Powered Onboarding Assistant</div>
+      <div class="roadmap-desc">Natural language AI agent that helps new hires complete onboarding tasks: "What's next?", "What documents do I need?", "When is this due?" Respects role-based permissions. Controllable rollout.</div>
+      <div class="roadmap-pain">Pain Relevance: For a 2,000-person hospitality operation with high turnover, an AI agent that guides new hires through onboarding reduces HR team burden — directly addresses the tribal gaming "HR capacity challenge" theme from industry roundtables.</div>
+    </div>
+
+    <div class="roadmap-card roadmap-t1">
+      <span class="roadmap-badge badge-shipped">SHIPPED 2026.2.09</span>
+      <div class="roadmap-title">Bulk Action for Forms Review &amp; Approval</div>
+      <div class="roadmap-desc">Review and approve multiple onboarding forms from a single dashboard — centralized, team-assigned, with PDF signature support. Addresses scalability for high-volume onboarding teams.</div>
+      <div class="roadmap-pain">Pain Relevance: Amy Laughner's team manages a large volume of frontline hires — bulk approval eliminates repetitive one-at-a-time form signing that creates HR bottlenecks.</div>
+    </div>
+
+    <div class="roadmap-card roadmap-t2">
+      <span class="roadmap-badge badge-shipped">SHIPPED 2026.2.09</span> <strong>Redesigned Task Management</strong> — Single-page task configuration interface with clearer assignment controls.
+    </div>
+    <div class="roadmap-card roadmap-t2">
+      <span class="roadmap-badge badge-shipped">SHIPPED 2026.1.06</span> <strong>Dashboard Completion Dates</strong> — Dashboard now shows when tasks were completed, improving accountability visibility.
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ================================================================ -->
+<!-- TAB 6: USAGE -->
+<!-- ================================================================ -->
+<div class="tab-panel" id="tab-6">
+
+  <div class="section">
+    <div class="section-title">LifeSuite Telemetry — Onboarding Platform</div>
+    <div class="grid-4">
+      <div class="usage-kpi">
+        <div class="usage-val kpi-amber">756</div>
+        <div class="usage-lbl">Events Launched (12mo)</div>
+      </div>
+      <div class="usage-kpi">
+        <div class="usage-val kpi-red">1</div>
+        <div class="usage-lbl">Events Last 30 Days</div>
+      </div>
+      <div class="usage-kpi">
+        <div class="usage-val kpi-amber">190</div>
+        <div class="usage-lbl">Events YTD (2026)</div>
+      </div>
+      <div class="usage-kpi">
+        <div class="usage-val kpi-red">1-2</div>
+        <div class="usage-lbl">Unique Logins/Day</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Utilization Analysis</div>
+    <div class="kv-row"><span class="kv-key">Events per Employee (12mo)</span><span class="kv-val">756 ÷ 1,962 = <strong>0.39 events/EE</strong> — Moderate utilization</span></div>
+    <div class="kv-row"><span class="kv-key">Recent Trend</span><span class="kv-val kpi-red">⬇ Sharp decline — 190 YTD through Jun 8 vs. 756 trailing 12mo implies ~56% MoM decline in run rate</span></div>
+    <div class="kv-row"><span class="kv-key">Login Pattern</span><span class="kv-val">1–2 unique logins/day in Jun 2026 (vs. likely higher earlier in year). Consistent with minimal maintenance-mode usage</span></div>
+    <div class="kv-row"><span class="kv-key">Unique_User_Logins_L30D</span><span class="kv-val">0 — <strong>No logins in the last 30 days</strong> per L30D field (confirmed multiple records showing 0.0)</span></div>
+    <div class="kv-row"><span class="kv-key">Breakdown (New Hire / Offboarding / Transfer)</span><span class="kv-val">All null — granular event type fields not populated for this account</span></div>
+    <div class="kv-row"><span class="kv-key">LSCode</span><span class="kv-val">Viejas (confirmed)</span></div>
+    <div class="divider"></div>
+    <div class="text-sm" style="color:#b91c1c"><strong>Key finding:</strong> The data is unambiguous. Unique_User_Logins_L30D = 0 across all recent records. Events have dropped from meaningful volumes earlier in the year to essentially zero. This is not seasonal — it is the direct result of the Workday migration. The platform is in terminal wind-down mode.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Instance Details</div>
+    <div class="kv-row"><span class="kv-key">Customer Name</span><span class="kv-val">Viejas Casino &amp; Resort (LSCode: Viejas)</span></div>
+    <div class="kv-row"><span class="kv-key">Usage Region</span><span class="kv-val">United States (Usage_Region_A__c — single region)</span></div>
+    <div class="kv-row"><span class="kv-key">Specific Countries</span><span class="kv-val">United States only (Specific_Countries_of_Usage_A__c)</span></div>
+    <div class="kv-row"><span class="kv-key">Active Users (Onboard)</span><span class="kv-val">Null (field not populated)</span></div>
+    <div class="kv-row"><span class="kv-key">Global Onboarding Score</span><span class="kv-val kpi-green">99 (excellent configuration completeness)</span></div>
+    <div class="kv-row"><span class="kv-key">Last Site Review</span><span class="kv-val">Jan 8, 2026 (151 days ago)</span></div>
+    <div class="kv-row"><span class="kv-key">Site Review Overdue</span><span class="kv-val">No (per SFDC field) — but moot given cancellation</span></div>
+    <div class="kv-row"><span class="kv-key">Last Onsite F2F</span><span class="kv-val">Never recorded (Last_Onsite_F2F_Date__c = null)</span></div>
+  </div>
+
+</div>
+
+<!-- ================================================================ -->
+<!-- TAB 7: CASES -->
+<!-- ================================================================ -->
+<div class="tab-panel" id="tab-7">
+
+  <div class="section">
+    <div class="section-title">Cases (Last 12 Months) — 39 Total</div>
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Case #</th>
+          <th>Subject</th>
+          <th>Status</th>
+          <th>Priority</th>
+          <th>Created</th>
+          <th>Closed</th>
+          <th>Owner</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a href="https://silkroadtech.my.salesforce.com/500Vs00001C6NNaIAN" target="_blank">00997649</a></td>
+          <td>E-Verify Status Change Report Available</td>
+          <td><span class="status-closed">Closed</span></td>
+          <td><span class="priority-high">High</span></td>
+          <td>May 22, 2026</td>
+          <td>May 25, 2026</td>
+          <td>Rica Lopez</td>
+        </tr>
+        <tr>
+          <td><a href="https://silkroadtech.my.salesforce.com/500Vs000015fsp9IAA" target="_blank">00996216</a></td>
+          <td>E-Verify Status Change Report Available</td>
+          <td><span class="status-closed">Closed</span></td>
+          <td><span class="priority-high">High</span></td>
+          <td>Apr 7, 2026</td>
+          <td>Apr 8, 2026</td>
+          <td>Rica Lopez</td>
+        </tr>
+        <tr>
+          <td><a href="https://silkroadtech.my.salesforce.com/500Vs000013vVuiIAE" target="_blank">00995894</a></td>
+          <td>OH – Request to Deactivate Site Link</td>
+          <td><span class="status-closed">Closed</span></td>
+          <td><span class="priority-high">High</span></td>
+          <td>Mar 25, 2026</td>
+          <td>Apr 6, 2026</td>
+          <td>Rica Lopez</td>
+        </tr>
+        <tr>
+          <td>00995889</td>
+          <td>Job applications via your ATS system (freeze request)</td>
+          <td><span class="status-closed">Closed</span></td>
+          <td><span class="priority-high">High</span></td>
+          <td>Mar 26, 2026</td>
+          <td>—</td>
+          <td>RAndrew Saavedra</td>
+        </tr>
+        <tr>
+          <td>00995839</td>
+          <td>RC – Unresolved E-verify</td>
+          <td><span class="status-closed">Closed</span></td>
+          <td><span class="priority-high">High</span></td>
+          <td>Mar 24, 2026</td>
+          <td>—</td>
+          <td>Hazel Laude</td>
+        </tr>
+        <tr>
+          <td>00995385</td>
+          <td>Help with Deleting run e-verify task</td>
+          <td><span class="status-closed">Closed</span></td>
+          <td>Normal</td>
+          <td>Mar 9, 2026</td>
+          <td>—</td>
+          <td>Edward Oropeza</td>
+        </tr>
+        <tr>
+          <td>00993429</td>
+          <td>RC – Unable to retire RC Profiles</td>
+          <td><span class="status-closed">Closed</span></td>
+          <td>Normal</td>
+          <td>Jan 2026</td>
+          <td>Feb 5, 2026</td>
+          <td>Hazel Laude</td>
+        </tr>
+        <tr>
+          <td>00994514</td>
+          <td>E-Verify Status Change Report Available</td>
+          <td><span class="status-closed">Closed</span></td>
+          <td><span class="priority-high">High</span></td>
+          <td>Feb 6, 2026</td>
+          <td>—</td>
+          <td>Rica Lopez</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="text-muted mt-8">39 cases in 12 months. Showing top 8. Dominant case themes: E-Verify status reports (recurring, monthly), RC profile management issues, ATS freeze request (migration marker). All recent cases are Closed. No open cases as of Jun 8, 2026.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Case Pattern Analysis</div>
+    <div class="kv-row"><span class="kv-key">Total Cases (12mo)</span><span class="kv-val">39</span></div>
+    <div class="kv-row"><span class="kv-key">Open Cases</span><span class="kv-val kpi-green">0</span></div>
+    <div class="kv-row"><span class="kv-key">Most Common Type</span><span class="kv-val">E-Verify Status Change Reports (recurring monthly automation)</span></div>
+    <div class="kv-row"><span class="kv-key">Migration Marker Case</span><span class="kv-val">00995889 (Mar 26, 2026) — "freeze job applications, moving to new ATS today"</span></div>
+    <div class="kv-row"><span class="kv-key">Key Support Owner</span><span class="kv-val">Rica Lopez (E-Verify), Hazel Laude (RC Onboarding), Edward Oropeza (RC Onboarding)</span></div>
+    <div class="kv-row"><span class="kv-key">Avg Resolution Time</span><span class="kv-val">E-Verify cases: ~1–3 days. RC issues: 7–14 days</span></div>
+    <div class="kv-row"><span class="kv-key">CSAT Score</span><span class="kv-val">Not available (Average_Support_CSAT_Score__c = null)</span></div>
+    <div class="divider"></div>
+    <div class="text-sm"><strong>Notable:</strong> The Mar 2026 cluster of cases (E-Verify issues, RC retire problems, ATS freeze) coincides precisely with the Workday migration. This suggests the migration was not smooth — there were operational issues during cutover. Whether these issues influenced the departure decision or were merely a symptom of it is unclear.</div>
+  </div>
+
+</div>
+
+<!-- ================================================================ -->
+<!-- TAB 8: RISK -->
+<!-- ================================================================ -->
+<div class="tab-panel" id="tab-8">
+
+  <div class="alert-banner alert-red">
+    <div class="alert-icon">🚨</div>
+    <div class="alert-body">
+      <h4>Overall Risk: CRITICAL — Confirmed Churn</h4>
+      <p>This is not a risk assessment in the traditional sense — the churn is confirmed. The risk framework below evaluates: (1) whether a save is possible, (2) what the full ARR exposure is, and (3) how to protect brand and re-engagement potential.</p>
+    </div>
+  </div>
+
+  <div class="risk-card risk-red">
+    <div class="risk-title">🔴 Confirmed Vendor Displacement — Workday ATS</div>
+    <div class="risk-body">
+      <strong>What:</strong> Viejas migrated their ATS and Workflow to a new vendor (confirmed: Workday, per viejas.wd108.myworkdayjobs.com job portal active with live postings). The migration was executed in March 2026 while no Rival CSM was actively engaged (Bernard was assigned Apr 14 — after the migration). Sophia Linde requested to "freeze job applications" on Mar 26, 2026, explicitly stating "moving to new ATS today."
+      <br><br><strong>Evidence:</strong> (1) SFDC case 00995889 — ATS freeze request Mar 26, 2026. (2) Bernard's Apr 14 email: "My understanding is that you have moved your Workflow and Recruit operations to another vendor. Is this correct?" (3) Apr 29 Chorus call: confirmed departure, discussed data extraction. (4) May 8 email: "While we're sorry to see you go..." (5) Workday jobs portal confirmed live with open positions.
+    </div>
+    <div class="risk-fix">What would move to green: An executive-level engagement with Freddie Harmon (VP HR) — not yet attempted — that surfaces whether the decision is reversible or if a partial retention (Onboarding standalone) is viable. Probability is low but the attempt has not been made.</div>
+  </div>
+
+  <div class="risk-card risk-red">
+    <div class="risk-title">🔴 Full ARR at Risk — $77,335 Expires Sep 1, 2026</div>
+    <div class="risk-body">
+      <strong>What:</strong> The entire ARR stack (Recruit $50,930 + Onboarding $23,623 + Integration $2,782) is at risk of cancellation on Sep 1, 2026. The opportunity is at Stage 5 with a 40% probability — this probability is stale and does not reflect the confirmed churn status. It should be updated to 0% unless a save scenario emerges.
+      <br><br><strong>Evidence:</strong> Opp NextStep = "Crystal working with client on data extraction" — this is exit logistics, not renewal negotiation.
+    </div>
+    <div class="risk-fix">What would move to green: Executive save or partial retention of Onboarding/Integration ($26,405 ARR) confirmed before Aug 1, 2026. Update opp probability to reflect reality (move to "Closed Lost" if no save viable).</div>
+  </div>
+
+  <div class="risk-card risk-red">
+    <div class="risk-title">🔴 Silent Churn — No Retention Attempt Was Made</div>
+    <div class="risk-body">
+      <strong>What:</strong> The account was in terminal decline before anyone at Rival noticed. CSM_Renewal_Strategy__c = null — no strategy was ever documented. Count_of_Active_At_Risk_Alerts__c = 0 — the at-risk system failed to flag this account. Bernard was assigned as NEW CSM on Apr 14, 2026 — after the migration was already complete. There is no record of a prior CSM taking action to prevent the departure.
+      <br><br><strong>Evidence:</strong> No strategic activities in Chorus or SFDC tasks prior to Bernard's Apr 14 outreach. The last "non-case" interaction before Apr 14 was the Jan 8, 2026 Site Review — 96 days before Bernard's first contact.
+    </div>
+    <div class="risk-fix">What would move to green: (1) Root cause post-mortem documented in SFDC. (2) Re-engagement timeline set (12 months post-exit). (3) Account flagged in competitive intelligence database. (4) CSM coverage gap closed — Tier 3 accounts need at minimum quarterly touchpoints.</div>
+  </div>
+
+  <div class="risk-card risk-amber">
+    <div class="risk-title">🟡 Usage Has Flatlined — Platform in Terminal State</div>
+    <div class="risk-body">
+      <strong>What:</strong> Unique_User_Logins_L30D = 0 across all recent telemetry records. Events last 30 days = 1. YTD events = 190 through Jun 8 — vs. 756 events in trailing 12 months — implying the platform has nearly stopped being used since the Workday migration in March. The Onboarding Score of 99 reflects prior configuration quality, not current usage.
+      <br><br><strong>Evidence:</strong> LifeSuite telemetry Jun 2026: Date__c = 2026-06-08, Total_Events_Launched_Last_30Ds_Onboard__c = 1.0, Unique_User_Logins_L30D_Onboard__c = 0.0. Consistent across last 30 records.
+    </div>
+    <div class="risk-fix">No action to take — this is a symptom of the confirmed departure, not a standalone risk. Monitor to confirm if any Onboarding events resume (unlikely).</div>
+  </div>
+
+  <div class="risk-card risk-amber">
+    <div class="risk-title">🟡 NPS Score = 0 — Detractor Territory</div>
+    <div class="risk-body">
+      <strong>What:</strong> Average_NPS_Score_SFDC__c = 0.0. Last NPS sent Apr 21, 2026 — after the departure was confirmed. A score of 0 = Detractor (NPS scale: 0–6 = detractor). This means Viejas is not a passive departure — they are actively dissatisfied. Detractor accounts share negative experiences in their networks.
+      <br><br><strong>Evidence:</strong> Average_NPS_Score_SFDC__c = 0.0, Last_NPS_Sent__c = Apr 21, 2026. NPS was sent AFTER they had already told Rival they were leaving — the score reflects their current sentiment accurately.
+    </div>
+    <div class="risk-fix">What would move to green: A recovery conversation with Freddie Harmon acknowledging service failures and understanding what went wrong. Exit on good terms with a commitment to demonstrate improvement before re-engagement.</div>
+  </div>
+
+  <div class="risk-card risk-green">
+    <div class="risk-title">🟢 No Competitive Threat to OTHER Accounts — Workday Risk Assessment</div>
+    <div class="risk-body">
+      <strong>What:</strong> Per Workday risk framework: Viejas' Workday adoption is NEW (migrated Mar 2026). This is a displacement event, not an existing coexistence relationship. However, this is contained to Viejas — there is no parent company or managed-services relationship that would propagate the Workday displacement to other Rival accounts. Viejas is a standalone tribal enterprise.
+    </div>
+    <div class="risk-fix">No action needed. Monitor for competitive pattern across tribal gaming / hospitality segment — if Workday is winning in this vertical, flag similar at-risk accounts for proactive engagement.</div>
+  </div>
+
+  <div class="risk-card risk-green">
+    <div class="risk-title">🟢 Re-engagement Potential in 12–18 Months</div>
+    <div class="risk-body">
+      <strong>What:</strong> Viejas won TopWorkplaces 2025 Professional Development award — they invest in HR/people technology. Their hiring is growing (Sales, Operations, Marketing, HR all at 12-month highs per ZoomInfo). Tribal gaming sector faces ongoing staffing/retention challenges that Rival's AI roadmap (ROSI Agent, Sequential Interviewing, Bulk Approvals) directly addresses. Workday's native onboarding is typically weaker than standalone tools for complex, multi-workflow environments.
+      <br><br><strong>Evidence:</strong> ZoomInfo scoops Jan–Apr 2026 show consistent hiring growth. Tribal gaming HR roundtable Mar 2026 themes (retention, leadership development, capacity) align with Rival Workflow + Learn + Perform capabilities.
+    </div>
+    <div class="risk-fix">Set calendar reminder for Sep 2027 (12 months post-exit). Contact Freddie Harmon — not Sophia/Amy. Lead with AI roadmap demo and tribal gaming success stories.</div>
+  </div>
+
+</div>
+
+<!-- ================================================================ -->
+<!-- SCRIPT -->
+<!-- ================================================================ -->
+<script>
+function switchTab(n) {
+  var panels = document.querySelectorAll('.tab-panel');
+  var btns = document.querySelectorAll('.tab-btn');
+  for (var i = 0; i < panels.length; i++) {
+    panels[i].classList.remove('active');
+  }
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].classList.remove('active');
+  }
+  var panel = document.getElementById('tab-' + n);
+  if (panel) { panel.classList.add('active'); }
+  for (var i = 0; i < btns.length; i++) {
+    if (btns[i].getAttribute('onclick') === 'switchTab(' + n + ')') {
+      btns[i].classList.add('active');
+      break;
+    }
+  }
+}
+</script>
+
+<!-- DATA SOURCE FOOTER -->
+<div style="padding:16px 20px;background:#f8f9fb;border-top:1px solid #e8eaf0;font-size:11px;color:#9ca3af;margin-top:8px">
+  <strong style="color:#6b7280">Data Sources:</strong> &nbsp;SFDC (queried Jun 8, 2026) &nbsp;·&nbsp; Chorus (Apr 29, 2026 meeting transcript) &nbsp;·&nbsp; ZoomInfo (enriched Jun 8, 2026) &nbsp;·&nbsp; Market Intel (web, TG&amp;H, ZoomInfo scoops) &nbsp;·&nbsp; Rival Release Notes (rival-hr.com, Jun 2026) &nbsp;·&nbsp; Cockpit built Jun 8, 2026 — Monday Full Refresh
+</div>
+
+</body>
+</html>

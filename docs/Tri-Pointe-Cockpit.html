@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light only">
+<title>Tri Pointe Homes — CSM Account Cockpit</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif; background: #f4f6f9; color: #1a1f2e; font-size: 14px; line-height: 1.5; overflow-x: hidden; }
+a { color: #2563eb; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* HEADER */
+.header { background: #1a2744; color: #fff; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.header-left { display: flex; align-items: center; gap: 14px; }
+.account-logo { width: 44px; height: 44px; border-radius: 10px; background: #2f4172; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; color: #7fa8e8; flex-shrink: 0; }
+.account-name { font-size: 20px; font-weight: 700; color: #fff; }
+.account-sub { font-size: 12px; color: #8da8cc; margin-top: 2px; }
+.header-meta { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.header-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.badge-tier3 { background: #2f4172; color: #7fa8e8; }
+.badge-enterprise { background: #1e3a5f; color: #60a5fa; }
+.badge-sda { background: #14532d; color: #4ade80; }
+.refresh-tag { font-size: 11px; color: #6b7fa8; }
+
+/* KPI STRIP */
+.kpi-strip { background: #fff; border-bottom: 1px solid #e5e8ee; padding: 12px 20px; display: flex; gap: 10px; overflow-x: auto; }
+.kpi-card { flex: 0 0 auto; min-width: 110px; background: #f8fafc; border: 1px solid #e5e8ee; border-radius: 10px; padding: 10px 14px; text-align: center; }
+.kpi-value { font-size: 20px; font-weight: 700; color: #1a1f2e; }
+.kpi-value.red { color: #dc2626; }
+.kpi-value.amber { color: #d97706; }
+.kpi-value.green { color: #16a34a; }
+.kpi-label { font-size: 10px; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 2px; }
+
+/* TAB BAR */
+.tab-bar { background: #fff; border-bottom: 1px solid #e5e8ee; padding: 0 16px; display: flex; gap: 0; overflow-x: auto; position: sticky; top: 0; z-index: 100; white-space: nowrap; }
+.tab-btn { padding: 12px 16px; border: none; background: transparent; color: #6b7280; font-size: 12px; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: color 0.15s; }
+.tab-btn.active { color: #2563eb; border-bottom-color: #2563eb; }
+.tab-btn:hover { color: #1a1f2e; }
+
+/* CONTAINER */
+.container { max-width: 100%; padding: 0; }
+
+/* TAB PANELS */
+.tab-panel { display: none; padding: 18px 20px; overflow: visible; }
+.tab-panel.active { display: block; }
+
+/* SECTIONS */
+.section { background: #fff; border: 1px solid #e5e8ee; border-radius: 12px; padding: 16px 18px; margin-bottom: 14px; overflow: visible; }
+.section-title { font-size: 13px; font-weight: 700; color: #374151; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* GRID */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; }
+@media (max-width: 700px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+/* RISK CARDS */
+.risk-card { border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; border-left: 4px solid #e5e8ee; background: #f9fafb; }
+.risk-card.red { border-left-color: #dc2626; background: #fef2f2; }
+.risk-card.amber { border-left-color: #d97706; background: #fffbeb; }
+.risk-card.green { border-left-color: #16a34a; background: #f0fdf4; }
+.risk-title { font-size: 13px; font-weight: 700; color: #1a1f2e; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.risk-body { font-size: 12px; color: #374151; line-height: 1.6; }
+.risk-action { margin-top: 8px; font-size: 11px; color: #6b7280; font-style: italic; border-top: 1px solid #e5e8ee; padding-top: 6px; }
+
+/* ACTION CARDS */
+.action-card { border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; border: 1px solid #e5e8ee; background: #fff; display: flex; gap: 14px; align-items: flex-start; }
+.action-num { width: 28px; height: 28px; border-radius: 50%; background: #2563eb; color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+.action-num.urgent { background: #dc2626; }
+.action-content { flex: 1; }
+.action-title { font-size: 13px; font-weight: 700; color: #1a1f2e; }
+.action-why { font-size: 12px; color: #6b7280; margin-top: 4px; }
+.action-next { margin-top: 6px; font-size: 12px; color: #2563eb; font-weight: 600; }
+
+/* HEALTH GRID */
+.health-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; overflow: visible; }
+.health-card { background: #f8fafc; border: 1px solid #e5e8ee; border-radius: 10px; padding: 12px 14px; text-align: center; position: relative; overflow: visible; }
+.health-score { font-size: 26px; font-weight: 800; }
+.health-score.green { color: #16a34a; }
+.health-score.amber { color: #d97706; }
+.health-score.red { color: #dc2626; }
+.health-score.gray { color: #9ca3af; }
+.health-label { font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 4px; }
+
+/* TOOLTIP */
+.metric-tip { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; background: #e5e8ee; color: #6b7280; font-size: 9px; font-weight: 700; cursor: help; position: relative; }
+.metric-tip .tip-box { display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); width: 240px; padding: 10px 12px; background: #1a2744; color: #fff; font-size: 11px; font-weight: 400; line-height: 1.5; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.2); z-index: 9999; text-align: left; }
+.metric-tip:hover .tip-box { display: block; }
+
+/* TABLES */
+.data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.data-table th { background: #f1f3f9; color: #374151; font-weight: 700; padding: 8px 10px; text-align: left; border-bottom: 2px solid #e5e8ee; }
+.data-table td { padding: 8px 10px; border-bottom: 1px solid #f1f3f9; color: #374151; vertical-align: top; }
+.data-table tr:hover td { background: #f8fafc; }
+
+/* BADGES */
+.badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; }
+.badge-green { background: #dcfce7; color: #15803d; }
+.badge-amber { background: #fef3c7; color: #92400e; }
+.badge-red { background: #fee2e2; color: #991b1b; }
+.badge-blue { background: #dbeafe; color: #1e40af; }
+.badge-purple { background: #ede9fe; color: #5b21b6; }
+.badge-gray { background: #f3f4f6; color: #374151; }
+.badge-shipped { background: #dcfce7; color: #15803d; }
+.badge-coming { background: #dbeafe; color: #1e40af; }
+
+/* PEOPLE CARDS */
+.people-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.person-card { background: #f8fafc; border: 1px solid #e5e8ee; border-radius: 10px; padding: 14px; }
+.person-avatar { width: 36px; height: 36px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+.person-name { font-size: 13px; font-weight: 700; color: #1a1f2e; }
+.person-title { font-size: 11px; color: #6b7280; margin-top: 2px; }
+.person-intel { font-size: 11px; color: #374151; margin-top: 6px; padding-top: 6px; border-top: 1px solid #e5e8ee; }
+
+/* ROADMAP */
+.roadmap-card { background: #f8fafc; border: 1px solid #e5e8ee; border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; }
+.roadmap-card.expansion { background: #f5f3ff; border-color: #c4b5fd; }
+.roadmap-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.roadmap-title { font-size: 13px; font-weight: 700; color: #1a1f2e; }
+.roadmap-body { font-size: 12px; color: #374151; line-height: 1.6; }
+.roadmap-pain { margin-top: 6px; font-size: 11px; color: #6b7280; font-style: italic; }
+
+/* USAGE BARS */
+.usage-bar-wrap { margin-bottom: 8px; }
+.usage-bar-label { font-size: 11px; color: #374151; margin-bottom: 3px; display: flex; justify-content: space-between; }
+.usage-bar-bg { height: 8px; background: #e5e8ee; border-radius: 4px; overflow: hidden; }
+.usage-bar-fill { height: 100%; border-radius: 4px; }
+
+/* STAT BOXES */
+.stat-box { text-align: center; padding: 12px; }
+.stat-value { font-size: 28px; font-weight: 800; color: #1a1f2e; }
+.stat-label { font-size: 11px; color: #6b7280; font-weight: 600; text-transform: uppercase; }
+
+/* DIVIDER */
+.divider { height: 1px; background: #e5e8ee; margin: 12px 0; }
+
+/* INFO ROW */
+.info-row { display: flex; gap: 6px; margin-bottom: 6px; font-size: 12px; }
+.info-key { color: #6b7280; font-weight: 600; min-width: 140px; flex-shrink: 0; }
+.info-val { color: #1a1f2e; }
+
+/* ALERT BOX */
+.alert-box { border-radius: 8px; padding: 10px 14px; font-size: 12px; margin-bottom: 10px; display: flex; gap: 10px; align-items: flex-start; }
+.alert-box.warn { background: #fffbeb; border: 1px solid #fcd34d; color: #78350f; }
+.alert-box.critical { background: #fef2f2; border: 1px solid #fca5a5; color: #7f1d1d; }
+.alert-box.info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e3a8a; }
+
+/* STRATEGY BOX */
+.strategy-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 14px; font-size: 12px; color: #78350f; margin-bottom: 10px; }
+
+/* TAG */
+.tag { display: inline-block; background: #e5e8ee; color: #374151; border-radius: 4px; padding: 2px 7px; font-size: 10px; font-weight: 600; margin: 2px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="account-logo">TP</div>
+    <div>
+      <div class="account-name">Tri Pointe Homes, Inc.</div>
+      <div class="account-sub">NYSE: TPH (now private) &bull; Incline Village, NV &bull; Commercial &amp; Residential Construction &bull; 1,579 employees</div>
+    </div>
+  </div>
+  <div class="header-meta">
+    <span class="header-badge badge-tier3">Tier 3</span>
+    <span class="header-badge badge-enterprise">Enterprise</span>
+    <span class="header-badge badge-sda">SDA Client</span>
+    <span class="refresh-tag">Monday Full Refresh &bull; June 8, 2026</span>
+  </div>
+</div>
+
+<!-- KPI STRIP -->
+<div class="kpi-strip">
+  <div class="kpi-card">
+    <div class="kpi-value">$89.2K</div>
+    <div class="kpi-label">Total ARR</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-value amber">75%</div>
+    <div class="kpi-label">Engagement</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-value green">100%</div>
+    <div class="kpi-label">Services Eng.</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-value red">181d</div>
+    <div class="kpi-label">To Renewal</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-value amber">0</div>
+    <div class="kpi-label">NPS Score</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-value">93</div>
+    <div class="kpi-label">X-Sell Score</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-value red">52</div>
+    <div class="kpi-label">Events (12mo)</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-value green">~10.7 yr</div>
+    <div class="kpi-label">Tenure</div>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab(0)">Actions</button>
+  <button class="tab-btn" onclick="switchTab(1)">Account Intel</button>
+  <button class="tab-btn" onclick="switchTab(2)">Use Case</button>
+  <button class="tab-btn" onclick="switchTab(3)">People</button>
+  <button class="tab-btn" onclick="switchTab(4)">Contracts</button>
+  <button class="tab-btn" onclick="switchTab(5)">Product</button>
+  <button class="tab-btn" onclick="switchTab(6)">Usage</button>
+  <button class="tab-btn" onclick="switchTab(7)">Cases</button>
+  <button class="tab-btn" onclick="switchTab(8)">Risk</button>
+</div>
+
+<!-- TAB 0: ACTIONS -->
+<div class="tab-panel active" id="tab-0">
+
+  <div class="alert-box critical">
+    <div>&#128680;</div>
+    <div><strong>CRITICAL:</strong> Sumitomo Forestry completed acquisition of Tri Pointe Homes on May 14, 2026. TPH is now a wholly owned private subsidiary ($4.5B, $47/share). This changes the vendor governance landscape — corporate consolidation mandates are a real churn risk. Engage now.</div>
+  </div>
+
+  <div class="alert-box warn">
+    <div>&#9888;</div>
+    <div><strong>Onboarding LOST (Oct 2025):</strong> A "Notice of Non-Renewal" case was filed Oct 2025 and closed as Closed Lost. $25,264 ARR gone. All remaining ARR ($89,246) is now at risk at Dec 2026 renewal.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Priority Actions</div>
+
+    <div class="action-card">
+      <div class="action-num urgent">1</div>
+      <div class="action-content">
+        <div class="action-title">Engage new Sumitomo parent on vendor strategy</div>
+        <div class="action-why">TPH went private May 14. Sumitomo is a Japanese conglomerate ($13.4B revenue, 24,815 employees). New parent = vendor review risk. All new leadership team is already flagged as a competitive threat. The Dec 2026 renewal is 181 days out — any parent-driven vendor consolidation mandate could arrive before then.</div>
+        <div class="action-next">&#8594; Identify who now controls HR vendor decisions: CHRO Heather Breidenthal or does parent company impose? Schedule executive-level conversation with Heather Breidenthal before Q3 planning begins.</div>
+      </div>
+    </div>
+
+    <div class="action-card">
+      <div class="action-num urgent">2</div>
+      <div class="action-content">
+        <div class="action-title">Formalize renewal strategy — both opps at 40% probability</div>
+        <div class="action-why">Two active renewal opps (Performance $65,486 + Managed Services $23,760) both at Stage 5 / 40% probability with close date Nov 30, 2026. The NextStep on Performance says "will meet with decision maker next week" — when was that logged? The prior renewal cycle lost Onboarding ($25K). This one could lose the remaining $89K.</div>
+        <div class="action-next">&#8594; Update NextStep on both opps. Confirm meeting with decision maker has occurred. Move to Stage 6+ or explain what is blocking. Escalate if DM is inaccessible post-merger.</div>
+      </div>
+    </div>
+
+    <div class="action-card">
+      <div class="action-num">3</div>
+      <div class="action-content">
+        <div class="action-title">Address critical usage gap — 0 events YTD, 52 events in 12 months</div>
+        <div class="action-why">52 events over 12 months for 1,579 employees = 0.033 events/employee. YTD events = 0. Logins are sporadic (0–8/day, L30D = 0). This is extremely low utilization. If Tri Pointe's internal review of Rival shows near-zero activity, the switching cost perception collapses. They can't justify renewal spend on an unused platform.</div>
+        <div class="action-next">&#8594; Understand WHY usage is near-zero: Are they on Performance only and not using workflow-based products? Has the platform configuration been updated since Onboarding was lost? Bring a specific use case for Performance adoption with Kirstyn Rigdon or Laura Denley.</div>
+      </div>
+    </div>
+
+    <div class="action-card">
+      <div class="action-num">4</div>
+      <div class="action-content">
+        <div class="action-title">Introduce ROSI (AI Review Writer) before next performance cycle</div>
+        <div class="action-why">Rival Perform now includes ROSI Review Writer (2026.2 + 2026.3) — AI-powered manager and employee review drafting built into the product. For a 1,579-person organization with OD Specialists (Lynelle Smith, Laura Denley), this is a direct time-saver. Monthly meetings are established (Bernard Jackson, May 2026). Demonstrate before annual review season.</div>
+        <div class="action-next">&#8594; Add ROSI demo to June/July monthly meeting agenda. Confirm Admin has enabled ROSI in Settings. Pull a usage report on current Perform activity to anchor the conversation.</div>
+      </div>
+    </div>
+
+    <div class="action-card">
+      <div class="action-num">5</div>
+      <div class="action-content">
+        <div class="action-title">Schedule site review — 313 days overdue</div>
+        <div class="action-why">Last site review: July 30, 2025. No onsite F2F ever on record. Site review is overdue per cadence. With the merger completed and new parent governance in play, a site review (even virtual) is a strong relationship signal. It also helps identify configuration issues driving the near-zero usage.</div>
+        <div class="action-next">&#8594; Propose site review for July 2026 with Kirstyn Rigdon (Dir HR) and Lynelle Smith (OD). Align with ROSI demo. Document in SFDC as Last_Site_Review_Date__c.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Engagement Health</div>
+    <div class="health-grid">
+      <div class="health-card">
+        <div class="health-score amber">75%</div>
+        <div class="health-label">Customer Engagement <span class="metric-tip">?<span class="tip-box">Source: Customer_Engagement_Score__c (CustomerEngagementScoreNUMBER__c = 0.75). Composite Rival engagement score. 75% = Moderate — active but not deeply embedded. Scale: 0–100%.</span></span></div>
+      </div>
+      <div class="health-card">
+        <div class="health-score green">100%</div>
+        <div class="health-label">Services Engagement <span class="metric-tip">?<span class="tip-box">Source: Services_Engagement_Score_Percent__c = 100%. Full engagement with Rival Managed Services team. Green — services relationship is strong.</span></span></div>
+      </div>
+      <div class="health-card">
+        <div class="health-score gray">N/A</div>
+        <div class="health-label">NPS Score <span class="metric-tip">?<span class="tip-box">Source: Average_NPS_Score_SFDC__c = 0.0. Last NPS sent Apr 18, 2026. Next send Oct 15, 2026. Score of 0 = no response or neutral response received. Cannot classify as promoter/passive/detractor.</span></span></div>
+      </div>
+      <div class="health-card">
+        <div class="health-score red">0</div>
+        <div class="health-label">Events YTD <span class="metric-tip">?<span class="tip-box">Source: Total_Events_YTD_Onboard__c = 0 (LifeSuite_Product_Usage__c, as of Jun 8). Zero events launched in calendar year 2026. Critical utilization risk. 52 events in past 12 months.</span></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">CSM Renewal Strategy (verbatim from SFDC)</div>
+    <div class="strategy-box">
+      <strong>From CSM_Renewal_Strategy__c:</strong><br>
+      &bull; Establish Monthly meetings. February<br>
+      &bull; Ask for it. March
+    </div>
+    <div style="font-size:11px;color:#6b7280;">Note: Monthly meetings are confirmed active (last meeting May 26, 2026 per activity log — Bernard Jackson). "Ask for it" implies renewal ask was planned for March — status unknown. Both renewal opps remain at Stage 5 / 40%.</div>
+  </div>
+
+</div>
+
+<!-- TAB 1: ACCOUNT INTEL -->
+<div class="tab-panel" id="tab-1">
+  <div class="grid-2">
+    <div>
+      <div class="section">
+        <div class="section-title">Company Overview</div>
+        <div class="info-row"><span class="info-key">Legal Name</span><span class="info-val">Tri Pointe Homes, Inc.</span></div>
+        <div class="info-row"><span class="info-key">Parent (as of May 14)</span><span class="info-val">Sumitomo Forestry Co., Ltd. (TSE: 1911) via Sumitomo Forestry America, Inc.</span></div>
+        <div class="info-row"><span class="info-key">Acquisition Date</span><span class="info-val">May 14, 2026 — $4.5B, $47/share all-cash</span></div>
+        <div class="info-row"><span class="info-key">HQ</span><span class="info-val">Incline Village, NV / Irvine, CA (operational)</span></div>
+        <div class="info-row"><span class="info-key">Industry</span><span class="info-val">Commercial &amp; Residential Construction</span></div>
+        <div class="info-row"><span class="info-key">Founded</span><span class="info-val">2009</span></div>
+        <div class="info-row"><span class="info-key">Employees</span><span class="info-val">1,579 (ZoomInfo: 1,579; SFDC: 1,579)</span></div>
+        <div class="info-row"><span class="info-key">Revenue (2025 FY)</span><span class="info-val">$3.25B (SFDC AnnualRevenue)</span></div>
+        <div class="info-row"><span class="info-key">Q1 2026 Revenue</span><span class="info-val">$506.5M home sales (vs. $720.8M Q1 2025 — 29.7% decline)</span></div>
+        <div class="info-row"><span class="info-key">Operations</span><span class="info-val">12 states + DC; 21 office locations; West, Central, East regions</span></div>
+        <div class="info-row"><span class="info-key">Ticker</span><span class="info-val">NYSE: TPH (now delisted — private subsidiary)</span></div>
+        <div class="info-row"><span class="info-key">Website</span><span class="info-val"><a href="https://www.tripointegroup.com" target="_blank">tripointegroup.com</a></span></div>
+        <div class="info-row"><span class="info-key">LinkedIn</span><span class="info-val"><a href="https://www.linkedin.com/company/tri-pointe-homes" target="_blank">33,128 followers</a></span></div>
+        <div class="divider"></div>
+        <p style="font-size:12px;color:#374151;">Tri Pointe Homes is one of the largest premium homebuilders in the U.S., building single-family attached and detached homes across growth markets from California to the Carolinas. The company operates through regional brands (Trendmaker, Winchester, Maracay, etc.) with local market identities while sharing corporate resources. Acquired by Sumitomo Forestry Group in May 2026 for $4.5B — the Japanese timber/construction conglomerate now controls vendor and technology decisions at the parent level.</p>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Parent Company — Sumitomo Forestry</div>
+        <div class="info-row"><span class="info-key">Parent Revenue</span><span class="info-val">$13.4B (ZoomInfo)</span></div>
+        <div class="info-row"><span class="info-key">Parent Employees</span><span class="info-val">24,815</span></div>
+        <div class="info-row"><span class="info-key">Ticker</span><span class="info-val">TSE: 1911</span></div>
+        <div class="info-row"><span class="info-key">Acquisition Rationale</span><span class="info-val">Vault into top-5 U.S. homebuilder; strategic foothold in U.S. residential construction</span></div>
+        <div class="info-row"><span class="info-key">Risk Implication</span><span class="info-val">Parent governance now controls major vendor decisions. Cost synergies are typical post-M&amp;A priority — Rival is a $89K line item.</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section">
+        <div class="section-title">Market Dynamics</div>
+        <table class="data-table">
+          <tr><th>Date</th><th>Event</th><th>HR Implication</th></tr>
+          <tr><td>May 14, 2026</td><td>Sumitomo Forestry closes $4.5B acquisition — TPH goes private</td><td>Vendor governance shift to parent. C-suite may change. Renewal decisions could require Japanese HQ approval. High risk window.</td></tr>
+          <tr><td>Apr 29, 2026</td><td>Q1 2026: Revenue $506.5M vs. $720.8M (30% decline), net income $6.8M vs. $64M prior year</td><td>Margin compression, SG&amp;A at 17.9% of revenue. Cost cutting likely — technology vendors under scrutiny.</td></tr>
+          <tr><td>Feb 13, 2026</td><td>Merger agreement announced — $47/share all-cash, 29% premium</td><td>Leadership distraction during M&amp;A process. HR team focused on integration, not platform adoption.</td></tr>
+          <tr><td>Apr 1, 2026</td><td>Named to 2026 Fortune 100 Best Companies to Work For</td><td>People-first culture is a corporate priority. CHRO Heather Breidenthal publicly owns this narrative — she's invested in HR tech that supports culture.</td></tr>
+          <tr><td>2025 (ongoing)</td><td>Active adult + move-up buyer market softening; cancellation rate 9%</td><td>Volume-driven hiring fluctuations. Onboarding events tied to headcount growth — low volume directly explains low usage.</td></tr>
+          <tr><td>Oct 2025</td><td>Onboarding non-renewal filed — contract lost</td><td>Indicates prior HR team's disengagement with Rival Workflow/Onboarding product. New leadership team may not know what was lost.</td></tr>
+        </table>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Competitive Position — Peer Homebuilders</div>
+        <table class="data-table">
+          <tr><th>Builder</th><th>Revenue Scale</th><th>Key Move 2026</th></tr>
+          <tr><td><strong>D.R. Horton</strong></td><td>#1 U.S. builder</td><td>Continuing volume dominance in entry-level</td></tr>
+          <tr><td><strong>Lennar</strong></td><td>#2 U.S. builder</td><td>Aggressive land banking in Sun Belt</td></tr>
+          <tr><td><strong>PulteGroup</strong></td><td>Top 5</td><td>Del Webb active adult expansion</td></tr>
+          <tr><td><strong>Tri Pointe</strong></td><td>~#13-15 U.S.</td><td>Acquired by Sumitomo — now private subsidiary; premium positioning</td></tr>
+          <tr><td><strong>Taylor Morrison</strong></td><td>Comparable scale</td><td>Active adult / move-up buyer similar mix</td></tr>
+        </table>
+        <div style="margin-top:8px;font-size:11px;color:#6b7280;">Source: Builder 100 list 2025; IR press releases</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 2: USE CASE -->
+<div class="tab-panel" id="tab-2">
+  <div class="section">
+    <div class="section-title">Executive Summary</div>
+    <p style="font-size:13px;color:#374151;line-height:1.7;">Tri Pointe Homes is a 10.7-year Rival customer now operating two active products: <strong>Rival Perform</strong> (Performance Management, $65,486/yr) and <strong>Rival Managed Services</strong> ($23,760/yr). They previously ran Onboarding/Workflow and SilkRoad recruiting, both now expired or lost to competitors. The People &amp; OD function under CHRO Heather Breidenthal manages performance cycles, goal-setting, and organizational development for ~1,579 employees across 12 states. Usage is critically low (52 events / 12 months, 0 YTD) — suggesting the platform is configured but not actively driven. Managed Services provides white-glove configuration support. The Sumitomo acquisition (May 2026) introduces a parent-governance risk that is the most acute threat to renewal.</p>
+  </div>
+
+  <div class="grid-2">
+    <div class="section">
+      <div class="section-title">Rival Perform ($65,486/yr)</div>
+      <div class="info-row"><span class="info-key">Use Case</span><span class="info-val">Performance reviews, goal management, check-ins, 360 feedback for 1,579 employees across 12 states</span></div>
+      <div class="info-row"><span class="info-key">Pain It Solves</span><span class="info-val">Standardized performance process across distributed regional teams with local brand identities</span></div>
+      <div class="info-row"><span class="info-key">Value Delivered</span><span class="info-val">10+ years of performance history, OD team (Lynelle Smith, Laura Denley) use Perform for review cycles; consistent cycle management</span></div>
+      <div class="info-row"><span class="info-key">Risk to Value</span><span class="info-val">Near-zero login activity suggests manual workarounds have replaced platform-driven processes; switching cost perception is low</span></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Rival Managed Services ($23,760/yr)</div>
+      <div class="info-row"><span class="info-key">Use Case</span><span class="info-val">White-glove configuration, admin support, and managed integration for HR platform</span></div>
+      <div class="info-row"><span class="info-key">Pain It Solves</span><span class="info-val">Small HR team (34 HR dept per ZoomInfo) cannot dedicate admin FTEs to platform management</span></div>
+      <div class="info-row"><span class="info-key">Value Delivered</span><span class="info-val">Services Engagement Score = 100%. Randy Havel (Rival) maintains high service cadence — strong operational relationship</span></div>
+      <div class="info-row"><span class="info-key">Risk to Value</span><span class="info-val">If Perform is underused, services spend is perceived as overhead without ROI</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Expansion Vectors</div>
+    <table class="data-table">
+      <tr><th>Product</th><th>Observed Pain Signal</th><th>Entry Point</th><th>SFDC Signal</th></tr>
+      <tr><td><strong>Rival Workflow (Onboarding)</strong></td><td>Lost Onboarding Oct 2025 — "Notice of Non-Renewal." Homebuilder hiring is volume-driven; new hire onboarding is a recurring pain.</td><td>Re-pitch to Heather Breidenthal after Sumitomo integration settles; frame as re-engagement after gap</td><td>Cross_Sell_Score__c = 93; Expired_Products__c includes Onboarding</td></tr>
+      <tr><td><strong>Rival Learn</strong></td><td>Fortune 100 Best Companies award = commitment to employee development. No Learning product in portfolio.</td><td>HR leadership conversation with CHRO on L&amp;D strategy</td><td>Cross_Sell_Score__c = 93</td></tr>
+      <tr><td><strong>Rival Recruit</strong></td><td>Lost Recruiting to iCIMS (SFDC competitive threat). Regional hiring needs across 12 states.</td><td>Position Recruit + Workflow together as integrated hire-to-onboard vs. iCIMS point solution</td><td>Closed Lost iCIMS Sep 2024</td></tr>
+    </table>
+  </div>
+
+  <div class="grid-3">
+    <div class="section" style="text-align:center;">
+      <div class="stat-value amber">$89.2K</div>
+      <div class="stat-label">ARR at Renewal</div>
+      <div style="font-size:11px;color:#6b7280;margin-top:4px;">100% renewal at risk (Dec 1, 2026)</div>
+    </div>
+    <div class="section" style="text-align:center;">
+      <div class="stat-value green">93</div>
+      <div class="stat-label">Cross-Sell Score</div>
+      <div style="font-size:11px;color:#6b7280;margin-top:4px;">High expansion potential if retained</div>
+    </div>
+    <div class="section" style="text-align:center;">
+      <div class="stat-value red">$25.3K</div>
+      <div class="stat-label">ARR Lost (Onboarding)</div>
+      <div style="font-size:11px;color:#6b7280;margin-top:4px;">Closed Lost Nov 2025</div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 3: PEOPLE -->
+<div class="tab-panel" id="tab-3">
+  <div class="section">
+    <div class="section-title">Key Stakeholders — Tri Pointe Homes</div>
+    <div class="people-grid">
+      <div class="person-card">
+        <div class="person-avatar" style="background:#7c3aed;">HB</div>
+        <div class="person-name">Heather Breidenthal</div>
+        <div class="person-title">Chief Human Resources Officer</div>
+        <span class="badge badge-purple">Executive Sponsor</span>
+        <div class="person-intel">Named CHRO at TPH; publicly leads people-first culture narrative. Quoted in 2025 PEOPLE Companies That Care announcement. Reports to CEO Doug Bauer. Key decision-maker on vendor renewal. Source: Web / Datanyze</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar" style="background:#0369a1;">KR</div>
+        <div class="person-name">Kirstyn Rigdon</div>
+        <div class="person-title">Director, Human Resources</div>
+        <span class="badge badge-blue">Operational Champion</span>
+        <div class="person-intel">Director-level HR; (704) 770-7159 mobile. Likely East region HR lead based on area code. Key contact for site review and platform adoption conversations. Source: SFDC</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar" style="background:#065f46;">LS</div>
+        <div class="person-name">Lynelle Smith</div>
+        <div class="person-title">OD Specialist</div>
+        <span class="badge badge-green">Product User</span>
+        <div class="person-intel">Organizational Development Specialist — likely direct Perform user for review cycle management. Prime contact for ROSI demo and platform utilization conversation. Source: SFDC</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar" style="background:#065f46;">LD</div>
+        <div class="person-name">Laura Denley</div>
+        <div class="person-title">Organizational Development Specialist</div>
+        <span class="badge badge-green">Product User</span>
+        <div class="person-intel">(949) 438-1433. OD team alongside Lynelle Smith. Second primary Perform user. Day-to-day platform champion. Source: SFDC</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar" style="background:#92400e;">EB</div>
+        <div class="person-name">Eva Brunell</div>
+        <div class="person-title">Director HR — TrendmakerHomes</div>
+        <span class="badge badge-amber">Regional Contact</span>
+        <div class="person-intel">Trendmaker brand HR Director (Eva.brunell@trendmakerhomes.com). Represents regional brand separation. May have separate platform needs or configuration. Source: SFDC</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar" style="background:#374151;">MB</div>
+        <div class="person-name">Mandy Briley</div>
+        <div class="person-title">Title not in SFDC</div>
+        <span class="badge badge-gray">Contact</span>
+        <div class="person-intel">Most recently modified contact (Jun 5, 2026). Role unverified. Source: SFDC — verify title before outreach.</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar" style="background:#374151;">SD</div>
+        <div class="person-name">Stacey DeRoche</div>
+        <div class="person-title">Title not in SFDC</div>
+        <span class="badge badge-gray">Contact</span>
+        <div class="person-intel">Recently modified. Role unverified — verify before engagement. Source: SFDC</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Tri Pointe Executive Leadership (External Research)</div>
+    <table class="data-table">
+      <tr><th>Name</th><th>Title</th><th>Relevance</th></tr>
+      <tr><td><strong>Doug Bauer</strong></td><td>Chief Executive Officer</td><td>Reports to Sumitomo post-acquisition. CHRO reports to him. Ultimate internal sponsor.</td></tr>
+      <tr><td><strong>Tom Mitchell</strong></td><td>President &amp; COO</td><td>Quoted on Fortune Best Workplaces recognition. People-operations focus.</td></tr>
+      <tr><td><strong>Mike Grubbs</strong></td><td>CFO</td><td>Financial approver for vendor renewals. Revenue declining — cost scrutiny high.</td></tr>
+      <tr><td><strong>Heather Breidenthal</strong></td><td>CHRO</td><td>Primary HR decision-maker. Owns Rival relationship budget.</td></tr>
+      <tr><td><strong>Urmila Menon</strong></td><td>CIO (appointed 2024)</td><td>Technology governance. Reports to Linda Mamet (EVP). Integration landscape decisions may route through her.</td></tr>
+      <tr><td><strong>Glenn Keeler</strong></td><td>CFO &amp; Chief Accounting Officer</td><td>Source: SFDC Contact. Financial control — renewal approval chain.</td></tr>
+    </table>
+    <div style="margin-top:6px;font-size:11px;color:#6b7280;">Source: Web research (IR page, press releases), SFDC contacts</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Rival Team</div>
+    <table class="data-table">
+      <tr><th>Name</th><th>Role</th><th>Focus</th></tr>
+      <tr><td><strong>Bernard Jackson</strong></td><td>CSM (Primary)</td><td>Monthly meetings active (May 26 last). Owns both renewal opps. Primary relationship manager.</td></tr>
+      <tr><td><strong>Andrew Pollard</strong></td><td>AM / CSM Owner</td><td>Owns renewal opps in SFDC. Strategy and escalation point.</td></tr>
+      <tr><td><strong>Randy Havel</strong></td><td>Services / Support</td><td>Primary case owner (Data Rules, File Feed, Site Review). High service engagement. Managed Services delivery.</td></tr>
+      <tr><td><strong>Venizybelle Cuevas</strong></td><td>Support</td><td>Handled SilkRoad data case (Mar 2026)</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- TAB 4: CONTRACTS -->
+<div class="tab-panel" id="tab-4">
+  <div class="section">
+    <div class="section-title">Active Contracts</div>
+    <table class="data-table">
+      <tr><th>Contract #</th><th>Status</th><th>Start Date</th><th>End Date</th><th>Days Remaining</th></tr>
+      <tr><td><a href="https://rivalgroup.lightning.force.com/lightning/r/Contract/800Vs00000IzlO0IAJ/view" target="_blank">00018543</a></td><td><span class="badge badge-green">Activated</span></td><td>Nov 21, 2024</td><td>Nov 30, 2026</td><td>175</td></tr>
+      <tr><td><a href="https://rivalgroup.lightning.force.com/lightning/r/Contract/800Vs00000KeSF8IAN/view" target="_blank">00018631</a></td><td><span class="badge badge-green">Activated</span></td><td>Dec 1, 2024</td><td>Nov 30, 2026</td><td>175</td></tr>
+    </table>
+    <div style="margin-top:8px;font-size:11px;color:#6b7280;">Both contracts expire Nov 30, 2026. Renewal date in SFDC: Dec 1, 2026 (181 days). No SBQQ renewal term data available.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Active Renewal Opportunities</div>
+    <div class="grid-2">
+      <div class="risk-card amber">
+        <div class="risk-title">&#128218; Performance Renewal — Stage 5</div>
+        <div class="risk-body">
+          <div class="info-row"><span class="info-key">Amount</span><span class="info-val">$65,485.92</span></div>
+          <div class="info-row"><span class="info-key">Close Date</span><span class="info-val">Nov 30, 2026</span></div>
+          <div class="info-row"><span class="info-key">Stage</span><span class="info-val">5. Renewal Solutioning</span></div>
+          <div class="info-row"><span class="info-key">Probability</span><span class="info-val">40%</span></div>
+          <div class="info-row"><span class="info-key">Owner</span><span class="info-val">Andrew Pollard</span></div>
+          <div class="info-row"><span class="info-key">Next Step</span><span class="info-val">"Creating a renewal strategy now. Will meet with Decision maker next week to discuss future plans and renewal."</span></div>
+          <div class="info-row"><span class="info-key">Last Modified</span><span class="info-val">Jun 3, 2026</span></div>
+        </div>
+        <div class="risk-action">Note: $130,972 at Dec 2024 renewal — now renewing at $65,486 (50% reduction). ARR compression trend.</div>
+      </div>
+      <div class="risk-card amber">
+        <div class="risk-title">&#128218; Managed Services Renewal — Stage 5</div>
+        <div class="risk-body">
+          <div class="info-row"><span class="info-key">Amount</span><span class="info-val">$23,760.00</span></div>
+          <div class="info-row"><span class="info-key">Close Date</span><span class="info-val">Nov 30, 2026</span></div>
+          <div class="info-row"><span class="info-key">Stage</span><span class="info-val">5. Renewal Solutioning</span></div>
+          <div class="info-row"><span class="info-key">Probability</span><span class="info-val">40%</span></div>
+          <div class="info-row"><span class="info-key">Owner</span><span class="info-val">Andrew Pollard</span></div>
+          <div class="info-row"><span class="info-key">Next Step</span><span class="info-val">None logged</span></div>
+          <div class="info-row"><span class="info-key">Last Modified</span><span class="info-val">Jun 3, 2026</span></div>
+        </div>
+        <div class="risk-action">No NextStep logged. Managed Services renewal is linked to Performance — if Performance churns, this goes too.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Historical Opportunity Summary</div>
+    <table class="data-table">
+      <tr><th>Opportunity</th><th>Stage</th><th>Amount</th><th>Close Date</th><th>Owner</th></tr>
+      <tr><td>Tri Pointe Homes_Onboarding Renewal</td><td><span class="badge badge-red">Closed Lost</span></td><td>$25,265</td><td>Nov 24, 2025</td><td>Bernard Jackson</td></tr>
+      <tr><td>Tri Pointe Homes, Inc. Onboarding Renewal</td><td><span class="badge badge-green">Closed Won</span></td><td>$25,265</td><td>Dec 20, 2024</td><td>John Eller</td></tr>
+      <tr><td>Tri Pointe Homes, Inc. — Performance Renewal</td><td><span class="badge badge-green">Closed Won</span></td><td>$130,972</td><td>Dec 20, 2024</td><td>John Eller</td></tr>
+      <tr><td>Tri Pointe Homes, Inc. Managed Services Renewal</td><td><span class="badge badge-green">Closed Won</span></td><td>$47,520</td><td>Nov 21, 2024</td><td>John Eller</td></tr>
+      <tr><td>Tri Pointe Homes, Inc. — TriPoint iCims</td><td><span class="badge badge-red">Closed Lost</span></td><td>$3,000</td><td>Sep 18, 2024</td><td>Brian Bowman</td></tr>
+      <tr><td>Tri Pointe Homes, Inc._Recruiting DB Backup</td><td><span class="badge badge-green">Closed Won</span></td><td>$5,000</td><td>Nov 30, 2023</td><td>Crystal Randall</td></tr>
+    </table>
+    <div style="margin-top:8px;font-size:11px;color:#6b7280;">Pattern: Performance halved from $130,972 to $65,486 at Dec 2024 renewal. Onboarding lost Nov 2025. iCIMS won Recruiting Sep 2024. ARR compression is a multi-year trend.</div>
+  </div>
+</div>
+
+<!-- TAB 5: PRODUCT -->
+<div class="tab-panel" id="tab-5">
+  <div class="section">
+    <div class="section-title">Active Products &amp; Configuration</div>
+    <div class="grid-2">
+      <div>
+        <div class="info-row"><span class="info-key">Active (SFDC)</span><span class="info-val"><span class="tag">Managed Services</span><span class="tag">Performance</span></span></div>
+        <div class="info-row"><span class="info-key">SilkRoad History</span><span class="info-val"><span class="tag">Connect</span><span class="tag">Recruiting</span><span class="tag">Ex-Performance WingSpan</span><span class="tag">Ex-Onboarding</span><span class="tag">SilkRoad-Managed Integration</span><span class="tag">Agile Performance</span><span class="tag">Talent Center</span></span></div>
+        <div class="info-row"><span class="info-key">Expired Products</span><span class="info-val">Performance (legacy), Performance WingSpan, Onboarding</span></div>
+        <div class="info-row"><span class="info-key">Usage Region</span><span class="info-val">United States</span></div>
+        <div class="info-row"><span class="info-key">Global Onboarding Score</span><span class="info-val">98 (legacy Onboarding data — product is expired)</span></div>
+      </div>
+      <div>
+        <p style="font-size:12px;color:#374151;line-height:1.6;">Tri Pointe has been a Rival / SilkRoad customer for 10.7 years, using the full suite historically. They are now down to Performance + Managed Services following the loss of Onboarding (Oct 2025) and Recruiting (2024). The SilkRoad Managed Integration service is noted in their SilkRoad product history — they have a deep configuration history that represents meaningful switching cost if properly documented and communicated.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Product Roadmap — Tier 1 (Direct Relevance to Tri Pointe)</div>
+
+    <div class="roadmap-card">
+      <div class="roadmap-header">
+        <span class="badge badge-shipped">SHIPPED</span>
+        <span style="color:#6b7280;font-size:11px;">Feb 2026 — Release 2026.2</span>
+        <div class="roadmap-title">ROSI Review Writer for Managers</div>
+      </div>
+      <div class="roadmap-body">AI-powered review writing built directly into Rival Perform. Helps managers draft higher-quality performance reviews faster by synthesizing goals, feedback, check-ins, and review history. Reduces time-to-draft, improves consistency across distributed teams.</div>
+      <div class="roadmap-pain">&#128161; Pain/Use Case for Tri Pointe: 1,579 employees across 12 states with regional brands. Managers in Trendmaker, Winchester, Maracay write reviews independently. ROSI removes wordsmithing burden and ensures consistency. Direct value for OD team (Lynelle Smith, Laura Denley) who manage cycles.</div>
+    </div>
+
+    <div class="roadmap-card">
+      <div class="roadmap-header">
+        <span class="badge badge-shipped">SHIPPED</span>
+        <span style="color:#6b7280;font-size:11px;">Mar 2026 — Release 2026.3</span>
+        <div class="roadmap-title">ROSI Review Writer Expanded to Employees</div>
+      </div>
+      <div class="roadmap-body">Employees can now use ROSI to draft and refine self-reviews. Admin controls enablement (Admin &gt; Settings &gt; System Management &gt; Enable Apps). Reduces prep time for annual review cycles and improves self-reflection quality.</div>
+      <div class="roadmap-pain">&#128161; Pain/Use Case for Tri Pointe: Self-review prep is a known friction point for distributed teams. Enabling employee ROSI = immediate adoption signal and concrete value story for renewal conversation.</div>
+    </div>
+
+    <div class="roadmap-card">
+      <div class="roadmap-header">
+        <span class="badge badge-shipped">SHIPPED</span>
+        <span style="color:#6b7280;font-size:11px;">Jan 2026 — Release 2026.1</span>
+        <div class="roadmap-title">Analytics Library + Custom Analytics Rename</div>
+      </div>
+      <div class="roadmap-body">Overview Dashboard renamed to "Analytics Library." Advanced Analytics renamed to "Custom Analytics." Improves discoverability for pre-built dashboards vs. self-service reporting.</div>
+      <div class="roadmap-pain">&#128161; Pain/Use Case: OD team can more easily navigate performance analytics. For renewal conversations, demo Analytics Library to show reporting capabilities Tri Pointe may not know they have.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Product Roadmap — Expansion Candidates (Not Currently Owned)</div>
+
+    <div class="roadmap-card expansion">
+      <div class="roadmap-header">
+        <span class="badge badge-purple">EXPANSION</span>
+        <div class="roadmap-title">Rival Workflow (Onboarding) — Re-Engage</div>
+      </div>
+      <div class="roadmap-body">Rival Workflow manages new hire onboarding events, transfer/promotion workflows, and offboarding — fully configurable with branded portals. Tri Pointe ran this product for years before losing it in Oct 2025. Recent Workflow releases include: redesigned Task Details (Jan 2026), multi-language support — Malay/Swedish (Apr 2026), and enhanced Task Details in Workflow (May 2026).</div>
+      <div class="roadmap-pain">&#128161; Pain: Homebuilder hiring is cyclical and volume-driven. A new-hire experiencing a broken or absent onboarding process reflects on Tri Pointe's culture — directly contradicting their Fortune 100 Best Workplaces narrative. Re-pitch Workflow as the onboarding experience layer that supports their employer brand.</div>
+    </div>
+
+    <div class="roadmap-card expansion">
+      <div class="roadmap-header">
+        <span class="badge badge-purple">EXPANSION</span>
+        <div class="roadmap-title">Rival Learn — Employee Development</div>
+      </div>
+      <div class="roadmap-body">Rival Learn (WingSpan) delivers structured learning, compliance training, and career development paths. PEOPLE Companies That Care + Fortune 100 Best Workplaces designation signals that development is a strategic priority for Heather Breidenthal.</div>
+      <div class="roadmap-pain">&#128161; Pain: No Learning product in portfolio. With 34 HR staff managing 1,579 employees across 12 states, L&amp;D without a platform = manual coordination and inconsistency across regions.</div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 6: USAGE -->
+<div class="tab-panel" id="tab-6">
+  <div class="alert-box critical">
+    <div>&#128680;</div>
+    <div><strong>Critical Usage Gap:</strong> 52 events launched in past 12 months across 1,579 employees = 0.033 events/employee. YTD 2026 events = 0. L30D logins = 0. The platform is configured but effectively idle. This is the single greatest churn signal in this account.</div>
+  </div>
+
+  <div class="health-grid">
+    <div class="health-card">
+      <div class="health-score red">0</div>
+      <div class="health-label">Logins L30D <span class="metric-tip">?<span class="tip-box">Source: Unique_User_Logins_L30D_Onboard__c. Field shows 0 as of Jun 8, 2026. Sporadic daily login counts (0–8/day this week) suggest minimal system access. Last meaningful activity: unknown.</span></span></div>
+    </div>
+    <div class="health-card">
+      <div class="health-score red">52</div>
+      <div class="health-label">Events 12mo <span class="metric-tip">?<span class="tip-box">Source: Total_Events_Launched_Last_12Mos_Onboard__c. 52 events over 12 months. 52 / 1,579 employees = 0.033 events per employee. Industry benchmark for healthy utilization: &gt;0.5 events/EE. Tri Pointe is 15x below benchmark.</span></span></div>
+    </div>
+    <div class="health-card">
+      <div class="health-score red">0</div>
+      <div class="health-label">Events 30d <span class="metric-tip">?<span class="tip-box">Source: Total_Events_Launched_Last_30Ds_Onboard__c = 0. Zero events in past 30 days. Platform is inactive.</span></span></div>
+    </div>
+    <div class="health-card">
+      <div class="health-score red">0</div>
+      <div class="health-label">Events YTD <span class="metric-tip">?<span class="tip-box">Source: Total_Events_YTD_Onboard__c = 0. No events launched in calendar year 2026 as of Jun 8. Platform has not been used for any formal workflows in 2026.</span></span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Recent Activity Trend (LifeSuite, Jun 4–8)</div>
+    <div class="usage-bar-wrap">
+      <div class="usage-bar-label"><span>Jun 8 — Daily Logins</span><span>0</span></div>
+      <div class="usage-bar-bg"><div class="usage-bar-fill" style="width:0%;background:#dc2626;"></div></div>
+    </div>
+    <div class="usage-bar-wrap">
+      <div class="usage-bar-label"><span>Jun 7 — Daily Logins</span><span>0</span></div>
+      <div class="usage-bar-bg"><div class="usage-bar-fill" style="width:0%;background:#dc2626;"></div></div>
+    </div>
+    <div class="usage-bar-wrap">
+      <div class="usage-bar-label"><span>Jun 6 — Daily Logins</span><span>4</span></div>
+      <div class="usage-bar-bg"><div class="usage-bar-fill" style="width:40%;background:#d97706;"></div></div>
+    </div>
+    <div class="usage-bar-wrap">
+      <div class="usage-bar-label"><span>Jun 5 — Daily Logins</span><span>8</span></div>
+      <div class="usage-bar-bg"><div class="usage-bar-fill" style="width:80%;background:#16a34a;"></div></div>
+    </div>
+    <div class="usage-bar-wrap">
+      <div class="usage-bar-label"><span>Jun 4 — Daily Logins</span><span>8</span></div>
+      <div class="usage-bar-bg"><div class="usage-bar-fill" style="width:80%;background:#16a34a;"></div></div>
+    </div>
+    <div style="font-size:11px;color:#6b7280;margin-top:8px;">Note: This is LifeSuite_Product_Usage__c — these metrics reflect the onboarding/workflow module telemetry. Actual Perform (performance management) login data is tracked separately and not available in this field. The low LifeSuite metrics likely reflect expired Onboarding product, not necessarily Perform disengagement.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Utilization Analysis</div>
+    <div class="grid-2">
+      <div>
+        <div class="info-row"><span class="info-key">Events/Employee (12mo)</span><span class="info-val" style="color:#dc2626;font-weight:700;">0.033 (CRITICAL LOW)</span></div>
+        <div class="info-row"><span class="info-key">Benchmark Target</span><span class="info-val">&gt;0.5 events/EE = healthy</span></div>
+        <div class="info-row"><span class="info-key">Total Employees</span><span class="info-val">1,579</span></div>
+        <div class="info-row"><span class="info-key">Global Onboarding Score</span><span class="info-val">98 (legacy — Onboarding product expired)</span></div>
+        <div class="info-row"><span class="info-key">Telemetry Source</span><span class="info-val">LifeSuite_Product_Usage__c (Workflow/Onboarding module)</span></div>
+      </div>
+      <div>
+        <div class="alert-box warn" style="margin-bottom:0;">
+          <div>&#9888;</div>
+          <div><strong>Important Context:</strong> The near-zero usage telemetry reflects the expired Onboarding/Workflow product. Rival Perform (active, $65K ARR) has separate activity tracking not surfaced in these LifeSuite fields. <strong>Verify with Randy Havel:</strong> Is Perform actively being used for review cycles? If yes, usage is healthy. If no, churn risk is critical.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Services &amp; Site Review Status</div>
+    <div class="info-row"><span class="info-key">Last Site Review</span><span class="info-val" style="color:#d97706;font-weight:600;">July 30, 2025 (313 days ago)</span></div>
+    <div class="info-row"><span class="info-key">Site Review Overdue</span><span class="info-val">False (per SFDC flag)</span></div>
+    <div class="info-row"><span class="info-key">Last Onsite F2F</span><span class="info-val" style="color:#dc2626;font-weight:600;">Never — no record in SFDC</span></div>
+    <div class="info-row"><span class="info-key">Services Engagement</span><span class="info-val" style="color:#16a34a;font-weight:600;">100%</span></div>
+    <div class="info-row"><span class="info-key">Primary Service Contact</span><span class="info-val">Randy Havel (Rival) — 5 of 6 cases in 12 months</span></div>
+  </div>
+</div>
+
+<!-- TAB 7: CASES -->
+<div class="tab-panel" id="tab-7">
+  <div class="section">
+    <div class="section-title">Cases — Last 12 Months (6 total)</div>
+    <table class="data-table">
+      <tr><th>#</th><th>Subject</th><th>Status</th><th>Priority</th><th>Created</th><th>Closed</th><th>Days Open</th><th>Owner</th></tr>
+      <tr><td>00995832</td><td>Data Rules Help</td><td><span class="badge badge-green">Closed</span></td><td>4-Low</td><td>Mar 24, 2026</td><td>Mar 25, 2026</td><td>1</td><td>Randy Havel</td></tr>
+      <tr><td>00995727</td><td>FW: Customer Data from SilkRoad Technology</td><td><span class="badge badge-green">Closed</span></td><td>3-Moderate</td><td>Mar 19, 2026</td><td>Mar 23, 2026</td><td>4</td><td>Venizybelle Cuevas</td></tr>
+      <tr><td>00993369</td><td>File Feed</td><td><span class="badge badge-green">Closed</span></td><td>4-Low</td><td>Jan 28, 2026</td><td>Mar 10, 2026</td><td>41</td><td>Randy Havel</td></tr>
+      <tr style="background:#fffbeb;"><td>00990404</td><td>TriPointe Review Process</td><td><span class="badge badge-green">Closed</span></td><td>4-Low</td><td>Oct 28, 2025</td><td>Dec 17, 2025</td><td>50</td><td>Randy Havel</td></tr>
+      <tr style="background:#fef2f2;"><td>00990102</td><td><strong>Tri Pointe Notice of Non-Renewal to Rival HR</strong></td><td><span class="badge badge-red">Closed (Lost)</span></td><td>3-Moderate</td><td>Oct 20, 2025</td><td>Oct 23, 2025</td><td>3</td><td>Rica Lopez</td></tr>
+      <tr><td>00983649</td><td>Site Review</td><td><span class="badge badge-green">Closed</span></td><td>4-Low</td><td>Jun 24, 2025</td><td>Sep 10, 2025</td><td>78</td><td>Randy Havel</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Case Analysis</div>
+    <div class="grid-3">
+      <div class="stat-box">
+        <div class="stat-value green">6</div>
+        <div class="stat-label">Total Cases (12mo)</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:4px;">Low volume — not a high-support account</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value amber">29.5d</div>
+        <div class="stat-label">Avg Days to Close</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:4px;">Median: 4 days; outliers: File Feed (41d), Site Review (78d)</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value">5/6</div>
+        <div class="stat-label">Randy Havel Cases</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:4px;">Single owner dependency — continuity risk</div>
+      </div>
+    </div>
+    <div class="alert-box warn" style="margin-top:10px;">
+      <div>&#9888;</div>
+      <div><strong>Notable:</strong> Case 00990102 (Oct 2025) — "Tri Pointe Notice of Non-Renewal to Rival HR" — filed by Rica Lopez (Rival) and closed in 3 days. This was the formal Onboarding non-renewal. The Closed Lost opp (Bernard Jackson, Nov 2025) confirmed the loss. Resolution: Onboarding expired and not renewed. $25,264 ARR lost.</div>
+    </div>
+    <div class="alert-box info" style="margin-top:6px;">
+      <div>&#8505;</div>
+      <div><strong>Case 00993369 — File Feed (41 days to close):</strong> Low priority but lengthy resolution. File Feed issues typically indicate integration maintenance or data sync challenges — may be related to SilkRoad legacy integration. Verify with Randy Havel whether resolved or still monitoring.</div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 8: RISK -->
+<div class="tab-panel" id="tab-8">
+  <div class="section">
+    <div class="section-title">Risk Assessment — Monday Full Refresh, June 8, 2026</div>
+
+    <div class="risk-card red">
+      <div class="risk-title">&#128308; CRITICAL: Sumitomo Acquisition = Vendor Governance Reset</div>
+      <div class="risk-body"><strong>What:</strong> Sumitomo Forestry ($13.4B, Japan) completed $4.5B acquisition of Tri Pointe on May 14, 2026. TPH is now a wholly owned private subsidiary.<br><br><strong>Evidence:</strong> IR press release May 14, 2026. Confirmed in Q1 2026 earnings. SFDC flags "All new Leadership Team" as competitive/renewal risk. Parent company controls major vendor decisions post-acquisition.<br><br><strong>HR Implication:</strong> Post-M&amp;A cost synergy reviews are standard practice within 6–12 months of close. Rival is a $89K line item that could be reviewed by Japanese parent-assigned cost controllers who don't know the product. The Dec 2026 renewal falls squarely in the integration review window.</div>
+      <div class="risk-action">What would move to green: Confirmed that Heather Breidenthal retains full vendor authority post-acquisition with no parent approval required. Executive sponsor meeting scheduled and renewal strategy confirmed. Move to amber: Parent awareness of Rival's role; no consolidation mandate issued.</div>
+    </div>
+
+    <div class="risk-card red">
+      <div class="risk-title">&#128308; CRITICAL: Near-Zero Platform Usage (YTD Events = 0)</div>
+      <div class="risk-body"><strong>What:</strong> 52 Onboarding/Workflow events in past 12 months; 0 YTD 2026. L30D logins = 0. Events/employee = 0.033 (vs. &gt;0.5 healthy benchmark).<br><br><strong>Evidence:</strong> LifeSuite_Product_Usage__c as of Jun 8. Note: This telemetry reflects the expired Onboarding/Workflow module. Perform usage is tracked separately — verify with Randy Havel.<br><br><strong>HR Implication:</strong> If Perform (active $65K product) is also near-zero in actual use, a vendor review by Sumitomo will find no ROI. A product that sits dormant is a $89K overhead line item, not a strategic investment.</div>
+      <div class="risk-action">What would move to green: Confirm Perform is actively used for review cycles (pull Perform-specific telemetry). If yes, document and communicate value. If no, engage immediately to drive adoption before renewal.</div>
+    </div>
+
+    <div class="risk-card red">
+      <div class="risk-title">&#128308; HIGH: ARR Compression Trend — 3 Consecutive Losses</div>
+      <div class="risk-body"><strong>What:</strong> ARR has declined significantly over 3 renewal cycles: Performance $130,972 &rarr; $65,486 (50% cut, Dec 2024). Onboarding $25,265 lost entirely (Nov 2025). iCIMS won Recruiting (Sep 2024).<br><br><strong>Evidence:</strong> SFDC opportunity history. Total ARR has compressed from ~$200K+ to $89K — a &gt;55% reduction over 24 months.<br><br><strong>HR Implication:</strong> Each cycle, Rival is defending a shrinking foothold. Remaining products (Perform + Managed Services) are the last Rival presence at this account. If either churns, Rival exits entirely.</div>
+      <div class="risk-action">What would move to amber: Renewal signed at current or higher ARR by Sep 1, 2026. Clear champion identified at executive level.</div>
+    </div>
+
+    <div class="risk-card amber">
+      <div class="risk-title">&#128992; MODERATE: All New Leadership Team</div>
+      <div class="risk-body"><strong>What:</strong> SFDC Renewal_Risks_Competitive_Threats__c explicitly states "All new Leadership Team" as a risk factor alongside the iCIMS competitive loss.<br><br><strong>Evidence:</strong> SFDC competitive risk field. Sumitomo acquisition adds another layer — post-acquisition leadership changes are typical within 12 months of close.<br><br><strong>HR Implication:</strong> New leaders who didn't select Rival don't have emotional investment in the relationship. They evaluate platforms fresh. Without a champion who can articulate Rival's 10-year history, the account appears as a legacy spend.</div>
+      <div class="risk-action">What would move to green: New HR/People leadership explicitly briefed on Rival value by Heather Breidenthal. Multi-threaded relationship beyond operational contacts.</div>
+    </div>
+
+    <div class="risk-card amber">
+      <div class="risk-title">&#128992; MODERATE: Renewal Opps at 40% Probability — No Clear DM Access</div>
+      <div class="risk-body"><strong>What:</strong> Both renewal opps at Stage 5, 40% probability. Performance opp NextStep mentions "will meet with DM next week" — logged Jun 3, 2026. No confirmed meeting logged yet. Managed Services has no NextStep at all.<br><br><strong>Evidence:</strong> SFDC opportunity records. Activity log shows last meeting May 26 (Bernard Jackson). Monthly cadence active but renewal specifically not closed.<br><br><strong>HR Implication:</strong> 40% probability with 181 days to close is not comfortable. Industry standard: Stage 5 at 181 days should be 60%+. The delta signals either pricing negotiation, internal approvals, or decision-maker uncertainty.</div>
+      <div class="risk-action">What would move to green: Both opps moved to Stage 6+ with confirmed verbal commitment by Aug 1. DM meeting documented in SFDC. NextStep updated on both opps.</div>
+    </div>
+
+    <div class="risk-card amber">
+      <div class="risk-title">&#128992; MODERATE: iCIMS Competitive Presence + NPS Unknown</div>
+      <div class="risk-body"><strong>What:</strong> iCIMS won Recruiting at Tri Pointe in Sep 2024. They now have an active foothold in the HR tech stack. NPS = 0 (no response to Apr 18, 2026 send). CSAT = unverified (null in SFDC).<br><br><strong>Evidence:</strong> Closed Lost opp (iCIMS, Sep 2024). Competitive risk field. Average_NPS_Score_SFDC__c = 0.<br><br><strong>HR Implication:</strong> iCIMS is a full-suite ATS with onboarding modules. Their presence in the account creates a natural expansion path. If they offer bundled performance or onboarding capabilities, they can pitch consolidation. NPS non-response means we don't know satisfaction level.</div>
+      <div class="risk-action">What would move to green: NPS response received showing promoter score (9–10). iCIMS pitch to HR leadership does not include Performance modules. Monitor for iCIMS expansion conversations in calls.</div>
+    </div>
+
+    <div class="risk-card green">
+      <div class="risk-title">&#128994; HEALTHY: Services Engagement = 100%</div>
+      <div class="risk-body"><strong>What:</strong> Services_Engagement_Score_Percent__c = 100%. Randy Havel is the primary service contact and maintains consistent responsiveness (5 of 6 cases, fast resolution).<br><br><strong>Evidence:</strong> SFDC. Recent cases resolved in 1–4 days. Managed Services = a functioning operational relationship even during product churn.<br><br><strong>HR Implication:</strong> The Managed Services relationship is a retention anchor. Tri Pointe's small HR team relies on Randy Havel for configuration support. This is the strongest renewal argument for the Managed Services opp.</div>
+      <div class="risk-action">This is a defense asset. Lead with services relationship quality in renewal conversations. Randy Havel should be present in the renewal meeting.</div>
+    </div>
+
+    <div class="risk-card green">
+      <div class="risk-title">&#128994; HEALTHY: 10.7-Year Tenure + Strong Cross-Sell Score</div>
+      <div class="risk-body"><strong>What:</strong> Tenure_Earliest_product__c = 3,916 days (~10.7 years). Cross_Sell_Score__c = 93. Long-standing customer with deep product history (Onboarding, Recruiting, Performance, Learning, Connect — all in SilkRoad lineage).<br><br><strong>Evidence:</strong> SFDC. ZoomInfo confirms B2B public company with now $3.25B revenue.<br><br><strong>HR Implication:</strong> 10.7 years of configuration history = high switching cost if surfaced. They know Rival's platform. Replatforming after a decade is painful — use this in renewal conversations.</div>
+      <div class="risk-action">Document switching cost explicitly: years of data, configuration depth, integrations, review history. Use in renewal deck.</div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- end container -->
+
+<script>
+function switchTab(n) {
+  var panels = document.querySelectorAll('.tab-panel');
+  var btns = document.querySelectorAll('.tab-btn');
+  for (var i = 0; i < panels.length; i++) { panels[i].classList.remove('active'); }
+  for (var i = 0; i < btns.length; i++) { btns[i].classList.remove('active'); }
+  document.getElementById('tab-' + n).classList.add('active');
+  for (var i = 0; i < btns.length; i++) {
+    if (btns[i].getAttribute('onclick') === 'switchTab(' + n + ')') {
+      btns[i].classList.add('active'); break;
+    }
+  }
+}
+</script>
+</body>
+</html>
